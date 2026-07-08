@@ -1,14 +1,14 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IA Hub — CRM Comercial</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/api.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:system-ui,sans-serif;background:#f5f5f3;color:#1a1a1a;font-size:14px;}
@@ -259,122 +259,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 /* ===== NOTIF BAR ===== */
 .notif-bar{background:#0d2240;color:#fff;border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;}
 .notif-bar-txt{flex:1;font-size:13px;line-height:1.7;}
-
-/* ===== BIDATX ===== */
-:root{--bx-ink:#101A33;--bx-ink-soft:#4B5567;--bx-ink-faint:#8993A6;--bx-accent:#B6862C;--bx-accent-soft:#F2E6CC;--bx-line:#DCE1EA;--bx-line-soft:#EAEDF3;--bx-success:#1E7F5C;--bx-success-soft:#DCEFE6;--bx-warn:#B4791E;--bx-warn-soft:#F6E7CC;--bx-danger:#AC3E3E;--bx-danger-soft:#F5DEDE;}
-.bx-board{display:flex;gap:14px;overflow-x:auto;padding-bottom:14px;align-items:flex-start;}
-.bx-col{min-width:240px;max-width:240px;flex-shrink:0;}
-.bx-col-head{display:flex;align-items:center;gap:8px;padding:0 2px 10px;border-bottom:2px solid var(--bx-line);margin-bottom:12px;}
-.bx-col-num{width:20px;height:20px;border-radius:50%;background:var(--bx-accent-soft);color:#8A6418;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.bx-col-num.final{background:var(--bx-success-soft);color:var(--bx-success);}
-.bx-col-title{font-size:12px;font-weight:700;color:var(--bx-ink-soft);}
-.bx-col-meta{font-size:10px;color:var(--bx-ink-faint);margin-top:2px;}
-.bx-card{background:#fff;border:1px solid var(--bx-line);border-radius:9px;padding:12px 13px;margin-bottom:10px;cursor:pointer;}
-.bx-card:hover{box-shadow:0 4px 14px rgba(16,26,51,.10);border-color:var(--bx-ink-faint);}
-.bx-card-cliente{font-weight:600;font-size:14px;margin-bottom:6px;}
-.bx-card-valor{font-weight:600;font-size:13px;margin-bottom:8px;}
-.bx-card-valor.pendente{color:var(--bx-ink-faint);font-style:italic;font-weight:500;font-size:12px;}
-.bx-card-row{display:flex;align-items:center;justify-content:space-between;margin-top:8px;}
-.bx-pill{font-size:10px;font-weight:700;padding:3px 7px;border-radius:5px;text-transform:uppercase;}
-.bx-pill-ok{background:var(--bx-success-soft);color:var(--bx-success);}
-.bx-pill-mid{background:var(--bx-warn-soft);color:var(--bx-warn);}
-.bx-pill-bad{background:var(--bx-danger-soft);color:var(--bx-danger);}
-.bx-followup-pill{font-size:10px;font-weight:700;padding:3px 7px;border-radius:5px;display:inline-flex;align-items:center;gap:4px;}
-.bx-followup-pill.mid{background:var(--bx-warn-soft);color:var(--bx-warn);}
-.bx-followup-pill.bad{background:var(--bx-danger-soft);color:var(--bx-danger);}
-.bx-followup-panel{background:#fff;border:1px solid var(--bx-warn-soft);border-left:4px solid var(--bx-warn);border-radius:10px;padding:14px 18px;margin-bottom:14px;}
-.bx-followup-panel.bad{border-color:var(--bx-danger-soft);border-left-color:var(--bx-danger);}
-.bx-followup-title{font-size:12.5px;font-weight:700;color:var(--bx-warn);text-transform:uppercase;}
-.bx-followup-title.bad{color:var(--bx-danger);}
-.bx-pend-panel{background:#fff;border:1px solid var(--bx-danger-soft);border-left:4px solid var(--bx-danger);border-radius:10px;padding:14px 18px;margin-bottom:18px;}
-.bx-pend-title{font-size:12.5px;font-weight:700;color:var(--bx-danger);text-transform:uppercase;margin-bottom:10px;}
-.bx-pend-item{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--bx-line-soft);font-size:13px;cursor:pointer;}
-.bx-pend-item:first-of-type{border-top:none;}
-.bx-pend-cliente{font-weight:600;color:var(--bx-ink);flex:1;}
-.bx-pend-etapa{color:var(--bx-ink-faint);font-size:12px;}
-.bx-pend-dias{font-weight:700;color:var(--bx-danger);font-size:12px;}
-.bx-kpis{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:22px;}
-.bx-kpi{flex:1;min-width:160px;background:#fff;border:1px solid var(--bx-line);border-radius:10px;padding:14px 16px;}
-.bx-kpi-label{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--bx-ink-faint);font-weight:600;}
-.bx-kpi-value{font-size:20px;font-weight:600;margin-top:6px;}
-.bx-kpi-value.warn{color:var(--bx-warn);}
-.bx-ticker-wrap{overflow:hidden;background:#101A33;border-radius:10px;padding:11px 0;margin-bottom:18px;}
-.bx-ticker-track{display:flex;gap:36px;white-space:nowrap;width:max-content;animation:bxticker 28s linear infinite;padding-left:24px;}
-@keyframes bxticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
-.bx-ticker-item{color:#fff;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:8px;}
-.bx-ticker-item .v{color:#F2E6CC;}
-.bx-ativ-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--bx-line-soft);font-size:12.5px;}
-.bx-ativ-item:last-child{border-bottom:none;}
-.bx-ativ-tipo{font-weight:700;color:var(--bx-ink);min-width:110px;font-size:11.5px;}
-.bx-ativ-texto{flex:1;color:var(--bx-ink-soft);line-height:1.4;}
-.bx-ativ-meta{font-size:10.5px;color:var(--bx-ink-faint);text-align:right;}
-.bx-ativ-form{background:var(--bx-line-soft);border-radius:8px;padding:12px;margin-top:8px;margin-bottom:8px;}
-.bx-sla-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--bx-line-soft);}
-.bx-sla-row label{font-size:12.5px;color:var(--bx-ink-soft);font-weight:500;}
-.bx-timeline{list-style:none;margin:0;padding:0;}
-.bx-timeline li{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;padding:6px 0;color:var(--bx-ink-soft);}
-.bx-timeline .dot{width:6px;height:6px;border-radius:50%;background:var(--bx-accent);flex-shrink:0;margin-top:5px;}
-.bx-timeline .et{font-weight:600;color:var(--bx-ink);flex:1;}
-.bx-timeline .dt{color:var(--bx-ink-faint);}
-.bx-comissao-row{background:var(--bx-line-soft);border-radius:8px;padding:9px;margin-bottom:8px;}
-.bx-dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
-@media(max-width:880px){.bx-dash-grid{grid-template-columns:1fr;}}
-.bx-dash-card{background:#fff;border:1px solid var(--bx-line);border-radius:10px;padding:18px 20px;}
-.bx-dash-card-title{font-size:11.5px;font-weight:700;text-transform:uppercase;color:var(--bx-ink-faint);margin-bottom:14px;}
-.bx-pizza-wrap{display:flex;align-items:center;gap:20px;}
-.bx-pizza-svg{width:120px;height:120px;flex-shrink:0;}
-.bx-legend-item{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--bx-ink-soft);padding:5px 0;}
-.bx-legend-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
-.bx-rank-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--bx-line-soft);}
-.bx-rank-row:first-of-type{border-top:none;}
-.bx-rank-pos{width:26px;font-size:13px;font-weight:700;color:var(--bx-ink-faint);text-align:center;}
-.bx-rank-nome{flex:1;font-size:13px;font-weight:600;}
-.bx-rank-valor{font-size:12.5px;font-weight:600;min-width:90px;text-align:right;}
-.bx-meta-bar-bg{background:var(--bx-line-soft);border-radius:6px;height:10px;overflow:hidden;}
-.bx-meta-bar-fill{background:var(--bx-accent);height:100%;border-radius:6px;}
-.bx-funil-row{display:flex;align-items:center;gap:10px;padding:5px 0;}
-.bx-funil-label{width:210px;flex-shrink:0;font-size:12px;color:var(--bx-ink-soft);}
-.bx-funil-bar-bg{flex:1;background:var(--bx-line-soft);border-radius:5px;height:14px;overflow:hidden;}
-.bx-funil-bar-fill{background:var(--bx-ink);height:100%;border-radius:5px;}
-.bx-funil-pct{width:36px;text-align:right;font-size:11.5px;color:var(--bx-ink-faint);}
-.bx-section-title{font-size:12.5px;font-weight:700;margin:20px 0 10px;padding-top:16px;border-top:1px solid var(--bx-line-soft);display:flex;align-items:center;justify-content:space-between;}
-.bx-field{margin-bottom:14px;}
-.bx-field label{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--bx-ink-faint);margin-bottom:6px;}
-.bx-field input,.bx-field select,.bx-field textarea{width:100%;border:1px solid var(--bx-line);border-radius:7px;padding:9px 11px;font-size:13.5px;color:var(--bx-ink);background:#fff;outline:none;box-sizing:border-box;}
-.bx-field input:focus,.bx-field select:focus,.bx-field textarea:focus{border-color:var(--bx-accent);}
-.bx-row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.bx-modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:22px;padding-top:16px;border-top:1px solid var(--bx-line-soft);}
-.bx-btn{display:inline-flex;align-items:center;gap:7px;background:var(--bx-ink);color:#fff;border:none;padding:10px 16px;border-radius:8px;font-weight:600;font-size:13.5px;cursor:pointer;}
-.bx-btn:hover{background:#0A1326;}
-.bx-btn-accent{background:var(--bx-accent)!important;color:#fff!important;}
-.bx-btn-ghost{background:transparent!important;color:var(--bx-ink-soft)!important;border:1px solid var(--bx-line)!important;}
-.bx-btn-danger{background:transparent!important;color:var(--bx-danger)!important;border:1px solid var(--bx-danger-soft)!important;}
-.bx-btn-sm{padding:6px 10px!important;font-size:12.5px!important;}
-.bx-link-btn{background:none;border:none;color:var(--bx-accent);font-size:12px;font-weight:700;cursor:pointer;padding:0;}
-.bx-icon-btn{background:transparent;border:none;cursor:pointer;color:var(--bx-ink-faint);padding:3px 6px;border-radius:5px;font-size:15px;line-height:1;}
-.bx-icon-btn:hover{color:var(--bx-danger);background:var(--bx-danger-soft);}
-.bx-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
-.bx-search{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--bx-line);border-radius:8px;padding:8px 12px;flex:1;max-width:280px;}
-.bx-search input{border:none;outline:none;font-size:13.5px;width:100%;background:transparent;}
-.bx-field-select{background:#fff;border:1px solid var(--bx-line);border-radius:8px;padding:8px 10px;font-size:13.5px;color:var(--bx-ink-soft);}
-.bx-negocios-wrap{background:#fff;border:1px solid var(--bx-line);border-radius:10px;overflow:auto;}
-.bx-negocios-table{width:100%;border-collapse:collapse;}
-.bx-negocios-table th{text-align:left;font-size:11px;text-transform:uppercase;color:var(--bx-ink-faint);padding:12px 16px;border-bottom:1px solid var(--bx-line);background:var(--bx-line-soft);font-weight:700;}
-.bx-negocios-table td{padding:13px 16px;border-bottom:1px solid var(--bx-line-soft);font-size:13.5px;color:var(--bx-ink-soft);}
-.bx-negocios-table tr:last-child td{border-bottom:none;}
-.bx-negocios-table tr:hover td{background:var(--bx-line-soft);cursor:pointer;}
-.btn-nova-op{background:#0891b2;color:#fff;border:none;border-radius:20px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;}
-.btn-nova-op:hover{background:#0e7490;}
-.nou-tabs{display:flex;border-bottom:1px solid #eee;margin:14px 0 0;}
-.nou-tab{flex:1;padding:11px 0;border:none;border-bottom:2.5px solid transparent;background:none;font-size:13px;cursor:pointer;color:#888;transition:all .15s;}
-.nou-tab.active{border-bottom-color:#0891b2;color:#0891b2;font-weight:600;}
-.nou-body{padding:20px;max-height:72vh;overflow-y:auto;}
-.cli-search-wrap{position:relative;}
-.cli-dropdown{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #ddd;border-radius:8px;z-index:300;max-height:160px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.12);}
-.cli-option{padding:9px 13px;font-size:13px;cursor:pointer;color:#1a1a1a;}
-.cli-option:hover{background:#f5f5f3;}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -444,7 +329,8 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <div class="auth-err" id="login-err">Email ou senha incorretos.</div>
       <span class="auth-link" onclick="showScreen('cadastro')">Novo por aqui? Solicite seu acesso</span>
       <div class="auth-demo">
-        <strong>Demo:</strong> socio@hub.com / 1234 &nbsp;|&nbsp; assoc@hub.com / 1234 &nbsp;|&nbsp; parceiro@hub.com / 1234
+        <strong>Demo:</strong> socio@hub.com / 1234 &nbsp;|&nbsp; assoc@hub.com / 1234 &nbsp;|&nbsp; parceiro@hub.com / 1234<br>
+        <strong>CorpLink:</strong> operador@corplink.co / corplink2026
       </div>
     </div>
   </div>
@@ -505,7 +391,6 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <button id="btn-aprovacao" class="notif-btn" onclick="openAprovacaoPanel()" style="display:none" title="Membros aguardando aprovação">👥 <span class="notif-count" id="aprovacao-count" style="display:none">0</span></button>
       <span class="user-pill" id="user-pill"></span>
       <button id="btn-reservar-sala" class="btn-p" style="display:none" onclick="openAddEvento()" title="Reservar sala de reunião">📅 Reservar sala</button>
-      <button class="btn-nova-op" onclick="abrirNovaOportunidade()">+ Nova Oportunidade</button>
       <button class="btn-p" onclick="abrirMinhaArea()" title="Minha área">👤 Minha Área</button>
       <button class="btn-s" onclick="openMeuPerfil()" title="Editar meu perfil">✏ Meu perfil</button>
       <button class="btn-s" onclick="doLogout()">Sair</button>
@@ -520,6 +405,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:4px">
         <div class="section-hdr" style="margin-top:0;border-bottom:none;margin-bottom:0">Mapa de Sinergias da Rede</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-p" onclick="abrirNovoNegocio()">💼 Novo Negócio / Oportunidade</button>
           <button class="btn-p" style="background:#fff;color:#2554C7;border:1.5px solid #2554C7" onclick="abrirNovaConexao()">🔗 Nova Conexão</button>
         </div>
       </div>
@@ -543,11 +429,6 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
         <!-- Oportunidades em destaque -->
         <div class="section-hdr" style="margin-top:20px">🔥 Oportunidades de negócio em destaque</div>
         <div id="dashboard-conexoes" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:8px"></div>
-        <!-- Feed + ranking -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px" id="dashboard-feed-wrap">
-          <div id="dashboard-feed"></div>
-          <div id="dashboard-ranking-con"></div>
-        </div>
       </div>
     </div>
     <!-- MEMBROS (unificado) -->
@@ -646,7 +527,6 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
         <button class="btn-p" id="btn-nova-sin" style="display:none" onclick="openAddSin()">+ Nova sinergia</button>
       </div>
       <div class="syn-grid" id="syn-grid"></div>
-      <div id="sin-sugestoes-wrap"></div>
     </div>
     <!-- PIPELINE -->
     <div class="panel" id="tab-pipeline"></div>
@@ -658,12 +538,6 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <div class="panel" id="tab-agenda">
       <div id="agenda-inner"></div>
     </div>
-    <!-- BIDATX — FUNIL -->
-    <div class="panel" id="tab-bidatx-funil"><div id="bidatx-funil-inner"></div></div>
-    <!-- BIDATX NEG -->
-    <div class="panel" id="tab-bidatx-negocios"><div id="bidatx-negocios-inner"></div></div>
-    <!-- BIDATX CONFIG -->
-    <div class="panel" id="tab-bidatx-config"><div id="bidatx-config-inner"></div></div>
     <!-- MEU RELATÓRIO (overlay) -->
     <div class="overlay" id="ov-relatorio" style="align-items:flex-start;overflow-y:auto;padding:20px 0">
       <div style="background:#fff;border-radius:14px;width:860px;max-width:96vw;margin:auto;padding:24px;position:relative">
@@ -1007,9 +881,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <label>Prioridade</label>
     <select id="sin-p"><option value="alta">Alta</option><option value="media">Média</option></select>
     <label>Descrição detalhada *</label>
-    <textarea id="sin-why" placeholder="Explique como esses segmentos se complementam, quais oportunidades existem e como membros podem se beneficiar..." style="height:80px"></textarea>
-    <label style="margin-top:10px;display:flex;align-items:center;gap:6px">💡 Insight do Sócio <span style="font-size:11px;color:#888;font-weight:400">(visão estratégica que você enxerga além do algoritmo)</span></label>
-    <textarea id="sin-obs" placeholder="Ex: Vi que o Alex (Advocacia) está buscando um contador para um cliente específico. Esse par tem timing certo agora." style="height:70px;border-color:#F59E0B;background:#FFFBEB"></textarea>
+    <textarea id="sin-why" placeholder="Explique como esses segmentos se complementam, quais oportunidades existem e como membros podem se beneficiar..." style="height:100px"></textarea>
     <div class="modal-btns">
       <button class="btn-s" onclick="closeOv('ov-sin')">Cancelar</button>
       <button class="btn-p" onclick="saveSin()">Salvar</button>
@@ -1028,22 +900,6 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 
 <div id="toast"></div>
 
-<!-- Modal unificado Nova Oportunidade -->
-<div class="overlay" id="ov-nova-op">
-  <div class="modal" style="max-width:680px;width:95%;padding:0;overflow:visible;">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px 0">
-      <h2 style="font-size:16px;font-weight:600;color:#0a1628">Nova Oportunidade de Negócio</h2>
-      <button onclick="closeOv('ov-nova-op')" style="background:none;border:none;cursor:pointer;font-size:20px;color:#aaa;line-height:1;padding:0">✕</button>
-    </div>
-    <div class="nou-tabs">
-      <button class="nou-tab active" id="nou-tab-trib" onclick="nouSwitchTab('trib')">🏦 Projeto Tributário</button>
-      <button class="nou-tab" id="nou-tab-hub" onclick="nouSwitchTab('hub')">💼 Outros Negócios (Hub)</button>
-      <button class="nou-tab" id="nou-tab-propor" onclick="nouSwitchTab('propor')">💡 Propor Ideia</button>
-    </div>
-    <div class="nou-body" id="nou-body"></div>
-  </div>
-</div>
-
 <!-- Modal aprovação de membros -->
 <div class="overlay" id="ov-aprovacao">
   <div class="modal" style="width:580px;max-height:85vh;overflow-y:auto">
@@ -1052,6 +908,26 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <button class="btn-s" onclick="closeOv('ov-aprovacao')" style="font-size:16px;padding:4px 10px">✕</button>
     </div>
     <div id="aprovacao-list"></div>
+  </div>
+</div>
+
+<!-- Modal Onboarding (Item 14) -->
+<div class="overlay" id="ov-onboarding">
+  <div class="modal" style="width:460px;background:linear-gradient(135deg,#0a1628 0%,#0d2240 60%,#0a3355 100%);border:none;color:#fff">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+      <span style="font-size:32px">👋</span>
+      <div>
+        <div style="font-size:18px;font-weight:700">Bem-vindo ao IA Hub!</div>
+        <div style="font-size:13px;opacity:.7;margin-top:2px">Complete esses passos para aproveitar ao máximo a rede</div>
+      </div>
+    </div>
+    <div id="onboarding-body"></div>
+    <div style="margin-top:18px;display:flex;gap:8px">
+      <button class="btn-p" style="flex:1;background:linear-gradient(90deg,#2554C7,#06b6d4)" onclick="fecharOnboarding()">Entendido — vamos lá! 🚀</button>
+    </div>
+    <div style="margin-top:10px;text-align:center">
+      <span style="font-size:11px;opacity:.5;cursor:pointer" onclick="fecharOnboarding()">Fechar e não mostrar novamente</span>
+    </div>
   </div>
 </div>
 
@@ -1073,9 +949,6 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
   </div>
 </div>
 
-
-<!-- BIDATX Modal -->
-<div class="overlay" id="ov-bidatx-op"><div class="modal" style="max-width:700px;width:95%;max-height:90vh;overflow-y:auto;"><div class="modal-hdr"><span id="bidatx-modal-title">Oportunidade Tributária</span><button class="close-btn" onclick="closeOv('ov-bidatx-op')">&#x2715;</button></div><div id="bidatx-projeto-body"></div></div></div>
 <script>
 // ===================== DADOS =====================
 const SEG_C={
@@ -1100,34 +973,35 @@ const SEG_C={
   'Pessoa Física':{bg:'#fef3c7',tx:'#92400e',dot:'#d97706'},
 };
 function sc(s){return SEG_C[s]||{bg:'#F1EFE8',tx:'#444441',dot:'#888780'};}
-const PS={Sócio:{bg:'#FAEEDA',tx:'#633806'},Associado:{bg:'#E1F5EE',tx:'#085041'},Parceiro:{bg:'#E6F1FB',tx:'#0C447C'}};
+const PS={Sócio:{bg:'#FAEEDA',tx:'#633806'},Associado:{bg:'#E1F5EE',tx:'#085041'},Parceiro:{bg:'#E6F1FB',tx:'#0C447C'},Operador:{bg:'#1e3a5f',tx:'#fff'}};
 const FUNIL_CLS={Prospect:'f-prospect','Contato feito':'f-contato','Proposta enviada':'f-proposta',Fechado:'f-fechado'};
 const PROJ_CLS={'Em andamento':'proj-and',Concluído:'proj-conc',Pausado:'proj-paus'};
 
 let users=[
-  {id:1,nome:'Sócio Demo',emp:'IA Hub',email:'socio@hub.com',senha:'1234',tel:'',perfil:'Sócio',status:'Ativo',funil:'Fechado',seg:'Gestão',ativ:'Gestão geral do IA Hub.',obs:'',desde:'01/01/2025'},
-  {id:2,nome:'Eduardo Santos',emp:'Plan Contabilidade',email:'assoc@hub.com',senha:'1234',tel:'(21) 99000-0001',perfil:'Associado',status:'Ativo',funil:'Contato feito',seg:'Contabilidade',ativ:'BPO financeiro, abertura de empresas, planejamento tributário e compliance fiscal para PMEs.',obs:'',desde:'15/03/2025'},
-  {id:3,nome:'Diego Braga',emp:'Aliança',email:'parceiro@hub.com',senha:'1234',tel:'(21) 99000-0002',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Produtos de Limpeza,Lar de Idosos,Home Care',ativ:'Distribuidora de produtos de limpeza e higiene para empresas, hospitais e restaurantes.',obs:'',desde:'20/05/2025'},
-  {id:4,nome:'Alex Salles',emp:'Alex Salles Adv.',email:'alex@hub.com',senha:'1234',tel:'',perfil:'Associado',status:'Ativo',funil:'Prospect',seg:'Advocacia',ativ:'Escritório de advocacia empresarial.',obs:'',desde:'01/01/2025'},
-  {id:5,nome:'Lipe de Biase',emp:'Taurus Investimento',email:'lipe@hub.com',senha:'1234',tel:'',perfil:'Associado',status:'Ativo',funil:'Prospect',seg:'Mercado Financeiro',ativ:'Gestão de investimentos e consultoria financeira para empresas e pessoas físicas.',obs:'',desde:'01/01/2025'},
-  {id:6,nome:'Ricardo Savino',emp:'',email:'rsavino@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Blindagem de Veículos,Restaurante',ativ:'Blindagem de veículos e restaurante.',obs:'',desde:'01/01/2025'},
-  {id:7,nome:'Marcus Soares',emp:'Marcus Soares Adv',email:'marcus@hub.com',senha:'1234',tel:'',perfil:'Associado',status:'Ativo',funil:'Prospect',seg:'Advocacia',ativ:'Advocacia cível e empresarial.',obs:'',desde:'01/01/2025'},
-  {id:8,nome:'André Reis',emp:'Mastermax',email:'andre.reis@hub.com',senha:'1234',tel:'',perfil:'Associado',status:'Ativo',funil:'Prospect',seg:'Contabilidade',ativ:'Contabilidade empresarial e fiscal.',obs:'',desde:'01/01/2025'},
-  {id:9,nome:'Fabio Sampaio',emp:'Mundo das Cores',email:'fabio@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Loja de Tintas,Consultoria Financeira',ativ:'Loja de tintas e consultoria financeira.',obs:'',desde:'01/01/2025'},
-  {id:10,nome:'Anselmo',emp:'Lasant',email:'anselmo@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Construção,Loja de Tintas',ativ:'Construção civil e fornecimento de tintas.',obs:'',desde:'01/01/2025'},
-  {id:11,nome:'Edgard Romero',emp:'',email:'edgard@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Locação de Veículos',ativ:'Locação de veículos para empresas.',obs:'',desde:'01/01/2025'},
-  {id:12,nome:'Rafael Matias',emp:'',email:'rafael@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Corretagem de Imóveis',ativ:'Corretagem e intermediação imobiliária.',obs:'',desde:'01/01/2025'},
-  {id:13,nome:'Juninho',emp:'LM Veículos',email:'juninho@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Venda de Veículos',ativ:'Compra e venda de veículos novos e seminovos.',obs:'',desde:'01/01/2025'},
-  {id:14,nome:'Marcelo Montenegro',emp:'213 Sports',email:'marcelo.m@hub.com',senha:'1234',tel:'',perfil:'Associado',status:'Ativo',funil:'Prospect',seg:'Mercado Esportivo,Eventos Corporativos',ativ:'Eventos esportivos corporativos e patrocínios.',obs:'',desde:'01/01/2025'},
-  {id:15,nome:'Pedro Dau',emp:'V3A',email:'pedro.dau@hub.com',senha:'1234',tel:'',perfil:'Associado',status:'Ativo',funil:'Prospect',seg:'Eventos Corporativos',ativ:'Produção de eventos corporativos.',obs:'',desde:'01/01/2025'},
-  {id:16,nome:'André Barbosa',emp:'',email:'andre.b@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Lobista',ativ:'Atuação política e lobby legislativo.',obs:'',desde:'01/01/2025'},
-  {id:17,nome:'Alexandre Almeida',emp:'',email:'alexandre@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Corretora de Seguros',ativ:'Corretagem de seguros pessoais e empresariais.',obs:'',desde:'01/01/2025'},
-  {id:18,nome:'Paulo BH',emp:'',email:'paulo@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Imobiliária',ativ:'Incorporação e venda imobiliária.',obs:'',desde:'01/01/2025'},
-  {id:19,nome:'Gustavo Kalife',emp:'',email:'gustavo@hub.com',senha:'1234',tel:'',perfil:'Associado',status:'Ativo',funil:'Prospect',seg:'Advocacia,Contabilidade',ativ:'Advocacia e consultoria contábil.',obs:'',desde:'01/01/2025'},
-  {id:20,nome:'Nonato',emp:'',email:'nonato@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Tributarista,Lobista',ativ:'Tributarista e lobista.',obs:'',desde:'01/01/2025'},
-  {id:21,nome:'Daniel Sá',emp:'',tipo:'PF',email:'daniel@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Agro',ativ:'Agronegócio e sustentabilidade.',obs:'',desde:'01/01/2025'},
-  {id:22,nome:'Pedro de Biase',emp:'',email:'pedro.b@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Mercado Financeiro',ativ:'Mercado financeiro e investimentos.',obs:'',desde:'01/01/2025'},
-  {id:23,nome:'Bernardo Montenegro',emp:'Grupo Malta',email:'bernardo@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Restaurante',ativ:'Rede de restaurantes e food service.',obs:'',desde:'01/01/2025'},
+  {id:1,nome:'Sócio Demo',emp:'IA Hub',email:'socio@hub.com',senha:'1234',tel:'',perfil:'Sócio',status:'Ativo',funil:'Fechado',seg:'Gestão',ativ:'Gestão geral do IA Hub.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:2,nome:'Eduardo Santos',emp:'Plan Contabilidade',email:'assoc@hub.com',senha:'1234',tel:'(21) 99000-0001',perfil:'Associado',status:'Ativo',funil:'Contato feito',seg:'Contabilidade',ativ:'BPO financeiro, abertura de empresas, planejamento tributário e compliance fiscal para PMEs.',obs:'',desde:'15/03/2025',dataEntrada:'2025-03-15T00:00:00.000Z',aprovadoPor:1},
+  {id:3,nome:'Diego Braga',emp:'Aliança',email:'parceiro@hub.com',senha:'1234',tel:'(21) 99000-0002',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Produtos de Limpeza,Lar de Idosos,Home Care',ativ:'Distribuidora de produtos de limpeza e higiene para empresas, hospitais e restaurantes.',obs:'',desde:'20/05/2025',dataEntrada:'2025-05-20T00:00:00.000Z',aprovadoPor:1},
+  {id:4,nome:'Alex Salles',emp:'Alex Salles Adv.',email:'alex@hub.com',senha:'1234',tel:'',perfil:'Associado',status:'Ativo',funil:'Prospect',seg:'Advocacia',ativ:'Escritório de advocacia empresarial.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:5,nome:'Lipe de Biase',emp:'Taurus Investimento',email:'lipe@hub.com',senha:'1234',tel:'',perfil:'Associado',status:'Ativo',funil:'Prospect',seg:'Mercado Financeiro',ativ:'Gestão de investimentos e consultoria financeira para empresas e pessoas físicas.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:6,nome:'Ricardo Savino',emp:'?',email:'rsavino@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Blindagem de Veículos,Restaurante',ativ:'Blindagem de veículos e restaurante.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:7,nome:'Marcus Soares',emp:'Marcus Soares Adv',email:'marcus@hub.com',senha:'1234',tel:'',perfil:'Associado',status:'Ativo',funil:'Prospect',seg:'Advocacia',ativ:'Advocacia cível e empresarial.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:8,nome:'André Reis',emp:'Mastermax',email:'andre.reis@hub.com',senha:'1234',tel:'',perfil:'Associado',status:'Ativo',funil:'Prospect',seg:'Contabilidade',ativ:'Contabilidade empresarial e fiscal.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:9,nome:'Fabio Sampaio',emp:'Mundo das Cores',email:'fabio@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Loja de Tintas,Consultoria Financeira',ativ:'Loja de tintas e consultoria financeira.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:10,nome:'Anselmo',emp:'Lasant',email:'anselmo@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Construção,Loja de Tintas',ativ:'Construção civil e fornecimento de tintas.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:11,nome:'Edgard Romero',emp:'?',email:'edgard@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Locação de Veículos',ativ:'Locação de veículos para empresas.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:12,nome:'Rafael Matias',emp:'?',email:'rafael@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Corretagem de Imóveis',ativ:'Corretagem e intermediação imobiliária.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:13,nome:'Juninho',emp:'LM Veículos',email:'juninho@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Venda de Veículos',ativ:'Compra e venda de veículos novos e seminovos.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:14,nome:'Marcelo Montenegro',emp:'213 Sports',email:'marcelo.m@hub.com',senha:'1234',tel:'',perfil:'Associado',status:'Ativo',funil:'Prospect',seg:'Mercado Esportivo,Eventos Corporativos',ativ:'Eventos esportivos corporativos e patrocínios.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:15,nome:'Pedro Dau',emp:'V3A',email:'pedro.dau@hub.com',senha:'1234',tel:'',perfil:'Associado',status:'Ativo',funil:'Prospect',seg:'Eventos Corporativos',ativ:'Produção de eventos corporativos.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:16,nome:'André Barbosa',emp:'?',email:'andre.b@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Lobista',ativ:'Atuação política e lobby legislativo.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:17,nome:'Alexandre Almeida',emp:'?',email:'alexandre@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Corretora de Seguros',ativ:'Corretagem de seguros pessoais e empresariais.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:18,nome:'Paulo BH',emp:'?',email:'paulo@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Imobiliária',ativ:'Incorporação e venda imobiliária.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:19,nome:'Gustavo Kalife',emp:'?',email:'gustavo@hub.com',senha:'1234',tel:'',perfil:'Associado',status:'Ativo',funil:'Prospect',seg:'Advocacia,Contabilidade',ativ:'Advocacia e consultoria contábil.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:20,nome:'Nonato',emp:'?',email:'nonato@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Tributarista,Lobista',ativ:'Tributarista e lobista.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:21,nome:'Daniel Sá',emp:'?',tipo:'PF',email:'daniel@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Agro',ativ:'Agronegócio e sustentabilidade.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:22,nome:'Pedro de Biase',emp:'?',email:'pedro.b@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Mercado Financeiro',ativ:'Mercado financeiro e investimentos.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:23,nome:'Bernardo Montenegro',emp:'Grupo Malta',email:'bernardo@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Restaurante',ativ:'Rede de restaurantes e food service.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:24,nome:'Operador CorpLink',emp:'CorpLink',email:'operador@corplink.co',senha:'corplink2026',perfil:'Operador',status:'Ativo',seg:'CorpLink',ativ:['Gestão de Parceria'],vinculoId:null,comissao:0},
 ];
 
 // Convidados externos cadastrados via agenda
@@ -1165,43 +1039,6 @@ let currentUser=null;
 let editUsrId=null,editProjId=null,editLancId=null,editSinId=null;
 let chartInstances={};
 
-// ===================== BIDATX — Constantes e Dados =====================
-let bidatxEtapas = ["Originação","Triagem","Diagnóstico","Contratação","Execução","Liquidação"];
-const BIDATX_ETAPA_FINAL = "Concluído";
-function allBidatxEtapas(){return [...bidatxEtapas, BIDATX_ETAPA_FINAL];}
-const ORIGENS_LEAD = ["Contador","Advogado","Gestor","Indicação PF","Hub Comercial","Sócio","Outro"];
-const TIPOS_EXECUCAO = ["PER/DCOMP","Retificação MS","Execução Cruzada (Law/Book/Biz)"];
-const PAPEIS_COMISSAO = ["Indicação","Vendedor Responsável","Parceiro","Sócio Gestor","Outro"];
-const TIPOS_NEGOCIO = ["Recuperação Tributária","Consultoria","Transação Tributária"];
-
-let bidatxClientes = [
-  {id:'c1', nome:'Indústria Vale do Aço Ltda', documento:'11.222.333/0001-44', contato:'financeiro@valedoaco.com.br'},
-  {id:'c2', nome:'Comércio Bom Preço Ltda', documento:'22.333.444/0001-55', contato:'(31) 3344-5566'},
-  {id:'c3', nome:'Metalúrgica Rio Claro Ltda', documento:'', contato:''},
-];
-
-let bidatxOportunidades = [
-  {id:'bx1',clienteId:'c1',tipoNegocio:'Recuperação Tributária',origemLead:'Hub Comercial',vendedorId:2,etapa:'Diagnóstico',valorApurado:null,taxaHonorario:null,historico:[{etapa:'Originação',data:'2024-04-01'},{etapa:'Triagem',data:'2024-04-05'},{etapa:'Diagnóstico',data:'2024-04-15'}],comissoes:[{id:'bxc1a',playerId:2,papel:'Vendedor Responsável',tipo:'pct',valor:5},{id:'bxc1b',playerId:1,papel:'Indicação',tipo:'pct',valor:2}],atividades:[],tipoExecucao:'',observacoes:'',followUpDate:null,createdAt:'2024-04-01'},
-  {id:'bx2',clienteId:'c2',tipoNegocio:'Recuperação Tributária',origemLead:'Contador',vendedorId:3,etapa:'Execução',valorApurado:920000,taxaHonorario:8,historico:[{etapa:'Originação',data:'2024-02-10'},{etapa:'Triagem',data:'2024-02-18'},{etapa:'Diagnóstico',data:'2024-03-01'},{etapa:'Contratação',data:'2024-03-20'},{etapa:'Execução',data:'2024-04-05'}],comissoes:[{id:'bxc2a',playerId:3,papel:'Vendedor Responsável',tipo:'pct',valor:8}],atividades:[],tipoExecucao:'PER/DCOMP',observacoes:'',followUpDate:null,createdAt:'2024-02-10'},
-  {id:'bx3',clienteId:'c1',tipoNegocio:'Recuperação Tributária',origemLead:'Advogado',vendedorId:1,etapa:'Contratação',valorApurado:150000,taxaHonorario:6,historico:[{etapa:'Originação',data:'2024-03-15'},{etapa:'Triagem',data:'2024-03-22'},{etapa:'Diagnóstico',data:'2024-04-01'},{etapa:'Contratação',data:'2024-04-18'}],comissoes:[{id:'bxc3a',playerId:1,papel:'Vendedor Responsável',tipo:'pct',valor:6}],atividades:[],tipoExecucao:'Retificação MS',observacoes:'',followUpDate:null,createdAt:'2024-03-15'},
-  {id:'bx4',clienteId:'c2',tipoNegocio:'Recuperação Tributária',origemLead:'Indicação PF',vendedorId:2,etapa:'Concluído',valorApurado:60000,taxaHonorario:5,historico:[{etapa:'Originação',data:'2023-11-01'},{etapa:'Triagem',data:'2023-11-10'},{etapa:'Diagnóstico',data:'2023-11-25'},{etapa:'Contratação',data:'2023-12-10'},{etapa:'Execução',data:'2024-01-05'},{etapa:'Liquidação',data:'2024-02-15'},{etapa:'Concluído',data:'2024-02-28'}],comissoes:[{id:'bxc4a',playerId:2,papel:'Vendedor Responsável',tipo:'fixo',valor:3000}],atividades:[],tipoExecucao:'PER/DCOMP',observacoes:'',followUpDate:null,createdAt:'2023-11-01'},
-  {id:'bx5',clienteId:'c3',tipoNegocio:'Recuperação Tributária',origemLead:'Gestor',vendedorId:2,etapa:'Triagem',valorApurado:null,taxaHonorario:null,historico:[{etapa:'Originação',data:'2024-05-01'},{etapa:'Triagem',data:'2024-05-05'}],comissoes:[],atividades:[],tipoExecucao:'',observacoes:'',followUpDate:null,createdAt:'2024-05-01'},
-  {id:'bx6',clienteId:'c1',tipoNegocio:'Consultoria',origemLead:'Hub Comercial',vendedorId:1,etapa:'Prospecção',valorApurado:80000,taxaHonorario:12,historico:[{etapa:'Prospecção',data:'2024-03-20'}],comissoes:[{id:'bxc6a',playerId:1,papel:'Vendedor Responsável',tipo:'pct',valor:12}],atividades:[],tipoExecucao:'',observacoes:'Consultoria tributária preventiva',followUpDate:null,createdAt:'2024-03-20'},
-];
-
-let bidatxEtapasConsultoria = ['Prospecção','Contrato Assinado','Entrega'];
-let bidatxEtapasTT = [];
-let bidatxSlaConfig = {Originação:3,Triagem:7,Diagnóstico:30,Contratação:15,Execução:60,Liquidação:5,Prospecção:7,'Contrato Assinado':15,Entrega:30};
-let bidatxFollowUpConfig = {Originação:3,Triagem:7,Diagnóstico:30,Contratação:15,Prospecção:7};
-function bidatxGetEtapas(tipo){
-  if(tipo==='Consultoria')return[...bidatxEtapasConsultoria,BIDATX_ETAPA_FINAL];
-  if(tipo==='Transação Tributária')return bidatxEtapasTT.length?[...bidatxEtapasTT,BIDATX_ETAPA_FINAL]:[...bidatxEtapas,BIDATX_ETAPA_FINAL];
-  return[...bidatxEtapas,BIDATX_ETAPA_FINAL];
-}
-let bidatxMetaMensal = 300000;
-let bidatxEditId = null;
-
-
 // ===================== TELAS =====================
 function showScreen(name){
   document.getElementById('screen-login').style.display='none';
@@ -1232,7 +1069,15 @@ function doLogin(){
   currentUser=u;
   setupMain();
   showScreen('main');
-  showTab('rede');
+  if(isOperador()){
+    showTab('conexoes');
+  } else {
+    showTab('rede');
+    // Item 14: Onboarding para novos membros (não Sócios)
+    if(u.perfil!=='Sócio'&&!u.onboardingConcluido){
+      setTimeout(()=>mostrarOnboarding(),600);
+    }
+  }
 }
 function doLogout(){currentUser=null;showScreen('login');}
 function isSocio(){return currentUser&&currentUser.perfil==='Sócio';}
@@ -1267,9 +1112,32 @@ function setupMain(){
   // Botão "Reservar sala" aparece só para não sócios
   const btnRS=document.getElementById('btn-reservar-sala');
   if(btnRS)btnRS.style.display=isSocio()?'none':'inline-block';
+  // Operador: esconder botões desnecessários
+  if(isOperador()){
+    ['btn-aprovacao','notif-btn','btn-reservar-sala'].forEach(id=>{
+      const el=document.getElementById(id);if(el)el.style.display='none';
+    });
+    const btnMinhaArea=document.querySelector('button[onclick="abrirMinhaArea()"]');
+    if(btnMinhaArea)btnMinhaArea.style.display='none';
+    const btnPerfil=document.querySelector('button[onclick="openMeuPerfil()"]');
+    if(btnPerfil)btnPerfil.style.display='none';
+  }
 }
 
+function isOperador(){return currentUser&&currentUser.perfil==='Operador';}
+
 function buildTabs(){
+  // Operador só vê a aba de Conexões
+  if(isOperador()){
+    const bar=document.getElementById('tabs-bar');
+    bar.innerHTML='';
+    const btn=document.createElement('button');
+    btn.className='tab';btn.id='tbtn-conexoes';
+    btn.textContent='Nova Conexão CorpLink';
+    btn.onclick=()=>showTab('conexoes');
+    bar.appendChild(btn);
+    return;
+  }
   const tabDefs=[
     {id:'rede',label:'Mapa da Rede',all:true},
     {id:'rede-membros',label:'Membros',all:true},
@@ -1280,9 +1148,6 @@ function buildTabs(){
     {id:'pipeline',label:'Pipeline',socio:true},
     {id:'meus-rendimentos',label:'Meus Rendimentos',notSocio:true},
     {id:'relatorio-rede',label:'Relatório da Rede',socio:true},
-    {id:'bidatx-funil',label:'Tributário — Funil',all:true},
-    {id:'bidatx-negocios',label:'Tributário — Negócios',socio:true},
-    {id:'bidatx-config',label:'Tributário — Config',socio:true},
   ];
   const bar=document.getElementById('tabs-bar');
   bar.innerHTML='';
@@ -1298,9 +1163,18 @@ function buildTabs(){
   });
 }
 
-let currentTabName='rede';
 function showTab(name){
-  currentTabName=name;
+  // Operador só pode ver a tela de nova conexão
+  if(isOperador()){
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    const panel=document.getElementById('tab-conexoes');
+    if(panel)panel.classList.add('active');
+    const tbtn=document.getElementById('tbtn-conexoes');
+    if(tbtn)tbtn.classList.add('active');
+    renderOperadorView();
+    return;
+  }
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   const panel=document.getElementById('tab-'+name);
@@ -1316,9 +1190,11 @@ function showTab(name){
   if(name==='pipeline')renderPipeline();
   if(name==='meus-rendimentos')renderMeusRendimentos();
   if(name==='relatorio-rede')renderRelatorioRede();
-  if(name==='bidatx-funil')bidatx.renderFunil();
-  if(name==='bidatx-negocios')bidatx.renderNegocios();
-  if(name==='bidatx-config')bidatx.renderConfig();
+  // Marcar que o user viu a aba de conexões (para onboarding)
+  if(name==='rede-membros'||name==='conexoes'){
+    const idx=users.findIndex(u=>u.id===currentUser.id);
+    if(idx>=0&&!users[idx].viuMatches){users[idx].viuMatches=true;currentUser.viuMatches=true;saveData();}
+  }
 }
 
 function initFilters(){
@@ -1331,282 +1207,8 @@ function initFilters(){
 }
 
 function closeOv(id){document.getElementById(id).classList.remove('open');}
-
-// ===================== NOVA OPORTUNIDADE UNIFICADA =====================
-function abrirNovaOportunidade(){
-  bidatxEditId=null;
-  document.getElementById('ov-nova-op').classList.add('open');
-  nouSwitchTab('trib');
-}
-
-function nouSwitchTab(tab){
-  document.querySelectorAll('.nou-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('nou-tab-'+tab).classList.add('active');
-  if(tab==='trib'){
-    document.getElementById('nou-body').innerHTML=nouBuildTribForm();
-  } else if(tab==='hub'){
-    if(!isSocio()){showToast('Somente sócios podem criar projetos Hub.');document.getElementById('nou-tab-trib').classList.add('active');document.getElementById('nou-tab-hub').classList.remove('active');return;}
-    document.getElementById('nou-body').innerHTML=nouBuildHubForm();
-    nouRefreshHubParts();
-  } else {
-    document.getElementById('nou-body').innerHTML=nouBuildProporForm();
-  }
-}
-
-function nouBuildProporForm(){
-  return`
-    <div class="bx-field">
-      <label>Título da oportunidade *</label>
-      <input id="nprop-titulo" placeholder="Ex: Grande varejista buscando automação fiscal" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px">
-    </div>
-    <div class="bx-field" style="margin-top:8px">
-      <label>Descrição detalhada *</label>
-      <textarea id="nprop-desc" rows="3" placeholder="Descreva o perfil, o desafio e o potencial de negócio sem revelar dados da empresa..." style="resize:vertical;width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px"></textarea>
-    </div>
-    <div class="bx-row2" style="margin-top:8px">
-      <div class="bx-field">
-        <label>Segmento / Indústria</label>
-        <input id="nprop-seg" placeholder="Ex: Varejo, Agronegócio, Saúde..." style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px">
-      </div>
-      <div class="bx-field">
-        <label>Segmentos da rede com maior fit</label>
-        <input id="nprop-alvo" placeholder="Ex: Contabilidade, TI, Jurídico..." style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px">
-      </div>
-    </div>
-    <div style="margin-top:12px;padding:10px 14px;background:#fef9c3;border-radius:8px;font-size:12px;color:#854d0e">
-      ⏳ Sua proposta será revisada pelos sócios antes de ser visível para a rede.
-    </div>
-    <div class="bx-modal-actions" style="border-top:1px solid #eee;margin-top:16px;padding-top:14px">
-      <button class="bx-btn bx-btn-ghost bx-btn-sm" onclick="closeOv('ov-nova-op')">Cancelar</button>
-      <button class="bx-btn bx-btn-accent bx-btn-sm" onclick="nouSalvarPropor()">Enviar para moderação</button>
-    </div>
-  `;
-}
-
-function nouSalvarPropor(){
-  const titulo=(document.getElementById('nprop-titulo').value||'').trim();
-  const desc=(document.getElementById('nprop-desc').value||'').trim();
-  if(!titulo||!desc){showToast('Título e descrição são obrigatórios.');return;}
-  oportunidadesPendentes.push({
-    id:Date.now(),titulo,desc,
-    segmento:(document.getElementById('nprop-seg').value||'').trim(),
-    segmentoAlvo:(document.getElementById('nprop-alvo').value||'').trim(),
-    porte:'',acesso:'',
-    proponenteId:currentUser.id,
-    status:'pendente',
-    criado:new Date().toLocaleDateString('pt-BR')
-  });
-  const socios=users.filter(u=>u.perfil==='Sócio').map(u=>u.id);
-  notificacoes.push({id:Date.now(),txt:`💡 Nova ideia proposta por ${currentUser.nome}: "${titulo}". Aguardando moderação.`,ts:Date.now(),lido:false,destinos:socios});
-  updateNotifBadge();saveData();
-  closeOv('ov-nova-op');
-  showToast('✅ Proposta enviada! Os sócios irão revisar em breve.');
-}
-
-function nouBuildHubForm(){
-  const statusOpts=['Em andamento','Concluído','Pausado'].map(s=>`<option>${s}</option>`).join('');
-  const recorrOpts=['','Mensal','Trimestral','Anual'].map(s=>`<option value="${s}">${s||'Não'}</option>`).join('');
-  return`
-    <div class="bx-field">
-      <label>Nome do projeto *</label>
-      <input id="nhub-nome" placeholder="Nome do projeto" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px">
-    </div>
-    <div class="bx-field" style="margin-top:8px">
-      <label>Descrição</label>
-      <textarea id="nhub-desc" rows="2" placeholder="Objetivo, escopo e entregas..." style="resize:vertical;width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px"></textarea>
-    </div>
-    <div class="bx-row2" style="margin-top:8px">
-      <div class="bx-field"><label>Status</label><select id="nhub-status">${statusOpts}</select></div>
-      <div class="bx-field"><label>Valor total (R$)</label><input id="nhub-valor" type="number" placeholder="0" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px"></div>
-    </div>
-    <div class="bx-row2" style="margin-top:8px">
-      <div class="bx-field"><label>Data de início</label><input id="nhub-inicio" type="date" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px"></div>
-      <div class="bx-field"><label>Previsão de conclusão</label><input id="nhub-fim" type="date" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px"></div>
-    </div>
-    <div class="bx-field" style="margin-top:8px">
-      <label>Sinergia explorada</label>
-      <input id="nhub-sin" placeholder="Ex: Advocacia ↔ Contabilidade" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px">
-    </div>
-    <div class="bx-field" style="margin-top:8px">
-      <label>Participantes</label>
-      <select id="nhub-parts" multiple style="width:100%;height:90px;padding:4px;border:1px solid #ddd;border-radius:8px;font-size:13px" onchange="nouBuildHubDist()"></select>
-      <div style="font-size:11px;color:#aaa;margin-top:3px">Segure Ctrl para selecionar mais de um</div>
-    </div>
-    <div class="bx-field" style="margin-top:8px">
-      <label>Distribuição de rendimentos (%)</label>
-      <div id="nhub-dist-wrap" style="font-size:13px;color:#aaa;margin-top:4px">Selecione participantes acima</div>
-    </div>
-    <div class="bx-field" style="margin-top:8px">
-      <label>1º follow-up / observações</label>
-      <textarea id="nhub-fu1" rows="2" placeholder="Registro inicial..." style="resize:vertical;width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px"></textarea>
-    </div>
-    <div class="bx-modal-actions" style="border-top:1px solid #eee;margin-top:16px;padding-top:14px">
-      <span style="font-size:11.5px;color:#aaa">Campos adicionais disponíveis ao editar o projeto.</span>
-      <button class="bx-btn bx-btn-ghost bx-btn-sm" onclick="closeOv('ov-nova-op')">Cancelar</button>
-      <button class="bx-btn bx-btn-accent bx-btn-sm" onclick="nouSalvarHub()">Salvar projeto</button>
-    </div>
-  `;
-}
-
-function nouRefreshHubParts(){
-  const sel=document.getElementById('nhub-parts');if(!sel)return;
-  sel.innerHTML='';
-  users.filter(u=>u.status==='Ativo').forEach(u=>{
-    const o=document.createElement('option');o.value=u.id;o.text=`${u.nome} (${u.perfil})`;sel.appendChild(o);
-  });
-}
-
-function nouBuildHubDist(){
-  const sel=document.getElementById('nhub-parts');if(!sel)return;
-  const parts=Array.from(sel.selectedOptions).map(o=>parseInt(o.value));
-  const wrap=document.getElementById('nhub-dist-wrap');if(!wrap)return;
-  if(!parts.length){wrap.innerHTML='<span style="color:#aaa;font-size:13px">Selecione participantes acima</span>';return;}
-  const eq=Math.floor(100/parts.length);
-  wrap.innerHTML=parts.map(id=>{const u=users.find(x=>x.id===id);
-    return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="flex:1;font-size:13px">${u?u.nome:'?'}</span><input type="number" id="nhub-dist-${id}" value="${eq}" min="0" max="100" style="width:70px;padding:4px 8px;border:1px solid #ddd;border-radius:6px;font-size:13px"> %</div>`;
-  }).join('');
-}
-
-function nouSalvarHub(){
-  if(!isSocio())return;
-  const nome=document.getElementById('nhub-nome').value.trim();
-  if(!nome){showToast('Informe o nome do projeto.');return;}
-  const parts=Array.from(document.getElementById('nhub-parts').selectedOptions).map(o=>parseInt(o.value));
-  const dist={};parts.forEach(id=>{const el=document.getElementById('nhub-dist-'+id);if(el)dist[id]=parseInt(el.value)||0;});
-  const fu1=(document.getElementById('nhub-fu1').value||'').trim();
-  const fus=fu1?[{texto:fu1,data:new Date().toLocaleDateString('pt-BR'),autor:currentUser.nome,ts:Date.now()}]:[];
-  projetos.push({
-    id:Date.now(),
-    nome,
-    desc:document.getElementById('nhub-desc').value.trim(),
-    status:document.getElementById('nhub-status').value,
-    valor:parseFloat(document.getElementById('nhub-valor').value)||0,
-    inicio:document.getElementById('nhub-inicio').value,
-    fim:document.getElementById('nhub-fim').value,
-    recorr:'',recorrAte:'',
-    sinergia:document.getElementById('nhub-sin').value.trim(),
-    participantes:parts,dist,followups:fus,lastSeen:{},
-    criadorId:currentUser.id
-  });
-  closeOv('ov-nova-op');
-  renderProjetos();saveData();
-  showToast('Projeto criado com sucesso!');
-}
-
-function nouBuildTribForm(){
-  const userOpts=users.filter(u=>u.status==='Ativo').map(u=>`<option value="${u.id}"${u.id===currentUser.id?' selected':''}>${u.nome} (${u.perfil})</option>`).join('');
-  const etapaOpts=bidatxGetEtapas(TIPOS_NEGOCIO[0]).map(e=>`<option value="${e}">${e}</option>`).join('');
-  const tipoOpts=TIPOS_NEGOCIO.map(t=>`<option>${t}</option>`).join('');
-  const origemOpts=ORIGENS_LEAD.map(o=>`<option>${o}</option>`).join('');
-  return`
-    <div class="bx-row2">
-      <div class="bx-field">
-        <label>Empresa cliente *</label>
-        <div class="cli-search-wrap">
-          <div style="display:flex;gap:6px">
-            <input type="text" id="nou-cli-txt" placeholder="Digite para buscar ou criar..." oninput="nouFiltrarClientes(this.value)" autocomplete="off" style="flex:1;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px">
-            <button onclick="nouCriarCliente()" style="padding:8px 12px;border:1px solid #0891b2;border-radius:8px;font-size:12px;background:#fff;cursor:pointer;color:#0891b2;white-space:nowrap">+ Criar</button>
-          </div>
-          <div id="nou-cli-dropdown" class="cli-dropdown" style="display:none"></div>
-          <input type="hidden" id="nou-cli-id">
-          <div id="nou-cli-selected" style="font-size:12px;color:#0891b2;margin-top:4px;min-height:16px"></div>
-        </div>
-      </div>
-      <div class="bx-field">
-        <label>Tipo de negócio</label>
-        <select id="nou-tipo" onchange="nouAtualizarEtapas()">${tipoOpts}</select>
-      </div>
-    </div>
-    <div class="bx-row2">
-      <div class="bx-field">
-        <label>Origem do lead</label>
-        <select id="nou-origem">${origemOpts}</select>
-      </div>
-      <div class="bx-field">
-        <label>Vendedor responsável</label>
-        <select id="nou-vendedor">${userOpts}</select>
-      </div>
-    </div>
-    <div class="bx-row2">
-      <div class="bx-field">
-        <label>Etapa inicial</label>
-        <select id="nou-etapa">${etapaOpts}</select>
-      </div>
-      <div class="bx-field">
-        <label>Follow-up (data)</label>
-        <input type="date" id="nou-followup">
-      </div>
-    </div>
-    <div class="bx-field" style="margin-top:4px">
-      <label>Observações</label>
-      <textarea id="nou-obs" rows="2" style="resize:vertical;width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px" placeholder="Contexto inicial, próximos passos..."></textarea>
-    </div>
-    <div class="bx-modal-actions" style="border-top:1px solid #eee;margin-top:16px;padding-top:14px">
-      <span style="font-size:11.5px;color:#aaa">Comissões e valor podem ser adicionados após salvar.</span>
-      <button class="bx-btn bx-btn-ghost bx-btn-sm" onclick="closeOv('ov-nova-op')">Cancelar</button>
-      <button class="bx-btn bx-btn-accent bx-btn-sm" onclick="nouSalvarTrib()">Salvar oportunidade</button>
-    </div>
-  `;
-}
-
-function nouFiltrarClientes(v){
-  const dd=document.getElementById('nou-cli-dropdown');
-  document.getElementById('nou-cli-id').value='';
-  document.getElementById('nou-cli-selected').textContent='';
-  if(!v.trim()){dd.style.display='none';return;}
-  const matches=bidatxClientes.filter(c=>c.nome.toLowerCase().includes(v.toLowerCase()));
-  if(!matches.length){dd.style.display='none';return;}
-  dd.innerHTML=matches.map(c=>`<div class="cli-option" onclick="nouSelecionarCliente('${c.id}','${c.nome.replace(/'/g,"\\'")}')">  ${c.nome}</div>`).join('');
-  dd.style.display='block';
-}
-
-function nouSelecionarCliente(id,nome){
-  document.getElementById('nou-cli-id').value=id;
-  document.getElementById('nou-cli-txt').value=nome;
-  document.getElementById('nou-cli-selected').textContent='✓ Selecionado';
-  document.getElementById('nou-cli-dropdown').style.display='none';
-}
-
-function nouCriarCliente(){
-  const nome=document.getElementById('nou-cli-txt').value.trim();
-  if(!nome){showToast('Digite o nome da empresa antes de criar.');return;}
-  if(bidatxClientes.find(c=>c.nome.toLowerCase()===nome.toLowerCase())){
-    showToast('Empresa já existe — selecione na lista.');return;
-  }
-  const nc={id:'c'+Date.now(),nome,documento:'',contato:''};
-  bidatxClientes.push(nc);
-  saveData();
-  nouSelecionarCliente(nc.id,nc.nome);
-  document.getElementById('nou-cli-dropdown').style.display='none';
-  showToast('"'+nome+'" cadastrada e selecionada!');
-}
-
-function nouAtualizarEtapas(){
-  const tipo=document.getElementById('nou-tipo');
-  const sel=document.getElementById('nou-etapa');
-  if(!tipo||!sel)return;
-  const etapas=bidatxGetEtapas(tipo.value);
-  sel.innerHTML=etapas.map(e=>`<option value="${e}">${e}</option>`).join('');
-}
-
-function nouSalvarTrib(){
-  const clienteId=document.getElementById('nou-cli-id').value;
-  if(!clienteId){showToast('Selecione ou crie a empresa cliente.');return;}
-  const tipoNegocio=document.getElementById('nou-tipo').value;
-  const origemLead=document.getElementById('nou-origem').value;
-  const vendedorId=parseInt(document.getElementById('nou-vendedor').value);
-  const etapa=document.getElementById('nou-etapa').value;
-  const followUpDate=document.getElementById('nou-followup').value||null;
-  const observacoes=document.getElementById('nou-obs').value.trim();
-  const newOp={id:'bx'+Date.now(),clienteId,tipoNegocio,origemLead,vendedorId,etapa,followUpDate,observacoes,valorApurado:null,taxaHonorario:null,historico:[{etapa,data:new Date().toISOString().slice(0,10)}],comissoes:[],atividades:[],createdAt:new Date().toISOString().slice(0,10)};
-  bidatxOportunidades.push(newOp);
-  saveData();
-  closeOv('ov-nova-op');
-  showToast('Oportunidade criada! Abrindo para detalhar...');
-  setTimeout(()=>bidatx.abrirOp(newOp.id),350);
-}
 window.addEventListener('click',e=>{
-  ['ov-usr','ov-proj','ov-fu','ov-lanc','ov-sin','ov-notif','ov-evento','ov-con','ov-relatorio','ov-propor','ov-moderacao','ov-aprovacao','ov-revelar','ov-bidatx-op','ov-nova-op'].forEach(id=>{if(e.target.id===id)closeOv(id);});
+  ['ov-usr','ov-proj','ov-fu','ov-lanc','ov-sin','ov-notif','ov-evento','ov-con','ov-relatorio','ov-propor','ov-moderacao','ov-aprovacao','ov-revelar','ov-onboarding'].forEach(id=>{if(e.target.id===id)closeOv(id);});
 });
 
 // ===================== REDE / CHARTS =====================
@@ -1762,88 +1364,6 @@ function renderDashboardConexoes(){
   }).join('');
   }
   renderLembreteConexao();
-  renderFeedEngajamento();
-}
-
-function renderFeedEngajamento(){
-  // ---- Feed de atividades recentes ----
-  const feedEl=document.getElementById('dashboard-feed');
-  const rankEl=document.getElementById('dashboard-ranking-con');
-  if(!feedEl||!rankEl)return;
-
-  const eventos=[];
-  // Followups de projetos
-  projetos.forEach(p=>{
-    (p.followups||[]).forEach(f=>{
-      eventos.push({ts:f.ts||0,icon:'📋',texto:`Follow-up em <strong>${p.nome}</strong>`,sub:`por ${f.autor} · ${f.data||''}`,tipo:'projeto'});
-    });
-  });
-  // Atividades de oportunidades tributárias
-  bidatxOportunidades.forEach(op=>{
-    (op.atividades||[]).forEach(a=>{
-      eventos.push({ts:a.ts||0,icon:'⚖️',texto:`Atividade em negócio Tributário`,sub:`${a.tipo||''} · por ${a.autor||'—'} · ${a.data||''}`,tipo:'tributario'});
-    });
-    // mudanças de etapa
-    (op.historico||[]).slice(1).forEach(h=>{
-      eventos.push({ts:new Date(h.data||'2024-01-01').getTime(),icon:'🔄',texto:`Negócio avançou para <strong>${h.etapa}</strong>`,sub:`${bidatxClientes.find(c=>c.id===op.clienteId)?.nome||'Cliente'} · ${h.data||''}`,tipo:'tributario'});
-    });
-  });
-  // Novos membros (usa campo desde como data aproximada)
-  users.filter(u=>u.status==='Ativo'&&u.desde).forEach(u=>{
-    const partes=(u.desde||'').split('/');
-    if(partes.length===3){
-      const ts=new Date(`${partes[2]}-${partes[1]}-${partes[0]}`).getTime();
-      eventos.push({ts,icon:'👤',texto:`<strong>${u.nome}</strong> entrou na rede`,sub:`${u.perfil} · ${u.seg||''}`,tipo:'membro'});
-    }
-  });
-
-  eventos.sort((a,b)=>b.ts-a.ts);
-  const recentes=eventos.slice(0,8);
-
-  feedEl.innerHTML=`
-    <div style="background:#fff;border:1px solid #eee;border-radius:12px;padding:16px 18px">
-      <div style="font-size:13px;font-weight:600;color:#0a1628;margin-bottom:14px">⚡ Atividades recentes</div>
-      ${recentes.length?recentes.map(e=>`
-        <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:0.5px solid #f5f5f3">
-          <span style="font-size:16px;flex-shrink:0;margin-top:1px">${e.icon}</span>
-          <div>
-            <div style="font-size:12.5px;color:#0a1628;line-height:1.4">${e.texto}</div>
-            <div style="font-size:11px;color:#aaa;margin-top:2px">${e.sub}</div>
-          </div>
-        </div>`).join(''):'<div style="color:#aaa;font-size:13px">Nenhuma atividade ainda.</div>'}
-    </div>`;
-
-  // ---- Ranking de conexões (visível a todos) ----
-  const rankData=users.filter(u=>u.status==='Ativo').map(u=>{
-    const cnt=conexoes.filter(c=>c.criadorId===u.id).length;
-    const matches=conexoes.filter(c=>c.criadorId===u.id).reduce((s,c)=>s+matchConexao(c).length,0);
-    return{u,cnt,matches};
-  }).filter(x=>x.cnt>0).sort((a,b)=>b.cnt-a.cnt).slice(0,8);
-
-  const maxCnt=rankData.length?rankData[0].cnt:1;
-  const medals=['🥇','🥈','🥉'];
-
-  rankEl.innerHTML=`
-    <div style="background:#fff;border:1px solid #eee;border-radius:12px;padding:16px 18px">
-      <div style="font-size:13px;font-weight:600;color:#0a1628;margin-bottom:14px">🔗 Top Conectores da Rede</div>
-      ${rankData.length?rankData.map((x,i)=>{
-        const ps=PS[x.u.perfil]||{bg:'#eee',tx:'#555'};
-        return`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid #f5f5f3">
-          <span style="font-size:15px;width:22px;text-align:center;flex-shrink:0">${medals[i]||'·'}</span>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${x.u.nome}</div>
-            <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
-              <div style="flex:1;height:5px;background:#f0f0ee;border-radius:3px;overflow:hidden"><div style="height:100%;width:${Math.round(x.cnt/maxCnt*100)}%;background:#2554C7;border-radius:3px"></div></div>
-            </div>
-          </div>
-          <div style="text-align:right;flex-shrink:0">
-            <div style="font-size:12px;font-weight:600;color:#2554C7">${x.cnt} <span style="color:#aaa;font-weight:400">con.</span></div>
-            ${x.matches?`<div style="font-size:10px;color:#0F6E56">${x.matches} match${x.matches>1?'es':''}</div>`:''}
-          </div>
-        </div>`;
-      }).join(''):'<div style="color:#aaa;font-size:13px">Nenhuma conexão cadastrada ainda.</div>'}
-      ${!isSocio()?`<div style="margin-top:10px;font-size:11.5px;color:#0891b2;cursor:pointer" onclick="showTab('rede-membros');setTimeout(()=>switchMbrTab('conexoes'),100)">→ Ver todas as conexões</div>`:''}
-    </div>`;
 }
 
 function renderLembreteConexao(){
@@ -2116,8 +1636,13 @@ function renderMembros(){
     const comissaoTxt=u.comissao?`${u.comissao}% (${(u.comissaoModelo||'').replace('por_projeto','por projeto')||'—'})`:'—';
     const ts=(() => { try { return calcTrustScore(u.id); } catch(e){ return {score:0,detalhes:[]}; } })();
     const tl=trustLabel(ts.score);
+    // Item 12: selo de membro verificado
+    const aprovadorNome=u.aprovadoPor?(users.find(x=>x.id===u.aprovadoPor)||{}).nome||'IA Hub':'IA Hub';
+    const dataEntradaFmt=u.dataEntrada?new Date(u.dataEntrada).toLocaleDateString('pt-BR'):'—';
+    const seloVerificado=u.dataEntrada?`<span title="Aprovado por: ${aprovadorNome} | Membro desde: ${dataEntradaFmt}" style="display:inline-flex;align-items:center;gap:3px;background:#E1F5EE;color:#085041;border-radius:20px;padding:2px 7px;font-size:10px;font-weight:600;margin-left:4px;cursor:help">✓ Verificado</span>`:'';
+    const membroDesdeHtml=u.dataEntrada?`<div style="font-size:10px;color:#888;margin-top:1px">desde ${dataEntradaFmt} · por ${aprovadorNome}</div>`:'';
     return`<tr>
-      <td><span class="avatar" style="background:${ps.bg};color:${ps.tx}">${initials(u.nome)}</span><strong>${u.nome}</strong> ${socio?trustBadgeHtml(u.id):''}</td>
+      <td><span class="avatar" style="background:${ps.bg};color:${ps.tx}">${initials(u.nome)}</span><strong>${u.nome}</strong>${seloVerificado} ${socio?trustBadgeHtml(u.id):''}${membroDesdeHtml}</td>
       <td>${tipoTag}</td>
       <td style="color:#666">${u.emp||'—'}</td>
       <td style="display:${socio?'table-cell':'none'};color:#666;font-size:12px">${u.email||'—'}</td>
@@ -2233,24 +1758,6 @@ function saveUsr(){
   if(editUsrId){const i=users.findIndex(u=>u.id===editUsrId);users[i]={...users[i],...obj};}
   else users.push({...obj,id:Date.now()});
   closeOv('ov-usr');renderMembros();initFilters();autoUpdateSinergiaPpl();updateAprovacaoBadge();saveData();
-  // notificar donos de conexões que ganharam novo match com este membro
-  try{
-    const novoUser=users.find(u=>u.email===obj.email);
-    if(novoUser){
-      const segsNovo=(obj.seg||'').split(',').map(s=>s.trim()).filter(Boolean);
-      const notificados=new Set();
-      conexoes.forEach(c=>{
-        if(c.criadorId===novoUser.id)return;// não notifica de si mesmo
-        const matchSegs=(c.seg?[c.seg]:[]).concat((c.fitSegs||'').split(',').map(s=>s.trim()).filter(Boolean));
-        const temFit=segsNovo.some(s=>matchSegs.some(ms=>ms.toLowerCase().includes(s.toLowerCase())||s.toLowerCase().includes(ms.toLowerCase())));
-        if(temFit&&!notificados.has(c.criadorId)){
-          notificados.add(c.criadorId);
-          notificacoes.push({id:Date.now()+Math.random(),txt:`🎯 Novo match! ${novoUser.nome} (${novoUser.perfil} · ${segsNovo.join(', ')}) pode ter fit com sua conexão no segmento ${c.seg}.`,ts:Date.now(),lido:false,destinos:[c.criadorId]});
-        }
-      });
-      if(notificados.size>0){updateNotifBadge();saveData();}
-    }
-  }catch(e){}
 }
 function removeUsr(id){
   if(!confirm('Remover este usuário?'))return;
@@ -2694,7 +2201,6 @@ function renderSin(){
     const ca=sc(syn.a),cb=sc(syn.b);
     const ppl=[...(syn.ppl_a||[]),...(syn.ppl_b||[])];
     const editBtn=isSocio()?`<div style="margin-top:10px;display:flex;gap:6px"><button class="btn-s btn-sm" onclick="openEditSin(${syn.id})">Editar</button><button class="btn-d btn-sm" onclick="removeSin(${syn.id})">Remover</button></div>`:'';
-    const obsHtml=syn.obs?`<div style="margin-top:8px;padding:8px 10px;background:#FFFBEB;border-left:3px solid #F59E0B;border-radius:0 6px 6px 0;font-size:12px;color:#92400E"><span style="font-weight:600">💡 Insight do sócio:</span> ${syn.obs}</div>`:'';
     return`<div class="syn-card">
       <div class="syn-hdr">
         <span class="badge" style="background:${ca.bg};color:${ca.tx}">${syn.a}</span>
@@ -2704,93 +2210,34 @@ function renderSin(){
       </div>
       ${ppl.length?`<div class="syn-ppl">${ppl.map(n=>`<span class="chip">${n}</span>`).join('')}</div>`:''}
       <div class="syn-why">${syn.why}</div>
-      ${obsHtml}
       ${editBtn}
     </div>`;
   }).join('');
   if(!list.length)document.getElementById('syn-grid').innerHTML=`<div class="empty-msg">Nenhuma sinergia encontrada.</div>`;
-  renderSugestoesSin();
 }
 
-function openAddSin(preA,preB){
+function openAddSin(){
   editSinId=null;document.getElementById('sin-ttl').textContent='Nova sinergia';
-  document.getElementById('sin-a').value=preA||'';
-  document.getElementById('sin-b').value=preB||'';
-  document.getElementById('sin-why').value='';
-  document.getElementById('sin-obs').value='';
+  ['sin-a','sin-b','sin-why'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('sin-p').value='alta';
   document.getElementById('ov-sin').classList.add('open');
-  if(preA&&preB) setTimeout(()=>document.getElementById('sin-why').focus(),100);
 }
 function openEditSin(id){
   const s=sinergias.find(x=>x.id===id);editSinId=id;
   document.getElementById('sin-ttl').textContent='Editar sinergia';
   document.getElementById('sin-a').value=s.a;document.getElementById('sin-b').value=s.b;
   document.getElementById('sin-p').value=s.p;document.getElementById('sin-why').value=s.why;
-  document.getElementById('sin-obs').value=s.obs||'';
   document.getElementById('ov-sin').classList.add('open');
 }
 function saveSin(){
   const a=document.getElementById('sin-a').value.trim(),b=document.getElementById('sin-b').value.trim(),why=document.getElementById('sin-why').value.trim();
   if(!a||!b||!why){alert('Preencha todos os campos.');return;}
-  const obj={a,b,p:document.getElementById('sin-p').value,why,obs:document.getElementById('sin-obs').value.trim(),ppl_a:[],ppl_b:[]};
+  const obj={a,b,p:document.getElementById('sin-p').value,why,ppl_a:[],ppl_b:[]};
   if(editSinId){const i=sinergias.findIndex(s=>s.id===editSinId);sinergias[i]={...sinergias[i],...obj};}
   else sinergias.push({...obj,id:Date.now()});
   closeOv('ov-sin');renderSin();saveData();
 }
 function removeSin(id){if(!confirm('Remover sinergia?'))return;sinergias=sinergias.filter(s=>s.id!==id);renderSin();saveData();}
-
-function renderSugestoesSin(){
-  if(!document.getElementById('sin-sugestoes-wrap'))return;
-  // Coleta todos os segmentos únicos dos membros ativos
-  const segsAtivos=[];
-  users.filter(u=>u.status==='Ativo').forEach(u=>{
-    (u.seg||'').split(',').map(s=>s.trim()).filter(Boolean).forEach(s=>{if(!segsAtivos.includes(s))segsAtivos.push(s);});
-  });
-  // Gera todos os pares possíveis
-  const pares=[];
-  for(let i=0;i<segsAtivos.length;i++){
-    for(let j=i+1;j<segsAtivos.length;j++){
-      const a=segsAtivos[i],b=segsAtivos[j];
-      const jaExiste=sinergias.some(s=>(s.a===a&&s.b===b)||(s.a===b&&s.b===a));
-      if(!jaExiste){
-        const mA=users.filter(u=>u.status==='Ativo'&&(u.seg||'').split(',').map(s=>s.trim()).includes(a)).map(u=>u.nome);
-        const mB=users.filter(u=>u.status==='Ativo'&&(u.seg||'').split(',').map(s=>s.trim()).includes(b)).map(u=>u.nome);
-        if(mA.length&&mB.length) pares.push({a,b,mA,mB});
-      }
-    }
-  }
-  const wrap=document.getElementById('sin-sugestoes-wrap');
-  if(!pares.length){wrap.innerHTML='';return;}
-  const socioBtn=isSocio()?`onclick="openAddSin(this.dataset.a,this.dataset.b)" style="cursor:pointer"`:`onclick="showToast('Apenas sócios podem criar sinergias.')" style="cursor:pointer"`;
-  wrap.innerHTML=`
-    <div style="margin-top:28px">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <span style="font-size:15px;font-weight:700;color:var(--txt)">💡 Sugestões automáticas</span>
-        <span style="font-size:12px;color:#888;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:2px 10px">${pares.length} par${pares.length>1?'es':''} ainda sem sinergia cadastrada</span>
-      </div>
-      <div class="syn-grid">
-        ${pares.map(p=>{
-          const ca=sc(p.a),cb=sc(p.b);
-          return`<div class="syn-card" style="border:1.5px dashed var(--line);opacity:.85">
-            <div class="syn-hdr">
-              <span class="badge" style="background:${ca.bg};color:${ca.tx}">${p.a}</span>
-              <span style="color:#bbb">↔</span>
-              <span class="badge" style="background:${cb.bg};color:${cb.tx}">${p.b}</span>
-              <span class="badge" style="margin-left:auto;background:#F3F4F6;color:#6B7280;font-size:10px">Sugestão</span>
-            </div>
-            <div class="syn-ppl">
-              ${[...p.mA,...p.mB].map(n=>`<span class="chip">${n}</span>`).join('')}
-            </div>
-            <div style="margin-top:8px;font-size:12px;color:#888">${p.mA.length} em ${p.a} · ${p.mB.length} em ${p.b}</div>
-            ${isSocio()?`<div style="margin-top:10px">
-              <button class="btn-p btn-sm" data-a="${p.a}" data-b="${p.b}" ${socioBtn}>+ Criar sinergia</button>
-            </div>`:`<div style="margin-top:8px;font-size:11px;color:#aaa">Sócios podem transformar em sinergia oficial</div>`}
-          </div>`;
-        }).join('')}
-      </div>
-    </div>`;
-}
 
 // ===================== PIPELINE =====================
 function renderPipeline(){
@@ -3351,9 +2798,9 @@ function openMeuPerfil(){
 // ===================== CONEXÕES =====================
 let _conexoesTarget=null;
 let conexoes=[
-  {id:1001,seg:'Agronegócio',porte:'Grande empresa',acesso:'Acesso ao CEO / Owner',nivel:'5',desc:'Grupo agrícola de grande porte no Centro-Oeste, com operações de soja e milho. Buscando soluções de contabilidade rural, planejamento tributário e gestão financeira para expansão.',fitSegs:'Contabilidade, Mercado Financeiro, Tributarista',obs:'Contato próximo, apresentação pode ser feita em até 2 semanas.',criadorId:1,desde:'01/06/2025'},
-  {id:1002,seg:'Varejo / Moda',porte:'Média empresa',acesso:'Acesso ao Diretor',nivel:'3',desc:'Rede de lojas de moda feminina com 12 unidades no Rio. Diretor receptivo a propostas de automação de processos, gestão fiscal e expansão via franquias. Momento de reestruturação.',fitSegs:'Advocacia, Contabilidade, Consultoria Financeira',obs:'',criadorId:2,desde:'10/06/2025'},
-  {id:1003,seg:'Construção Civil',porte:'Grande empresa',acesso:'Acesso ao Comprador',nivel:'3',desc:'Construtora com obras residenciais e comerciais em andamento. Comprando materiais de acabamento, tintas e serviços de blindagem para veículos da frota.',fitSegs:'Construção, Loja de Tintas, Blindagem de Veículos',obs:'',criadorId:3,desde:'15/06/2025'},
+  {id:1001,seg:'Agronegócio',porte:'Grande empresa',acesso:'Acesso ao CEO / Owner',nivel:'5',desc:'Grupo agrícola de grande porte no Centro-Oeste, com operações de soja e milho. Buscando soluções de contabilidade rural, planejamento tributário e gestão financeira para expansão.',fitSegs:'Contabilidade, Mercado Financeiro, Tributarista',obs:'Contato próximo, apresentação pode ser feita em até 2 semanas.',criadorId:1,desde:'01/06/2025',origem:'IA Hub'},
+  {id:1002,seg:'Varejo / Moda',porte:'Média empresa',acesso:'Acesso ao Diretor',nivel:'3',desc:'Rede de lojas de moda feminina com 12 unidades no Rio. Diretor receptivo a propostas de automação de processos, gestão fiscal e expansão via franquias. Momento de reestruturação.',fitSegs:'Advocacia, Contabilidade, Consultoria Financeira',obs:'',criadorId:2,desde:'10/06/2025',origem:'IA Hub'},
+  {id:1003,seg:'Construção Civil',porte:'Grande empresa',acesso:'Acesso ao Comprador',nivel:'3',desc:'Construtora com obras residenciais e comerciais em andamento. Comprando materiais de acabamento, tintas e serviços de blindagem para veículos da frota.',fitSegs:'Construção, Loja de Tintas, Blindagem de Veículos',obs:'',criadorId:3,desde:'15/06/2025',origem:'IA Hub'},
 ];
 let editConId=null;
 
@@ -3380,6 +2827,7 @@ function renderConexoes(targetEl){
       <p style="font-size:13px;color:#888">Contatos anônimos — sem nome, empresa ou dados pessoais. O sistema cruza os segmentos com a rede e sugere quem tem mais fit.</p>
       <div style="display:flex;gap:8px">
         <button class="btn-p" onclick="openAddCon()">+ Nova conexão</button>
+        ${!isSocio()?`<button class="btn-p" style="background:#fff;color:#2554C7;border:1.5px solid #2554C7" onclick="openProporNegocio()">💡 Propor negócio</button>`:''}
         ${isSocio()?`<button class="btn-p" style="background:#854F0B" onclick="openModeracaoPanel()">🔔 Moderação ${oportunidadesPendentes.length?'('+oportunidadesPendentes.length+')':''}</button>`:''}
       </div>
     </div>
@@ -3426,11 +2874,17 @@ function renderConList(){
     const matches=matchConexao(c);
     const porteCls=PORTE_CLS[c.porte]||'';
     const isMine=c.criadorId===currentUser.id;
+    const isCorpLink=c.origem==='CorpLink';
+    const isPendente=c.status==='pendente';
     const editBtns=isMine||isSocio()?`<div style="display:flex;gap:4px">
       <button class="btn-s btn-sm" onclick="openEditCon(${c.id})">Editar</button>
       <button class="btn-d btn-sm" onclick="deleteCon(${c.id})">✕</button>
     </div>`:'';
-    return`<div class="con-card">
+    // Item 17: badge CorpLink
+    const corpLinkBadge=isCorpLink?`<span class="badge" style="background:#1e3a5f;color:#7dd3fc;border:1px solid #2554C7;font-weight:700">🏦 CorpLink</span>`:'';
+    // Item 18: badge pendente para sócios
+    const pendenteBadge=isPendente&&isSocio()?`<span class="badge" style="background:#fef9c3;color:#854d0e">⏳ Aguardando aprovação</span>`:'';
+    return`<div class="con-card" style="${isPendente?'border-color:#fbbf24;':''}" >
       <div class="con-header">
         <div>
           <div class="con-title">${c.seg}</div>
@@ -3439,6 +2893,8 @@ function renderConList(){
               👤 ${owner?owner.nome:'?'}
             </span>
             <span class="con-owner">${c.desde||''}</span>
+            ${corpLinkBadge}
+            ${pendenteBadge}
             ${isSocio()&&c.obs?`<span class="badge" style="background:#fef3c7;color:#92400e">📝 obs. interna</span>`:''}
           </div>
         </div>
@@ -3463,11 +2919,26 @@ function renderConList(){
             `<span class="badge" style="background:#fef9c3;color:#854d0e">⏳ Pendente</span>`:
             `<button class="btn-p btn-sm" onclick="interesseCon(${c.id},${m.user.id})">💡 Manifestar interesse</button>`
           ):'';
+          // Item 13: narrativa rica do match
+          const uSegs=(m.user.seg||'').split(',').map(s=>s.trim()).filter(Boolean);
+          const cSegs=(c.seg||'').split(',').map(s=>s.trim()).filter(Boolean);
+          const sinCount=sinergias.filter(syn=>{
+            const sa=syn.a.toLowerCase(),sb=syn.b.toLowerCase();
+            const uHas=uSegs.some(s=>s.toLowerCase().includes(sa)||s.toLowerCase().includes(sb));
+            const cHas=cSegs.some(s=>s.toLowerCase().includes(sa)||s.toLowerCase().includes(sb));
+            return uHas&&cHas;
+          }).length;
+          const projCount=projetos.filter(p=>p.participantes.includes(m.user.id)&&p.participantes.includes(c.criadorId)).length;
+          const segLabel=uSegs[0]&&cSegs[0]?`${cSegs[0]} ↔ ${uSegs[0]}`:'segmentos complementares';
+          const chips=[];
+          chips.push(`<span class="chip" style="background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8">🔗 ${segLabel}</span>`);
+          if(sinCount>0)chips.push(`<span class="chip" style="background:#f0fdf4;border-color:#bbf7d0;color:#166534">⚡ ${sinCount} sinergia${sinCount>1?'s':''} mapeada${sinCount>1?'s':''}</span>`);
+          if(projCount>0)chips.push(`<span class="chip" style="background:#fef3c7;border-color:#fde68a;color:#92400e">📁 ${projCount} projeto${projCount>1?'s':''} em comum</span>`);
           return`<div class="con-match-item">
           <div class="con-match-score">${m.score}%</div>
           <div style="flex:1">
             <div style="font-weight:500">${m.user.nome}</div>
-            <div style="color:#888;font-size:11px">${m.razao}</div>
+            <div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:3px">${chips.join('')}</div>
           </div>
           <span class="badge" style="background:${PS[m.user.perfil]?.bg||'#eee'};color:${PS[m.user.perfil]?.tx||'#555'}">${m.user.perfil}</span>
           ${btnInteresse}
@@ -3519,10 +2990,10 @@ function calcTrustScore(userId){
 }
 
 function trustLabel(score){
-  if(score>=80)return{cls:'trust-s',label:'🏆 Platina',desc:'Conector elite'};
-  if(score>=60)return{cls:'trust-a',label:'🥇 Ouro',desc:'Alta confiança'};
-  if(score>=40)return{cls:'trust-b',label:'🥈 Prata',desc:'Em crescimento'};
-  return{cls:'trust-c',label:'🥉 Bronze',desc:'Iniciante'};
+  if(score>=80)return{cls:'trust-s',label:'S',desc:'Conector elite'};
+  if(score>=60)return{cls:'trust-a',label:'A',desc:'Alta confiança'};
+  if(score>=40)return{cls:'trust-b',label:'B',desc:'Em crescimento'};
+  return{cls:'trust-c',label:'C',desc:'Iniciante'};
 }
 
 function trustBadgeHtml(userId){
@@ -3607,11 +3078,17 @@ function saveCon(){
   const seg=document.getElementById('con-seg').value.trim();
   const desc=document.getElementById('con-desc').value.trim();
   if(!seg||!desc){alert('Segmento e descrição são obrigatórios.');return;}
-  const obj={seg,porte:document.getElementById('con-porte').value,acesso:document.getElementById('con-acesso').value,nivel:document.getElementById('con-nivel').value,desc,fitSegs:document.getElementById('con-fit-segs').value.trim(),obs:document.getElementById('con-obs').value.trim(),criadorId:currentUser.id,desde:new Date().toLocaleDateString('pt-BR')};
+  const isOperador=currentUser.perfil==='Operador';
+  const origem=isOperador?'CorpLink':'IA Hub';
+  const statusCon=isOperador?'pendente':'ativo';
+  const obj={seg,porte:document.getElementById('con-porte').value,acesso:document.getElementById('con-acesso').value,nivel:document.getElementById('con-nivel').value,desc,fitSegs:document.getElementById('con-fit-segs').value.trim(),obs:document.getElementById('con-obs').value.trim(),criadorId:currentUser.id,desde:new Date().toLocaleDateString('pt-BR'),origem,status:statusCon};
   if(editConId){const i=conexoes.findIndex(c=>c.id===editConId);conexoes[i]={...conexoes[i],...obj};}
   else conexoes.push({...obj,id:Date.now()});
-  closeOv('ov-con');renderConexoes();saveData();
-  showToast('✅ Conexão salva!');
+  closeOv('ov-con');
+  if(!isOperador)renderConexoes();
+  saveData();
+  showToast(isOperador?'✅ Conexão enviada para moderação dos sócios!':'✅ Conexão salva!');
+  if(isOperador)renderOperadorView();
 }
 function deleteCon(id){
   const targetId=id||editConId;
@@ -3672,12 +3149,39 @@ function openModeracaoPanel(){
       </div>
     </div>`).join('');
   }
-  if(!oportunidadesPendentes.filter(o=>o.status==='pendente').length&&!intPend.length){
+  // Item 18: conexões CorpLink pendentes
+  const conCorpLinkPend=conexoes.filter(c=>c.origem==='CorpLink'&&c.status==='pendente');
+  let corpLinkHtml='';
+  if(conCorpLinkPend.length){
+    corpLinkHtml=`<div class="section-hdr">🏦 Conexões CorpLink aguardando aprovação (${conCorpLinkPend.length})</div>`+
+    conCorpLinkPend.map(c=>{
+      const dono=users.find(u=>u.id===c.criadorId);
+      return`<div class="con-card" style="margin-bottom:10px;border-color:#2554C7">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+          <div>
+            <div style="font-size:14px;font-weight:600">${c.seg} <span class="badge" style="background:#1e3a5f;color:#7dd3fc;font-weight:700">🏦 CorpLink</span></div>
+            <div style="font-size:11px;color:#888">enviada por ${dono?dono.nome:'?'} · ${c.desde||''}</div>
+          </div>
+          <span class="badge" style="background:#fef9c3;color:#854d0e">⏳ Pendente</span>
+        </div>
+        <div style="font-size:13px;color:#555;margin-bottom:8px">${c.desc}</div>
+        ${c.porte?`<div style="font-size:12px;color:#888;margin-bottom:4px">Porte: <strong>${c.porte}</strong></div>`:''}
+        ${c.fitSegs?`<div style="font-size:12px;color:#888;margin-bottom:8px">Fit sugerido: <strong>${c.fitSegs}</strong></div>`:''}
+        <div style="display:flex;gap:8px">
+          <button class="btn-p btn-sm" style="flex:1" onclick="aprovarConexaoCorpLink(${c.id})">✅ Aprovar e publicar</button>
+          <button class="btn-d btn-sm" style="flex:1;border-radius:6px;padding:4px 10px;cursor:pointer" onclick="rejeitarConexaoCorpLink(${c.id})">❌ Rejeitar</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  if(!oportunidadesPendentes.filter(o=>o.status==='pendente').length&&!intPend.length&&!conCorpLinkPend.length){
     el.innerHTML='<div class="empty-msg">Nenhuma oportunidade ou interesse aguardando moderação.</div>';
+  } else if(!oportunidadesPendentes.filter(o=>o.status==='pendente').length&&!intPend.length){
+    el.innerHTML=corpLinkHtml;
   } else if(!oportunidadesPendentes.filter(o=>o.status==='pendente').length){
-    el.innerHTML=intHtml;
+    el.innerHTML=intHtml+corpLinkHtml;
   } else {
-    el.innerHTML=intHtml+`<div class="section-hdr">🚀 Oportunidades propostas</div>`+oportunidadesPendentes.filter(o=>o.status==='pendente').map(o=>{
+    el.innerHTML=intHtml+corpLinkHtml+`<div class="section-hdr">🚀 Oportunidades propostas</div>`+oportunidadesPendentes.filter(o=>o.status==='pendente').map(o=>{
       const prop=users.find(u=>u.id===o.proponenteId);
       return`<div class="con-card" style="margin-bottom:10px">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:8px">
@@ -3784,6 +3288,8 @@ function aprovarMembro(id){
   if(!vinculoId){alert('Selecione um vínculo antes de aprovar.');return;}
   const vinculo=users.find(x=>x.id===vinculoId);
   u.status='Ativo';u.vinculoId=vinculoId;u.vinculoNome=vinculo?vinculo.nome:'';
+  u.aprovadoPor=currentUser.id;
+  u.dataEntrada=new Date().toISOString();
   notificacoes.push({id:Date.now(),txt:`✅ Seu cadastro foi aprovado! Bem-vindo ao IA Hub. Você está vinculado a ${vinculo?vinculo.nome:'um sócio'}.`,ts:Date.now(),lido:false,destinos:[id]});
   updateNotifBadge();updateAprovacaoBadge();saveData();
   showToast(`✅ ${u.nome} aprovado!`);openAprovacaoPanel();
@@ -3844,6 +3350,24 @@ function aprovarInteresse(id){
   openModeracaoPanel();
 }
 
+function aprovarConexaoCorpLink(id){
+  const c=conexoes.find(x=>x.id===id);if(!c)return;
+  c.status='ativo';
+  const socios=users.filter(u=>u.perfil==='Sócio').map(u=>u.id);
+  notificacoes.push({id:Date.now(),txt:`✅ Conexão CorpLink "${c.seg}" aprovada e publicada na rede.`,ts:Date.now(),lido:false,destinos:socios});
+  updateNotifBadge();saveData();
+  showToast(`✅ Conexão CorpLink "${c.seg}" aprovada e publicada!`);
+  openModeracaoPanel();
+}
+function rejeitarConexaoCorpLink(id){
+  if(!confirm('Rejeitar esta conexão CorpLink?'))return;
+  const c=conexoes.find(x=>x.id===id);if(!c)return;
+  c.status='rejeitado';
+  saveData();
+  showToast('Conexão CorpLink rejeitada.');
+  openModeracaoPanel();
+}
+
 function rejeitarInteresse(id){
   const int=interessesPendentes.find(x=>x.id===id);if(!int)return;
   int.status='rejeitado';
@@ -3894,157 +3418,52 @@ function gerarLinkWhatsapp(userId,msg){
 // ===================== MEUS RENDIMENTOS =====================
 function renderMeusRendimentos(){
   const uid=currentUser.id;
+  const u=currentUser;
+  const meusProjetos=projetos.filter(p=>p.participantes.includes(uid));
+  let totalRend=0;
+  meusProjetos.forEach(p=>{const pct=(p.dist&&p.dist[uid])||0;totalRend+=(p.valor||0)*(pct/100);});
+  const minhasComissoes=lancamentos.filter(l=>l.partId===uid&&l.tipo==='in');
+  const totalComissoes=minhasComissoes.reduce((s,l)=>s+(l.valor||0),0);
   const el=document.getElementById('tab-meus-rendimentos');
-  if(!el)return;
-
-  // === Comissões BIDATX ===
-  const bidatxItems=[];
-  bidatxOportunidades.forEach(op=>{
-    const com=(op.comissoes||[]).find(c=>c.playerId===uid);
-    if(!com)return;
-    const cli=bidatxClientes.find(c=>c.id===op.clienteId);
-    const receita=op.valorApurado&&op.taxaHonorario?op.valorApurado*(op.taxaHonorario/100):0;
-    const valorCom=com.tipo==='pct'?Math.round(receita*(com.valor/100)):(com.valor||0);
-    let situacao='Pendente';
-    if(op.etapa===BIDATX_ETAPA_FINAL){
-      const concHist=(op.historico||[]).filter(h=>h.etapa===BIDATX_ETAPA_FINAL).slice(-1)[0];
-      if(concHist&&concHist.data){
-        const disp=new Date(new Date(concHist.data).getTime()+15*24*60*60*1000);
-        if(com.pago){situacao='Pago';}
-        else if(Date.now()>=disp.getTime()){situacao='Disponível';}
-        else{situacao='Disp. em '+disp.toLocaleDateString('pt-BR');}
-      }
-    }
-    bidatxItems.push({tipo:'Tributário',desc:cli?cli.nome:'?',etapa:op.etapa,comLabel:com.tipo==='pct'?`${com.valor}%`:`R$ ${(com.valor||0).toLocaleString('pt-BR')} fixo`,valorCom,situacao,pago:com.pago||false,opId:op.id,comId:com.id});
-  });
-
-  // === Projetos Hub ===
-  const hubItems=[];
-  projetos.filter(p=>(p.participantes||[]).includes(uid)).forEach(p=>{
-    const pct=(p.dist||{})[uid]||0;
-    const valorCom=pct&&p.valor?Math.round(p.valor*(pct/100)):0;
-    const situacao=p.status==='Concluído'?'Disponível':'Pendente';
-    hubItems.push({tipo:'Hub',desc:p.nome,etapa:p.status,comLabel:`${pct}%`,valorCom,situacao,projId:p.id});
-  });
-
-  // === KPIs ===
-  const all=[...bidatxItems,...hubItems];
-  const totalPipeline=all.reduce((s,x)=>s+x.valorCom,0);
-  const totalDisp=all.filter(x=>x.situacao==='Disponível').reduce((s,x)=>s+x.valorCom,0);
-  const totalPend=all.filter(x=>x.situacao!=='Disponível'&&x.situacao!=='Pago').reduce((s,x)=>s+x.valorCom,0);
-
-  const sitBadge=s=>{
-    if(s==='Disponível')return`<span style="background:#dcfce7;color:#0F6E56;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600">✓ Disponível</span>`;
-    if(s==='Pago')return`<span style="background:#e0f2fe;color:#0c447c;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600">✓ Pago</span>`;
-    if(s.startsWith('Disp.'))return`<span style="background:#fef9c3;color:#92400e;padding:2px 10px;border-radius:20px;font-size:11px">⏳ ${s}</span>`;
-    return`<span style="background:#f3f4f6;color:#666;padding:2px 10px;border-radius:20px;font-size:11px">Pendente</span>`;
-  };
-
-  const pagoBtn=(x)=>isSocio()&&x.situacao==='Disponível'
-    ?`<button class="btn-s" style="font-size:11px;padding:3px 10px;white-space:nowrap" onclick="event.stopPropagation();bidatx.marcarPago('${x.opId}','${x.comId}')">✓ Marcar pago</button>`
-    :'';
-
-  const bidatxRows=bidatxItems.map(x=>`<tr style="cursor:pointer" onclick="bidatx.abrirOp('${x.opId}')">
-    <td style="font-weight:600">${x.desc}</td>
-    <td><span class="badge">${x.etapa}</span></td>
-    <td style="color:#666">${x.comLabel}</td>
-    <td style="font-weight:600;color:#0F6E56">${x.valorCom?'R$ '+x.valorCom.toLocaleString('pt-BR'):'—'}</td>
-    <td>${sitBadge(x.situacao)}</td>
-    <td>${pagoBtn(x)}</td>
-  </tr>`).join('');
-
-  const hubRows=hubItems.map(x=>`<tr style="cursor:pointer" onclick="openAddProj(${x.projId})">
-    <td style="font-weight:600">${x.desc}</td>
-    <td><span class="badge ${PROJ_CLS[x.etapa]||''}">${x.etapa}</span></td>
-    <td style="color:#666">${x.comLabel}</td>
-    <td style="font-weight:600;color:#0F6E56">${x.valorCom?'R$ '+x.valorCom.toLocaleString('pt-BR'):'—'}</td>
-    <td>${sitBadge(x.situacao)}</td>
-    <td></td>
-  </tr>`).join('');
-
   el.innerHTML=`
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
       <div class="section-hdr" style="margin:0;border:none">Meus Rendimentos</div>
-      <button class="btn-p" onclick="gerarPDFRendimentos()">⬇ Exportar PDF</button>
+      <button class="btn-p" onclick="gerarPDF(${uid})">⬇ Exportar PDF</button>
     </div>
     <div class="stats">
-      <div class="stat"><div class="stat-label">Pipeline total</div><div class="stat-value" style="color:#2554C7">R$ ${totalPipeline.toLocaleString('pt-BR')}</div></div>
-      <div class="stat"><div class="stat-label">Disponível agora</div><div class="stat-value" style="color:#0F6E56">R$ ${totalDisp.toLocaleString('pt-BR')}</div></div>
-      <div class="stat"><div class="stat-label">Ainda pendente</div><div class="stat-value">R$ ${totalPend.toLocaleString('pt-BR')}</div></div>
+      <div class="stat"><div class="stat-label">Projetos</div><div class="stat-value">${meusProjetos.length}</div></div>
+      <div class="stat"><div class="stat-label">Em andamento</div><div class="stat-value">${meusProjetos.filter(p=>p.status==='Em andamento').length}</div></div>
+      <div class="stat"><div class="stat-label">Rendimentos (projetos)</div><div class="stat-value" style="font-size:16px;color:#0F6E56">R$ ${totalRend.toLocaleString('pt-BR',{minimumFractionDigits:0})}</div></div>
+      <div class="stat"><div class="stat-label">Comissões recebidas</div><div class="stat-value" style="font-size:16px;color:#0F6E56">R$ ${totalComissoes.toLocaleString('pt-BR',{minimumFractionDigits:0})}</div></div>
     </div>
-
-    <div class="section-hdr" style="margin-top:20px">Tributário (BIDATX)</div>
-    ${bidatxItems.length?`<div class="table-wrap"><table>
-      <thead><tr><th>Cliente</th><th>Etapa</th><th>Comissão</th><th>Valor</th><th>Situação</th><th></th></tr></thead>
-      <tbody>${bidatxRows}</tbody>
-    </table></div>`:'<div class="empty-msg">Nenhuma comissão tributária registrada.</div>'}
-
-    <div class="section-hdr" style="margin-top:20px">Outros Projetos (Hub)</div>
-    ${hubItems.length?`<div class="table-wrap"><table>
-      <thead><tr><th>Projeto</th><th>Status</th><th>Participação</th><th>Valor</th><th>Situação</th><th></th></tr></thead>
-      <tbody>${hubRows}</tbody>
-    </table></div>`:'<div class="empty-msg">Você ainda não está em nenhum projeto do Hub.</div>'}
-  `;
-}
-
-function gerarPDFRendimentos(){
-  if(!window.jspdf){showToast('jsPDF não disponível');return;}
-  const{jsPDF}=window.jspdf;
-  const doc=new jsPDF();
-  const uid=currentUser.id;
-  let y=20;
-  const line=(txt,sz,bold,color)=>{doc.setFontSize(sz||12);doc.setFont('helvetica',bold?'bold':'normal');doc.setTextColor(...(color||[26,26,26]));const ls=doc.splitTextToSize(txt,170);doc.text(ls,20,y);y+=ls.length*(sz?sz*0.45+2:6);};
-  const sep=()=>{doc.setDrawColor(220,220,220);doc.line(20,y,190,y);y+=5;};
-
-  line('Extrato de Rendimentos — IA Hub',16,true,[16,26,51]);
-  line(currentUser.nome+' · '+currentUser.perfil,12,false,[80,80,80]);
-  line('Gerado em '+new Date().toLocaleDateString('pt-BR'),10,false,[150,150,150]);
-  y+=2;sep();
-
-  // BIDATX
-  const bidatxRows=[];
-  let totBx=0;
-  bidatxOportunidades.forEach(op=>{
-    const com=(op.comissoes||[]).find(c=>c.playerId===uid);
-    if(!com)return;
-    const cli=bidatxClientes.find(c=>c.id===op.clienteId);
-    const receita=op.valorApurado&&op.taxaHonorario?op.valorApurado*(op.taxaHonorario/100):0;
-    const valorCom=com.tipo==='pct'?Math.round(receita*(com.valor/100)):(com.valor||0);
-    let sit='Pendente';
-    if(op.etapa===BIDATX_ETAPA_FINAL){
-      const concHist=(op.historico||[]).filter(h=>h.etapa===BIDATX_ETAPA_FINAL).slice(-1)[0];
-      if(concHist&&concHist.data){const disp=new Date(new Date(concHist.data).getTime()+15*24*60*60*1000);if(com.pago){sit='Pago';}else if(Date.now()>=disp.getTime()){sit='Disponível';}else{sit='Disp. '+disp.toLocaleDateString('pt-BR');}}
-    }
-    totBx+=valorCom;
-    bidatxRows.push([cli?cli.nome:'?',op.etapa,com.tipo==='pct'?com.valor+'%':'R$ '+com.valor+' fx',valorCom?'R$ '+valorCom.toLocaleString('pt-BR'):'—',sit]);
-  });
-
-  line('TRIBUTÁRIO (BIDATX)',12,true,[16,26,51]);y+=2;
-  if(doc.autoTable&&bidatxRows.length){
-    doc.autoTable({startY:y,margin:{left:20,right:20},head:[['Cliente','Etapa','Comissão','Valor','Situação']],body:bidatxRows,styles:{fontSize:9},headStyles:{fillColor:[16,26,51]},alternateRowStyles:{fillColor:[245,247,250]}});
-    y=doc.lastAutoTable.finalY+6;
-  } else if(!bidatxRows.length){line('Nenhuma comissão tributária.',10,false,[150,150,150]);y+=4;}
-
-  // Hub
-  const hubRows=[];
-  let totHub=0;
-  projetos.filter(p=>(p.participantes||[]).includes(uid)).forEach(p=>{
-    const pct=(p.dist||{})[uid]||0;
-    const valorCom=pct&&p.valor?Math.round(p.valor*(pct/100)):0;
-    const sit=p.status==='Concluído'?'Disponível':'Pendente';
-    totHub+=valorCom;
-    hubRows.push([p.nome,p.status,pct+'%',valorCom?'R$ '+valorCom.toLocaleString('pt-BR'):'—',sit]);
-  });
-
-  y+=4;line('OUTROS PROJETOS (HUB)',12,true,[16,26,51]);y+=2;
-  if(doc.autoTable&&hubRows.length){
-    doc.autoTable({startY:y,margin:{left:20,right:20},head:[['Projeto','Status','Participação','Valor','Situação']],body:hubRows,styles:{fontSize:9},headStyles:{fillColor:[8,145,178]},alternateRowStyles:{fillColor:[245,247,250]}});
-    y=doc.lastAutoTable.finalY+6;
-  } else if(!hubRows.length){line('Nenhum projeto Hub.',10,false,[150,150,150]);y+=4;}
-
-  y+=4;sep();
-  line(`Total pipeline: R$ ${(totBx+totHub).toLocaleString('pt-BR')}`,12,true);
-  doc.save('rendimentos_'+currentUser.nome.replace(/\s/g,'_')+'_'+new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')+'.pdf');
+    <div class="section-hdr">Projetos e participações</div>
+    ${meusProjetos.length?`<div class="table-wrap"><table>
+      <thead><tr><th>Projeto</th><th>Status</th><th>Valor total</th><th>Minha %</th><th>Meus rendimentos</th><th>Previsão receb.</th></tr></thead>
+      <tbody>${meusProjetos.map(p=>{
+        const pct=(p.dist&&p.dist[uid])||0;
+        const rend=(p.valor||0)*(pct/100);
+        const dtR=calcDataReceb(p.fim);
+        return`<tr>
+          <td><strong>${p.nome}</strong>${p.recorr?`<div style="font-size:11px;color:#0F6E56">🔄 ${p.recorr}</div>`:''}</td>
+          <td><span class="badge ${PROJ_CLS[p.status]||''}">${p.status}</span></td>
+          <td>R$ ${(p.valor||0).toLocaleString('pt-BR')}</td>
+          <td>${pct}%</td>
+          <td style="color:#0F6E56;font-weight:600">R$ ${rend.toLocaleString('pt-BR',{minimumFractionDigits:0})}</td>
+          <td style="font-size:12px;color:#888">${dtR||'—'}</td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table></div>`:`<div class="empty-msg">Você ainda não está em nenhum projeto.</div>`}
+    ${minhasComissoes.length?`
+    <div class="section-hdr" style="margin-top:20px">Comissões e entradas</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Descrição</th><th>Data</th><th>Valor</th><th>Obs.</th></tr></thead>
+      <tbody>${minhasComissoes.map(l=>`<tr>
+        <td>${l.desc}</td>
+        <td style="color:#888">${l.data||'—'}</td>
+        <td style="color:#0F6E56;font-weight:600">R$ ${(l.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
+        <td style="color:#aaa;font-size:12px">${l.obs||'—'}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>`:''}`;
 }
 
 // ===================== RELATÓRIO DA REDE =====================
@@ -4093,7 +3512,7 @@ function renderRelatorioRede(){
         <h3>🏆 Quem mais trouxe conexões</h3>
         ${conPorMembro.length?conPorMembro.map((x,i)=>`<div class="ranking-row">
           <div><span class="ranking-pos">${['🥇','🥈','🥉'][i]||i+1}</span>${x.u.nome} <span style="font-size:11px;color:#888">(${x.u.perfil})</span></div>
-          <div style="text-align:right"><strong>${x.cnt}</strong> cone${x.cnt!==1?'xões':'xão'}<div class="ranking-bar" style="width:${Math.round(x.cnt/conPorMembro[0].cnt*100)}%"></div></div>
+          <div style="text-align:right"><strong>${x.cnt}</strong> conexão${x.cnt!==1?'ões':''}<div class="ranking-bar" style="width:${Math.round(x.cnt/conPorMembro[0].cnt*100)}%"></div></div>
         </div>`).join(''):'<div style="color:#aaa;font-size:13px;padding:8px">Nenhuma conexão cadastrada.</div>'}
       </div>
       <div class="rel-box" style="margin:0">
@@ -4151,504 +3570,7 @@ function gerarPDFRede(){
   doc.save('relatorio_rede_'+new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')+'.pdf');
 }
 
-// ===================== BIDATX — Módulo =====================
-const bidatx = {
-  playerNome(id){const u=users.find(u=>u.id===id);return u?u.nome:'—';},
-  clienteNome(id){const c=bidatxClientes.find(c=>c.id===id);return c?c.nome:'—';},
-  minhasOps(){
-    if(isSocio())return bidatxOportunidades;
-    return bidatxOportunidades.filter(op=>{
-      if(op.vendedorId===currentUser.id)return true;
-      if(op.comissoes&&op.comissoes.some(c=>c.playerId===currentUser.id))return true;
-      return false;
-    });
-  },
-  diasNaEtapa(op){
-    if(!op.historico||!op.historico.length)return 0;
-    const ent=op.historico.filter(h=>h.etapa===op.etapa);
-    if(!ent.length)return 0;
-    const dt=new Date(ent[ent.length-1].data);
-    return Math.floor((Date.now()-dt.getTime())/(1000*86400));
-  },
-  slaPill(op){
-    if(op.etapa===BIDATX_ETAPA_FINAL)return '';
-    const sla=bidatxSlaConfig[op.etapa];if(!sla)return '';
-    const d=this.diasNaEtapa(op);
-    if(d<=sla*0.5)return `<span class="bx-pill bx-pill-ok">${d}d / ${sla}d</span>`;
-    if(d<=sla)return `<span class="bx-pill bx-pill-mid">${d}d / ${sla}d</span>`;
-    return `<span class="bx-pill bx-pill-bad">${d}d / ${sla}d ⚠</span>`;
-  },
-  calcFollowUp(op){
-    if(!op.followUpDate)return null;
-    const dt=new Date(op.followUpDate);
-    const diff=Math.floor((dt.getTime()-Date.now())/(1000*86400));
-    return{dias:diff,dt:op.followUpDate};
-  },
-  followUpPill(op){
-    const fu=this.calcFollowUp(op);if(!fu)return '';
-    if(fu.dias>3)return '';
-    if(fu.dias>=0)return `<span class="bx-followup-pill mid">🔔 Follow-up em ${fu.dias}d</span>`;
-    return `<span class="bx-followup-pill bad">⚠ Follow-up atrasado ${Math.abs(fu.dias)}d</span>`;
-  },
-  renderFunil(){
-    const el=document.getElementById('bidatx-funil-inner');if(!el)return;
-    // lê filtro de tipo (preserva seleção se já renderizado)
-    const tipoFiltroEl=document.getElementById('bx-funil-tipo-fil');
-    const tipoFiltro=tipoFiltroEl?tipoFiltroEl.value:'';
-    const allOps=this.minhasOps();
-    const ops=tipoFiltro?allOps.filter(o=>o.tipoNegocio===tipoFiltro):allOps;
-    // etapas do tipo selecionado (sem "Concluído")
-    const etapasFiltro=tipoFiltro?bidatxGetEtapas(tipoFiltro).filter(e=>e!==BIDATX_ETAPA_FINAL):bidatxEtapas;
-    const ativos=ops.filter(o=>o.etapa!==BIDATX_ETAPA_FINAL);
-    const concluidos=ops.filter(o=>o.etapa===BIDATX_ETAPA_FINAL);
-    let tickItems=ativos.filter(o=>o.valorApurado);
-    let tickHtml='';
-    if(tickItems.length>0){
-      const items=tickItems.map(o=>`<span class="bx-ticker-item"><span>${this.clienteNome(o.clienteId)}</span><span class="v"> R$ ${(o.valorApurado||0).toLocaleString('pt-BR')}</span></span>`).join('<span style="color:rgba(255,255,255,.25);margin:0 8px">|</span>');
-      tickHtml=`<div class="bx-ticker-wrap"><div class="bx-ticker-track">${items}<span style="margin:0 36px;color:rgba(255,255,255,.2)">···</span>${items}</div></div>`;
-    }
-    const totalApurado=ativos.reduce((s,o)=>s+(o.valorApurado||0),0);
-    const totalHonorado=concluidos.reduce((s,o)=>s+(o.valorApurado&&o.taxaHonorario?o.valorApurado*(o.taxaHonorario/100):0),0);
-    const pct=bidatxMetaMensal>0?Math.min(100,Math.round(totalHonorado/bidatxMetaMensal*100)):0;
-    const kpisHtml=`<div class="bx-kpis">
-      <div class="bx-kpi"><div class="bx-kpi-label">Em andamento</div><div class="bx-kpi-value">${ativos.length}</div></div>
-      <div class="bx-kpi"><div class="bx-kpi-label">Valor apurado</div><div class="bx-kpi-value">R$ ${totalApurado.toLocaleString('pt-BR')}</div></div>
-      <div class="bx-kpi"><div class="bx-kpi-label">Honorários realizados</div><div class="bx-kpi-value">R$ ${totalHonorado.toLocaleString('pt-BR')}</div></div>
-      <div class="bx-kpi"><div class="bx-kpi-label">Meta mensal</div><div class="bx-kpi-value${pct<50?' warn':''}">${pct}%</div></div>
-    </div>`;
-    const pendSla=ativos.filter(o=>{const s=bidatxSlaConfig[o.etapa];return s&&this.diasNaEtapa(o)>s;});
-    let pendHtml='';
-    if(pendSla.length){
-      const items=pendSla.map(o=>`<div class="bx-pend-item" onclick="bidatx.abrirOp('${o.id}')"><span class="bx-pend-cliente">${this.clienteNome(o.clienteId)}</span><span class="bx-pend-etapa">${o.etapa}</span><span class="bx-pend-dias">${this.diasNaEtapa(o)}d</span></div>`).join('');
-      pendHtml=`<div class="bx-pend-panel"><div class="bx-pend-title">⚠ SLA Vencido (${pendSla.length})</div>${items}</div>`;
-    }
-    const cols=etapasFiltro.map((etapa,i)=>{
-      const cards=ativos.filter(o=>o.etapa===etapa);
-      const total=cards.reduce((s,o)=>s+(o.valorApurado||0),0);
-      const cardHtml=cards.length?cards.map(o=>`<div class="bx-card" onclick="bidatx.abrirOp('${o.id}')">
-        <div class="bx-card-cliente">${this.clienteNome(o.clienteId)}</div>
-        ${o.valorApurado?`<div class="bx-card-valor">R$ ${o.valorApurado.toLocaleString('pt-BR')}</div>`:'<div class="bx-card-valor pendente">Valor pendente</div>'}
-        <div style="font-size:11px;color:var(--bx-ink-faint);margin-bottom:6px">${o.tipoNegocio}</div>
-        <div class="bx-card-row"><span style="font-size:11px;color:var(--bx-ink-soft)">${this.playerNome(o.vendedorId)}</span>${this.slaPill(o)}</div>
-        ${this.followUpPill(o)?`<div style="margin-top:7px">${this.followUpPill(o)}</div>`:''}
-      </div>`).join(''):`<div style="font-size:11.5px;color:var(--bx-ink-faint);padding:14px 4px;text-align:center;border:1px dashed var(--bx-line);border-radius:8px">Nenhuma</div>`;
-      return`<div class="bx-col"><div class="bx-col-head"><div class="bx-col-num">${i+1}</div><div><div class="bx-col-title">${etapa}</div>${total?`<div class="bx-col-meta">R$ ${total.toLocaleString('pt-BR')}</div>`:'<div class="bx-col-meta">—</div>'}</div></div>${cardHtml}</div>`;
-    }).join('');
-    const concCards=concluidos.map(o=>`<div class="bx-card" onclick="bidatx.abrirOp('${o.id}')">
-      <div class="bx-card-cliente">${this.clienteNome(o.clienteId)}</div>
-      ${o.valorApurado?`<div class="bx-card-valor">R$ ${o.valorApurado.toLocaleString('pt-BR')}</div>`:'<div class="bx-card-valor pendente">Sem valor</div>'}
-      <div class="bx-card-row"><span class="bx-pill bx-pill-ok">Concluído</span></div>
-    </div>`).join('');
-    const concCol=`<div class="bx-col"><div class="bx-col-head"><div class="bx-col-num final">✓</div><div><div class="bx-col-title">Concluído</div><div class="bx-col-meta">${concluidos.length} op.</div></div></div>${concCards||'<div style="font-size:11.5px;color:var(--bx-ink-faint);padding:14px 4px;text-align:center;border:1px dashed var(--bx-line);border-radius:8px">Nenhuma</div>'}</div>`;
-    const totalOps=ops.length;
-    const convPct=totalOps>0?Math.round(concluidos.length/totalOps*100):0;
-    const funilRows=[...etapasFiltro.map(e=>{
-      const cnt=ativos.filter(o=>o.etapa===e).length;
-      const pctBar=Math.round(cnt/Math.max(1,totalOps)*100);
-      return`<div style="display:flex;align-items:center;gap:10px;margin-bottom:7px;font-size:12px"><div style="width:96px;color:var(--bx-ink-soft);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e}</div><div style="flex:1;height:14px;background:#f0f2f5;border-radius:4px;overflow:hidden"><div style="height:100%;width:${pctBar}%;background:var(--azul);border-radius:4px;transition:width .3s"></div></div><div style="width:26px;font-weight:600;color:var(--bx-ink);text-align:right">${cnt}</div></div>`;
-    }),`<div style="display:flex;align-items:center;gap:10px;margin-bottom:7px;font-size:12px"><div style="width:96px;color:#0F6E56;font-weight:600;text-align:right">Concluído</div><div style="flex:1;height:14px;background:#f0f2f5;border-radius:4px;overflow:hidden"><div style="height:100%;width:${Math.round(concluidos.length/Math.max(1,totalOps)*100)}%;background:#0F6E56;border-radius:4px"></div></div><div style="width:26px;font-weight:600;color:#0F6E56;text-align:right">${concluidos.length}</div></div>`].join('');
-    const rankMap={};
-    ops.forEach(o=>{const v=o.vendedorId;if(!rankMap[v])rankMap[v]={nome:this.playerNome(v),valor:0,count:0};rankMap[v].valor+=(o.valorApurado||0);rankMap[v].count++;});
-    const rankList=Object.values(rankMap).sort((a,b)=>b.valor-a.valor);
-    const maxRank=rankList.length?rankList[0].valor:1;
-    const rankRows=rankList.length?rankList.map((r,i)=>`<div style="display:flex;align-items:center;gap:10px;margin-bottom:7px;font-size:12px"><div style="width:18px;font-weight:700;color:var(--azul);text-align:right">${i+1}</div><div style="width:108px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--bx-ink)">${r.nome}</div><div style="flex:1;height:12px;background:#f0f2f5;border-radius:4px;overflow:hidden"><div style="height:100%;width:${maxRank>0?Math.round(r.valor/maxRank*100):0}%;background:var(--azul);border-radius:4px"></div></div><div style="width:90px;text-align:right;font-size:11px;color:var(--bx-ink-soft)">R$ ${r.valor.toLocaleString('pt-BR')}</div></div>`).join(''):'<div style="font-size:12px;color:var(--bx-ink-faint)">Nenhum dado.</div>';
-    const dashHtml=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;flex-wrap:wrap"><div style="background:#fff;border-radius:12px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,.06)"><div style="font-size:12px;font-weight:600;color:var(--bx-ink);margin-bottom:12px;display:flex;justify-content:space-between"><span>Funil de Conversão</span><span style="color:${convPct>=50?'#0F6E56':'#c0392b'};font-weight:700">${convPct}% chegam ao fim</span></div>${funilRows}</div><div style="background:#fff;border-radius:12px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,.06)"><div style="font-size:12px;font-weight:600;color:var(--bx-ink);margin-bottom:12px">Ranking por Valor Apurado</div>${rankRows}</div></div>`;
-    const tipoOpts=`<option value="">Todos os tipos</option>${TIPOS_NEGOCIO.map(t=>`<option value="${t}"${tipoFiltro===t?' selected':''}>${t}</option>`).join('')}`;
-    el.innerHTML=`
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px">
-        <div class="section-hdr" style="margin:0;border:none">Tributário — Funil</div>
-        <select id="bx-funil-tipo-fil" onchange="bidatx.renderFunil()" style="padding:7px 12px;border:1px solid var(--bx-line);border-radius:8px;font-size:13px;color:var(--bx-ink);background:#fff">${tipoOpts}</select>
-      </div>
-      ${tickHtml}${kpisHtml}${dashHtml}${pendHtml}
-      <div class="bx-board">${cols}${concCol}</div>
-    `;
-  },
-  novaOp(){
-    bidatxEditId=null;
-    document.getElementById('bidatx-modal-title').textContent='Nova Oportunidade Tributária';
-    document.getElementById('bidatx-projeto-body').innerHTML=this.buildOpForm({});
-    document.getElementById('ov-bidatx-op').classList.add('open');
-  },
-  abrirOp(id){
-    bidatxEditId=id;
-    const op=bidatxOportunidades.find(o=>o.id===id);if(!op)return;
-    document.getElementById('bidatx-modal-title').textContent=this.clienteNome(op.clienteId);
-    document.getElementById('bidatx-projeto-body').innerHTML=this.buildOpForm(op);
-    this.renderAtividades(id);
-    document.getElementById('ov-bidatx-op').classList.add('open');
-  },
-  buildOpForm(op){
-    const activeUsers=users.filter(u=>u.status==='Ativo');
-    const clienteOpts=bidatxClientes.map(c=>`<option value="${c.id}"${op.clienteId===c.id?' selected':''}>${c.nome}</option>`).join('');
-    const userOpts=activeUsers.map(u=>`<option value="${u.id}"${op.vendedorId===u.id?' selected':''}>${u.nome}</option>`).join('');
-    const etapaOpts=bidatxGetEtapas(op.tipoNegocio).map(e=>`<option value="${e}"${op.etapa===e?' selected':''}>${e}</option>`).join('');
-    const tipoNegOpts=TIPOS_NEGOCIO.map(t=>`<option value="${t}"${op.tipoNegocio===t?' selected':''}>${t}</option>`).join('');
-    const origemOpts=ORIGENS_LEAD.map(o=>`<option value="${o}"${op.origemLead===o?' selected':''}>${o}</option>`).join('');
-    const timelineHtml=op.historico&&op.historico.length?`<ul class="bx-timeline">${op.historico.map(h=>`<li><span class="dot"></span><span class="et">${h.etapa}</span><span class="dt">${h.data||''}</span></li>`).join('')}</ul>`:'<div style="color:var(--bx-ink-faint);font-size:12px">Sem histórico</div>';
-    const comissoesHtml=this.buildComissoesHtml(op);
-    const slaInfo=op.etapa&&op.etapa!==BIDATX_ETAPA_FINAL&&bidatxSlaConfig[op.etapa]?`<div style="margin-top:8px;font-size:12px;color:var(--bx-ink-faint)">SLA desta etapa: ${bidatxSlaConfig[op.etapa]} dias · Tempo atual: ${this.diasNaEtapa(op)} dias</div>`:'';
-    return`
-      <div class="bx-row2">
-        <div class="bx-field"><label>Cliente</label><select id="bxf-cliente">${clienteOpts}</select><button class="bx-link-btn" style="margin-top:5px" onclick="bidatx.novoCliente()">+ Novo cliente</button></div>
-        <div class="bx-field"><label>Tipo de Negócio</label><select id="bxf-tipo" onchange="bidatx.atualizarEtapasPorTipo()">${tipoNegOpts}</select></div>
-      </div>
-      <div class="bx-row2">
-        <div class="bx-field"><label>Origem do Lead</label><select id="bxf-origem">${origemOpts}</select></div>
-        <div class="bx-field"><label>Vendedor Responsável</label><select id="bxf-vendedor">${userOpts}</select></div>
-      </div>
-      <div class="bx-row2">
-        <div class="bx-field"><label>Etapa Atual</label><select id="bxf-etapa">${etapaOpts}</select>${slaInfo}</div>
-        <div class="bx-field"><label>Follow-up (data)</label><input type="date" id="bxf-followup" value="${op.followUpDate||''}"></div>
-      </div>
-      <div class="bx-row2">
-        <div class="bx-field"><label>Valor Apurado (R$)</label><input type="number" id="bxf-valor" placeholder="ex: 150000" value="${op.valorApurado||''}"></div>
-        <div class="bx-field"><label>Taxa Honorário (%)</label><input type="number" id="bxf-taxa" placeholder="ex: 8" value="${op.taxaHonorario||''}"></div>
-      </div>
-      <div class="bx-field"><label>Observações</label><textarea id="bxf-obs" rows="2" style="resize:vertical">${op.observacoes||''}</textarea></div>
-      ${op.id?`<div class="bx-section-title"><span>Histórico de Etapas</span></div>${timelineHtml}`:''}
-      <div class="bx-section-title"><span>Comissões</span>${isSocio()?'<button class="bx-link-btn" onclick="bidatx.addComissao()">+ Adicionar</button>':''}</div>
-      <div id="bxf-comissoes">${comissoesHtml}</div>
-      ${op.id?`<div class="bx-section-title"><span>Atividades</span><button class="bx-link-btn" onclick="bidatx.abrirFormAtividade()">+ Registrar</button></div><div id="bxf-atividades-wrap"></div>`:''}
-      <div class="bx-modal-actions">
-        ${op.id&&isSocio()?`<button class="bx-btn bx-btn-danger bx-btn-sm" onclick="bidatx.excluirOp('${op.id}')">Excluir</button>`:''}
-        <button class="bx-btn bx-btn-ghost bx-btn-sm" onclick="closeOv('ov-bidatx-op')">Cancelar</button>
-        <button class="bx-btn bx-btn-accent bx-btn-sm" onclick="bidatx.salvarOp()">Salvar</button>
-      </div>
-    `;
-  },
-  buildComissoesHtml(op){
-    if(!op.comissoes||!op.comissoes.length)return'<div style="font-size:12px;color:var(--bx-ink-faint);padding:8px 0">Nenhuma comissão cadastrada.</div>';
-    return op.comissoes.map(c=>{
-      const u=users.find(u=>u.id===c.playerId);
-      const uNome=u?u.nome:'?';
-      const val=c.tipo==='pct'?`${c.valor}%`:`R$ ${(c.valor||0).toLocaleString('pt-BR')}`;
-      const est=op.valorApurado&&c.tipo==='pct'?` (≈ R$ ${Math.round(op.valorApurado*c.valor/100).toLocaleString('pt-BR')})`:'';
-      return`<div class="bx-comissao-row" style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div><div style="font-weight:600;font-size:13px">${uNome}</div><div style="font-size:11.5px;color:var(--bx-ink-faint)">${c.papel} · ${val}${est}</div></div>${isSocio()?`<button class="bx-icon-btn" onclick="bidatx.rmComissao('${c.id}')">✕</button>`:''}</div>`;
-    }).join('');
-  },
-  atualizarEtapasPorTipo(){
-    const tipo=document.getElementById('bxf-tipo');
-    const etapaSel=document.getElementById('bxf-etapa');
-    if(!tipo||!etapaSel)return;
-    const atual=etapaSel.value;
-    const etapas=bidatxGetEtapas(tipo.value);
-    etapaSel.innerHTML=etapas.map(e=>`<option value="${e}"${e===atual?' selected':''}>${e}</option>`).join('');
-  },
-  addComissao(){
-    const activeUsers=users.filter(u=>u.status==='Ativo');
-    const userOpts=activeUsers.map(u=>`<option value="${u.id}">${u.nome}</option>`).join('');
-    const papelOpts=PAPEIS_COMISSAO.map(p=>`<option value="${p}">${p}</option>`).join('');
-    const form=`<div class="bx-ativ-form"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px"><select id="bxnc-player">${userOpts}</select><select id="bxnc-papel">${papelOpts}</select></div><div style="display:grid;grid-template-columns:64px 110px 1fr 1fr;gap:6px;align-items:center"><select id="bxnc-tipo" style="font-size:12px;padding:6px 4px"><option value="pct">%</option><option value="fixo">R$</option></select><input type="number" id="bxnc-valor" placeholder="Valor" min="0" step="0.01" style="border:1px solid var(--bx-line);border-radius:7px;padding:7px 8px;font-size:13px;width:100%"><button class="bx-btn bx-btn-accent bx-btn-sm" onclick="bidatx.salvarComissao()">Adicionar</button><button class="bx-btn bx-btn-ghost bx-btn-sm" onclick="bidatx.renderComissoesOnly()">Cancelar</button></div></div>`;
-    const el=document.getElementById('bxf-comissoes');
-    if(el)el.innerHTML=form+el.innerHTML;
-  },
-  salvarComissao(){
-    const op=bidatxOportunidades.find(o=>o.id===bidatxEditId);if(!op)return;
-    const pId=parseInt(document.getElementById('bxnc-player').value);
-    const papel=document.getElementById('bxnc-papel').value;
-    const tipo=document.getElementById('bxnc-tipo').value;
-    const valor=parseFloat(document.getElementById('bxnc-valor').value)||0;
-    if(!valor)return showToast('Informe o valor da comissão');
-    if(!op.comissoes)op.comissoes=[];
-    op.comissoes.push({id:'bxc'+Date.now(),playerId:pId,papel,tipo,valor,pago:false,dataPagamento:null});
-    saveData();this.renderComissoesOnly();
-  },
-  rmComissao(cid){
-    const op=bidatxOportunidades.find(o=>o.id===bidatxEditId);if(!op)return;
-    op.comissoes=op.comissoes.filter(c=>c.id!==cid);
-    saveData();this.renderComissoesOnly();
-  },
-  renderComissoesOnly(){
-    const op=bidatxOportunidades.find(o=>o.id===bidatxEditId)||{comissoes:[]};
-    const el=document.getElementById('bxf-comissoes');
-    if(el)el.innerHTML=this.buildComissoesHtml(op);
-  },
-  salvarOp(){
-    const clienteId=document.getElementById('bxf-cliente').value;
-    const tipoNegocio=document.getElementById('bxf-tipo').value;
-    const origemLead=document.getElementById('bxf-origem').value;
-    const vendedorId=parseInt(document.getElementById('bxf-vendedor').value);
-    const etapa=document.getElementById('bxf-etapa').value;
-    const followUpDate=document.getElementById('bxf-followup').value||null;
-    const valorApurado=parseFloat(document.getElementById('bxf-valor').value)||null;
-    const taxaHonorario=parseFloat(document.getElementById('bxf-taxa').value)||null;
-    const observacoes=document.getElementById('bxf-obs').value.trim();
-    if(!clienteId)return showToast('Selecione um cliente');
-    if(bidatxEditId){
-      const op=bidatxOportunidades.find(o=>o.id===bidatxEditId);if(!op)return;
-      const etapaChanged=op.etapa!==etapa;
-      if(etapaChanged){if(!op.historico)op.historico=[];op.historico.push({etapa,data:new Date().toISOString().slice(0,10)});}
-      Object.assign(op,{clienteId,tipoNegocio,origemLead,vendedorId,etapa,followUpDate,valorApurado,taxaHonorario,observacoes});
-    } else {
-      const newOp={id:'bx'+Date.now(),clienteId,tipoNegocio,origemLead,vendedorId,etapa,followUpDate,valorApurado,taxaHonorario,observacoes,historico:[{etapa,data:new Date().toISOString().slice(0,10)}],comissoes:[],atividades:[],createdAt:new Date().toISOString().slice(0,10)};
-      bidatxOportunidades.push(newOp);bidatxEditId=newOp.id;
-    }
-    saveData();
-    closeOv('ov-bidatx-op');
-    showToast('Oportunidade salva!');
-    const fEl=document.getElementById('tab-bidatx-funil');
-    if(fEl&&fEl.classList.contains('active'))this.renderFunil();
-    const nEl=document.getElementById('tab-bidatx-negocios');
-    if(nEl&&nEl.classList.contains('active'))this.renderNegocios();
-  },
-  excluirOp(id){
-    if(!confirm('Excluir esta oportunidade?'))return;
-    bidatxOportunidades=bidatxOportunidades.filter(o=>o.id!==id);
-    saveData();closeOv('ov-bidatx-op');showToast('Oportunidade excluída.');this.renderFunil();
-  },
-  novoCliente(){
-    const nome=prompt('Nome do cliente (empresa):');if(!nome||!nome.trim())return;
-    const doc=prompt('CNPJ (opcional):')||'';
-    const cont=prompt('Contato (email ou tel):')||'';
-    const nc={id:'c'+Date.now(),nome:nome.trim(),documento:doc,contato:cont};
-    bidatxClientes.push(nc);saveData();showToast('Cliente cadastrado: '+nc.nome);
-    const sel=document.getElementById('bxf-cliente');
-    if(sel){const opt=document.createElement('option');opt.value=nc.id;opt.textContent=nc.nome;opt.selected=true;sel.appendChild(opt);}
-  },
-  renderAtividades(opId){
-    const el=document.getElementById('bxf-atividades-wrap');if(!el)return;
-    const op=bidatxOportunidades.find(o=>o.id===opId);
-    if(!op||!op.atividades||!op.atividades.length){el.innerHTML='<div style="font-size:12px;color:var(--bx-ink-faint);padding:4px 0">Nenhuma atividade registrada.</div>';return;}
-    el.innerHTML=op.atividades.slice().reverse().map(a=>`<div class="bx-ativ-item"><div class="bx-ativ-tipo">${a.tipo}</div><div class="bx-ativ-texto">${a.texto}</div><div class="bx-ativ-meta">${a.data||''}<br><button class="bx-icon-btn" onclick="bidatx.rmAtividade('${opId}','${a.id}')">✕</button></div></div>`).join('');
-  },
-  abrirFormAtividade(){
-    const wrap=document.getElementById('bxf-atividades-wrap');if(!wrap)return;
-    const tipoOpts=['Reunião','Ligação','E-mail','WhatsApp','Visita','Análise','Outro'].map(t=>`<option value="${t}">${t}</option>`).join('');
-    wrap.innerHTML=`<div class="bx-ativ-form"><div class="bx-row2"><select id="bxa-tipo">${tipoOpts}</select><input type="date" id="bxa-data" value="${new Date().toISOString().slice(0,10)}"></div><textarea id="bxa-texto" rows="2" placeholder="Descreva a atividade..." style="width:100%;margin-top:8px;border:1px solid var(--bx-line);border-radius:7px;padding:9px;box-sizing:border-box;resize:vertical"></textarea><div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end"><button class="bx-btn bx-btn-ghost bx-btn-sm" onclick="bidatx.renderAtividades('${bidatxEditId}')">Cancelar</button><button class="bx-btn bx-btn-accent bx-btn-sm" onclick="bidatx.salvarAtividade('${bidatxEditId}')">Salvar</button></div></div>`;
-  },
-  salvarAtividade(opId){
-    const op=bidatxOportunidades.find(o=>o.id===opId);if(!op)return;
-    const tipo=document.getElementById('bxa-tipo').value;
-    const data=document.getElementById('bxa-data').value;
-    const texto=document.getElementById('bxa-texto').value.trim();
-    if(!texto)return showToast('Descreva a atividade');
-    if(!op.atividades)op.atividades=[];
-    op.atividades.push({id:'bxa'+Date.now(),tipo,data,texto,autor:currentUser.nome});
-    saveData();this.renderAtividades(opId);showToast('Atividade registrada!');
-  },
-  rmAtividade(opId,aid){
-    const op=bidatxOportunidades.find(o=>o.id===opId);if(!op)return;
-    op.atividades=op.atividades.filter(a=>a.id!==aid);
-    saveData();this.renderAtividades(opId);
-  },
-  gerarLinkWhatsApp(opId){
-    const op=bidatxOportunidades.find(o=>o.id===opId);if(!op)return;
-    const cli=bidatxClientes.find(c=>c.id===op.clienteId);
-    const msg=`Olá! Referente à oportunidade de ${op.tipoNegocio} para ${cli?cli.nome:'sua empresa'} — gostaria de alinhar os próximos passos.`;
-    window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
-  },
-  gerarLinkEmail(opId){
-    const op=bidatxOportunidades.find(o=>o.id===opId);if(!op)return;
-    const cli=bidatxClientes.find(c=>c.id===op.clienteId);
-    const sub=encodeURIComponent(`${op.tipoNegocio} — ${cli?cli.nome:'Cliente'}`);
-    const body=encodeURIComponent(`Prezado(a),\n\nSegue nossa proposta de ${op.tipoNegocio}.\n\nAtenciosamente,\n${currentUser.nome}`);
-    window.open(`mailto:${cli&&cli.contato&&cli.contato.includes('@')?cli.contato:''}?subject=${sub}&body=${body}`,'_blank');
-  },
-  renderNegocios(){
-    const el=document.getElementById('bidatx-negocios-inner');if(!el)return;
-    if(!isSocio()){el.innerHTML='<div class="empty-msg">Acesso restrito a Sócios.</div>';return;}
-    const ops=bidatxOportunidades;
-    const totalApurado=ops.filter(o=>o.valorApurado).reduce((s,o)=>s+(o.valorApurado||0),0);
-    const concl=ops.filter(o=>o.etapa===BIDATX_ETAPA_FINAL);
-    const totalHon=concl.reduce((s,o)=>s+(o.valorApurado&&o.taxaHonorario?o.valorApurado*(o.taxaHonorario/100):0),0);
-    const rows=ops.map(o=>`<tr onclick="bidatx.abrirOp('${o.id}')"><td style="font-weight:600;color:var(--bx-ink)">${this.clienteNome(o.clienteId)}</td><td>${o.tipoNegocio}</td><td>${o.etapa}</td><td>${o.valorApurado?'R$ '+o.valorApurado.toLocaleString('pt-BR'):'—'}</td><td>${o.taxaHonorario?o.taxaHonorario+'%':'—'}</td><td>${o.valorApurado&&o.taxaHonorario?'R$ '+Math.round(o.valorApurado*o.taxaHonorario/100).toLocaleString('pt-BR'):'—'}</td><td>${this.playerNome(o.vendedorId)}</td></tr>`).join('');
-    el.innerHTML=`
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px">
-        <div class="section-hdr" style="margin:0;border:none">Tributário — Negócios</div>
-        <div style="display:flex;gap:10px"><button class="bx-btn bx-btn-ghost bx-btn-sm" onclick="bidatx.exportarCSV()">⬇ CSV Concluídos</button><button class="bx-btn bx-btn-ghost bx-btn-sm" onclick="bidatx.gerarRelatorioPDF()">⬇ PDF</button></div>
-      </div>
-      <div class="bx-kpis">
-        <div class="bx-kpi"><div class="bx-kpi-label">Total oportunidades</div><div class="bx-kpi-value">${ops.length}</div></div>
-        <div class="bx-kpi"><div class="bx-kpi-label">Valor apurado</div><div class="bx-kpi-value">R$ ${totalApurado.toLocaleString('pt-BR')}</div></div>
-        <div class="bx-kpi"><div class="bx-kpi-label">Honorários realizados</div><div class="bx-kpi-value">R$ ${totalHon.toLocaleString('pt-BR')}</div></div>
-        <div class="bx-kpi"><div class="bx-kpi-label">Concluídos</div><div class="bx-kpi-value">${concl.length}</div></div>
-      </div>
-      <div class="bx-negocios-wrap">
-        <table class="bx-negocios-table">
-          <thead><tr><th>Cliente</th><th>Tipo</th><th>Etapa</th><th>Valor apurado</th><th>Honorário</th><th>Receita</th><th>Vendedor</th></tr></thead>
-          <tbody>${rows||'<tr><td colspan="7" style="text-align:center;color:var(--bx-ink-faint);padding:20px">Nenhuma oportunidade cadastrada.</td></tr>'}</tbody>
-        </table>
-      </div>`;
-  },
-  renderConfig(){
-    const el=document.getElementById('bidatx-config-inner');if(!el)return;
-    if(!isSocio()){el.innerHTML='<div class="empty-msg">Acesso restrito a Sócios.</div>';return;}
-    const etapasUsadas=new Set(bidatxOportunidades.map(o=>o.etapa));
-    const buildEtapaRows=(arr,prefix)=>arr.map((e,i)=>{
-      const emUso=etapasUsadas.has(e);
-      return`<div class="bx-sla-row" style="align-items:center;gap:10px">
-        <input type="text" value="${e}" id="${prefix}-nome-${i}" style="flex:1;border:1px solid var(--bx-line);border-radius:7px;padding:7px 10px;font-size:13px">
-        <label style="font-size:11px;color:var(--bx-ink-faint);white-space:nowrap">SLA</label>
-        <input type="number" value="${bidatxSlaConfig[e]||7}" id="${prefix}-sla-${i}" style="width:62px;text-align:center;border:1px solid var(--bx-line);border-radius:7px;padding:7px" min="1">
-        <span style="font-size:11px;color:var(--bx-ink-faint)">d</span>
-        <label style="font-size:11px;color:var(--bx-ink-faint);white-space:nowrap">FU</label>
-        <input type="number" value="${bidatxFollowUpConfig[e]||''}" id="${prefix}-fu-${i}" style="width:62px;text-align:center;border:1px solid var(--bx-line);border-radius:7px;padding:7px" min="1" placeholder="—">
-        <span style="font-size:11px;color:var(--bx-ink-faint)">d</span>
-        <button onclick="bidatx.removerEtapaDeArr('${prefix}',${i})" style="border:none;background:none;cursor:${emUso?'not-allowed':'pointer'};color:${emUso?'#ccc':'#c0392b'};font-size:15px;padding:0 2px" ${emUso?'disabled':''} title="${emUso?'Em uso':'Remover'}">✕</button>
-      </div>`;
-    }).join('');
-    const clienteRows=bidatxClientes.map(c=>`<div class="bx-comissao-row" style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:600">${c.nome}</div><div style="font-size:11.5px;color:var(--bx-ink-faint)">${c.documento||'CNPJ não informado'} · ${c.contato||'Sem contato'}</div></div></div>`).join('');
-    el.innerHTML=`
-      <div class="section-hdr" style="margin-bottom:18px;border:none">Tributário — Configurações</div>
-      <div style="max-width:720px">
-        <div style="font-size:11px;color:var(--bx-ink-faint);margin-bottom:14px">SLA = prazo máximo na etapa · FU = prazo de follow-up (dias)</div>
-
-        <div class="bx-section-title" style="border-top:none;padding-top:0;margin-top:0">
-          <span>Recuperação Tributária — Etapas</span>
-          <button class="bx-link-btn" onclick="bidatx.adicionarEtapaDeArr('rt')">+ Etapa</button>
-        </div>
-        <div id="bxetapas-rt">${buildEtapaRows(bidatxEtapas,'bxrt')}</div>
-        <button class="bx-btn bx-btn-accent bx-btn-sm" style="margin-top:10px" onclick="bidatx.salvarEtapasArr('rt')">Salvar</button>
-
-        <div class="bx-section-title">
-          <span>Consultoria — Etapas</span>
-          <button class="bx-link-btn" onclick="bidatx.adicionarEtapaDeArr('cons')">+ Etapa</button>
-        </div>
-        <div id="bxetapas-cons">${buildEtapaRows(bidatxEtapasConsultoria,'bxcons')}</div>
-        <button class="bx-btn bx-btn-accent bx-btn-sm" style="margin-top:10px" onclick="bidatx.salvarEtapasArr('cons')">Salvar</button>
-
-        <div class="bx-section-title">
-          <span>Transação Tributária — Etapas</span>
-          <button class="bx-link-btn" onclick="bidatx.adicionarEtapaDeArr('tt')">+ Etapa</button>
-        </div>
-        ${bidatxEtapasTT.length?`<div id="bxetapas-tt">${buildEtapaRows(bidatxEtapasTT,'bxtt')}</div><button class="bx-btn bx-btn-accent bx-btn-sm" style="margin-top:10px" onclick="bidatx.salvarEtapasArr('tt')">Salvar</button>`:'<div style="font-size:12px;color:var(--bx-ink-faint);padding:8px 0">Etapas ainda não definidas. Clique em "+ Etapa" para adicionar.</div><div id="bxetapas-tt"></div><button class="bx-btn bx-btn-accent bx-btn-sm" style="margin-top:6px" onclick="bidatx.salvarEtapasArr(\'tt\')">Salvar</button>'}
-
-        <div class="bx-section-title"><span>Meta Mensal de Honorários</span></div>
-        <div class="bx-sla-row">
-          <label>Meta (R$)</label>
-          <input type="number" id="bx-meta" value="${bidatxMetaMensal}" style="width:160px;border:1px solid var(--bx-line);border-radius:7px;padding:7px 10px">
-          <button class="bx-btn bx-btn-accent bx-btn-sm" onclick="bidatx.salvarMeta()" style="margin-left:8px">Salvar</button>
-        </div>
-
-        <div class="bx-section-title"><span>Clientes</span><button class="bx-link-btn" onclick="bidatx.novoCliente()">+ Novo cliente</button></div>
-        ${clienteRows||'<div style="font-size:12px;color:var(--bx-ink-faint)">Nenhum cliente cadastrado.</div>'}
-      </div>`;
-  },
-  adicionarEtapa(){
-    const nome=prompt('Nome da nova etapa:');
-    if(!nome||!nome.trim())return;
-    const n=nome.trim();
-    if(bidatxEtapas.includes(n)){showToast('Já existe uma etapa com esse nome.');return;}
-    bidatxEtapas.push(n);
-    bidatxSlaConfig[n]=7;
-    saveData();
-    this.renderConfig();
-    showToast('Etapa "'+n+'" adicionada.');
-  },
-  removerEtapa(i){
-    const nome=bidatxEtapas[i];
-    if(!nome)return;
-    if(bidatxOportunidades.some(o=>o.etapa===nome)){showToast('Etapa em uso — mova os negócios antes de remover.');return;}
-    if(!confirm('Remover a etapa "'+nome+'"?'))return;
-    bidatxEtapas.splice(i,1);
-    delete bidatxSlaConfig[nome];
-    delete bidatxFollowUpConfig[nome];
-    saveData();
-    this.renderConfig();
-    showToast('Etapa "'+nome+'" removida.');
-  },
-  salvarEtapas(){
-    const novosNomes=[];
-    const novoSla={};
-    const novoFu={};
-    for(let i=0;i<bidatxEtapas.length;i++){
-      const nomeEl=document.getElementById('bxetapa-nome-'+i);
-      const slaEl=document.getElementById('bxetapa-sla-'+i);
-      const fuEl=document.getElementById('bxetapa-fu-'+i);
-      if(!nomeEl)continue;
-      const nome=nomeEl.value.trim();
-      if(!nome){showToast('Nome de etapa não pode ser vazio.');return;}
-      if(novosNomes.includes(nome)){showToast('Nomes de etapa duplicados.');return;}
-      const antigoNome=bidatxEtapas[i];
-      // remap oportunidades que estavam na etapa com nome antigo
-      if(antigoNome!==nome){
-        bidatxOportunidades.forEach(op=>{if(op.etapa===antigoNome)op.etapa=nome;if(op.historico)op.historico.forEach(h=>{if(h.etapa===antigoNome)h.etapa=nome;});});
-      }
-      novosNomes.push(nome);
-      novoSla[nome]=parseInt(slaEl?slaEl.value:7)||7;
-      const fuVal=fuEl?parseInt(fuEl.value):0;
-      if(fuVal>0)novoFu[nome]=fuVal;
-    }
-    bidatxEtapas=novosNomes;
-    bidatxSlaConfig=novoSla;
-    bidatxFollowUpConfig=novoFu;
-    saveData();
-    this.renderConfig();
-    showToast('Etapas salvas com sucesso!');
-  },
-  salvarMeta(){
-    const metaEl=document.getElementById('bx-meta');if(metaEl)bidatxMetaMensal=parseFloat(metaEl.value)||300000;
-    saveData();showToast('Meta atualizada!');
-  },
-  salvarConfig(){
-    // mantido por compatibilidade — use salvarEtapas() + salvarMeta()
-    this.salvarEtapas();
-  },
-  marcarPago(opId,comId){
-    if(!isSocio())return;
-    const op=bidatxOportunidades.find(o=>o.id===opId);if(!op)return;
-    const com=(op.comissoes||[]).find(c=>c.id===comId);if(!com)return;
-    if(!confirm(`Marcar comissão de ${this.playerNome(com.playerId)} como paga?`))return;
-    com.pago=true;
-    com.dataPagamento=new Date().toISOString().slice(0,10);
-    saveData();
-    showToast('Comissão marcada como paga.');
-    renderMeusRendimentos();
-  },
-  exportarCSV(){
-    const concluidas=bidatxOportunidades.filter(o=>o.etapa===BIDATX_ETAPA_FINAL);
-    if(!concluidas.length){showToast('Nenhum negócio concluído para exportar.');return;}
-    const cols=['Oportunidade','Cliente','Tipo de Negócio','Valor Apurado (R$)','Honorário (%)','Receita Honorário (R$)','Comissionado','Papel','Tipo Comissão','% ou R$ Fixo','Valor Comissão (R$)'];
-    const rows=[cols];
-    concluidas.forEach(op=>{
-      const cli=bidatxClientes.find(c=>c.id===op.clienteId);
-      const cliNome=cli?cli.nome:'?';
-      const receita=op.valorApurado&&op.taxaHonorario?Math.round(op.valorApurado*op.taxaHonorario/100):0;
-      if(!op.comissoes||!op.comissoes.length){
-        rows.push([op.id,cliNome,op.tipoNegocio,op.valorApurado||'',op.taxaHonorario||'',receita||'','—','—','—','—','—']);
-      } else {
-        op.comissoes.forEach(c=>{
-          const u=users.find(u=>u.id===c.playerId);
-          const uNome=u?u.nome:'?';
-          const valCom=c.tipo==='pct'&&receita?Math.round(receita*c.valor/100):c.tipo==='fixo'?c.valor:'';
-          rows.push([op.id,cliNome,op.tipoNegocio,op.valorApurado||'',op.taxaHonorario||'',receita||'',uNome,c.papel,c.tipo==='pct'?'%':'Fixo R$',c.valor,valCom]);
-        });
-      }
-    });
-    const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\r\n');
-    const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');
-    a.href=url;a.download='tributario_concluidos_'+new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')+'.csv';
-    document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
-    showToast(`CSV gerado: ${concluidas.length} negócio(s), ${rows.length-1} linha(s).`);
-  },
-  gerarRelatorioPDF(){
-    if(!window.jspdf)return showToast('jsPDF não disponível');
-    const{jsPDF}=window.jspdf;
-    const doc=new jsPDF();
-    let y=20;
-    const addLine=(txt,sz,bold,color)=>{doc.setFontSize(sz||12);doc.setFont('helvetica',bold?'bold':'normal');if(color)doc.setTextColor(...color);else doc.setTextColor(26,26,26);const lines=doc.splitTextToSize(txt,170);doc.text(lines,20,y);y+=lines.length*(sz?sz*0.5+2:7);};
-    const addSep=()=>{doc.setDrawColor(200,200,200);doc.line(20,y,190,y);y+=5;};
-    addLine('Tributário — Relatório de Oportunidades',16,true,[16,26,51]);addSep();
-    addLine('Gerado em: '+new Date().toLocaleDateString('pt-BR'),10,false,[150,150,150]);y+=4;
-    const ops=bidatxOportunidades;
-    const totalApurado=ops.filter(o=>o.valorApurado).reduce((s,o)=>s+(o.valorApurado||0),0);
-    const concl=ops.filter(o=>o.etapa===BIDATX_ETAPA_FINAL);
-    const totalHon=concl.reduce((s,o)=>s+(o.valorApurado&&o.taxaHonorario?o.valorApurado*(o.taxaHonorario/100):0),0);
-    addLine(`Total: ${ops.length} oportunidades | Concluídos: ${concl.length} | Valor apurado: R$ ${totalApurado.toLocaleString('pt-BR')}`,12);
-    addLine(`Honorários realizados: R$ ${totalHon.toLocaleString('pt-BR')}`,12,true,[15,110,86]);
-    y+=4;addSep();
-    if(doc.autoTable){
-      doc.autoTable({startY:y,margin:{left:20,right:20},head:[['Cliente','Tipo','Etapa','Valor Apurado','Honor.%','Receita']],body:ops.map(o=>[this.clienteNome(o.clienteId),o.tipoNegocio,o.etapa,o.valorApurado?'R$ '+o.valorApurado.toLocaleString('pt-BR'):'—',o.taxaHonorario?o.taxaHonorario+'%':'—',o.valorApurado&&o.taxaHonorario?'R$ '+Math.round(o.valorApurado*o.taxaHonorario/100).toLocaleString('pt-BR'):'—']),styles:{fontSize:9},headStyles:{fillColor:[16,26,51]},alternateRowStyles:{fillColor:[240,242,246]}});
-    }
-    doc.save('bidatx_relatorio_'+new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')+'.pdf');
-  }
-};
-
-
-// ===================== PERSISTÊNCIA localStorage =====================
-// ===================== SUPABASE =====================
+// ===================== PERSISTÊNCIA =====================
 const SUPA_URL='https://pxcqyzbgfbwwkazmonzx.supabase.co';
 const SUPA_KEY='sb_publishable_6QT2f_wCkTmpfoO_EEZlpA_BCcC8Fv8';
 let supaClient=null;
@@ -4658,10 +3580,7 @@ function getStateSnapshot(){
   return{
     users,projetos,lancamentos,sinergias,conexoes,
     agendaLocalEvents,notificacoes,oportunidadesPendentes,
-    convidadosExternos,customGroups,interessesPendentes,
-    bidatxEtapas,bidatxEtapasConsultoria,bidatxEtapasTT,
-    bidatxOportunidades,bidatxClientes,bidatxSlaConfig,
-    bidatxFollowUpConfig,bidatxMetaMensal
+    convidadosExternos,customGroups,interessesPendentes
   };
 }
 
@@ -4678,14 +3597,6 @@ function applyStateSnapshot(d){
   if(d.convidadosExternos)convidadosExternos=d.convidadosExternos;
   if(d.customGroups)customGroups=d.customGroups;
   if(d.interessesPendentes)interessesPendentes=d.interessesPendentes;
-  if(d.bidatxEtapas)bidatxEtapas=d.bidatxEtapas;
-  if(d.bidatxEtapasConsultoria)bidatxEtapasConsultoria=d.bidatxEtapasConsultoria;
-  if(d.bidatxEtapasTT)bidatxEtapasTT=d.bidatxEtapasTT;
-  if(d.bidatxOportunidades)bidatxOportunidades=d.bidatxOportunidades;
-  if(d.bidatxClientes)bidatxClientes=d.bidatxClientes;
-  if(d.bidatxSlaConfig)bidatxSlaConfig=d.bidatxSlaConfig;
-  if(d.bidatxFollowUpConfig)bidatxFollowUpConfig=d.bidatxFollowUpConfig;
-  if(d.bidatxMetaMensal)bidatxMetaMensal=d.bidatxMetaMensal;
 }
 
 let _syncTimer=null;
@@ -4722,14 +3633,6 @@ function saveData(){
     localStorage.setItem('iahub_externos',JSON.stringify(convidadosExternos));
     localStorage.setItem('iahub_customGroups',JSON.stringify(customGroups));
     localStorage.setItem('iahub_interesses',JSON.stringify(interessesPendentes));
-    localStorage.setItem('iahub_bidatx_etapas',JSON.stringify(bidatxEtapas));
-    localStorage.setItem('iahub_bidatx_etapas_cons',JSON.stringify(bidatxEtapasConsultoria));
-    localStorage.setItem('iahub_bidatx_etapas_tt',JSON.stringify(bidatxEtapasTT));
-    localStorage.setItem('iahub_bidatx_oportunidades',JSON.stringify(bidatxOportunidades));
-    localStorage.setItem('iahub_bidatx_clientes',JSON.stringify(bidatxClientes));
-    localStorage.setItem('iahub_bidatx_sla',JSON.stringify(bidatxSlaConfig));
-    localStorage.setItem('iahub_bidatx_followup',JSON.stringify(bidatxFollowUpConfig));
-    localStorage.setItem('iahub_bidatx_meta',JSON.stringify(bidatxMetaMensal));
   }catch(e){console.warn('saveData failed',e);}
   syncToSupabase();
 }
@@ -4746,34 +3649,111 @@ function loadData(){
     const e=localStorage.getItem('iahub_externos');if(e)convidadosExternos=JSON.parse(e);
     const cg=localStorage.getItem('iahub_customGroups');if(cg)customGroups=JSON.parse(cg);
     const int=localStorage.getItem('iahub_interesses');if(int)interessesPendentes=JSON.parse(int);
-    const bxet=localStorage.getItem('iahub_bidatx_etapas');if(bxet)bidatxEtapas=JSON.parse(bxet);
-    const bxetc=localStorage.getItem('iahub_bidatx_etapas_cons');if(bxetc)bidatxEtapasConsultoria=JSON.parse(bxetc);
-    const bxett=localStorage.getItem('iahub_bidatx_etapas_tt');if(bxett)bidatxEtapasTT=JSON.parse(bxett);
-    const bxo=localStorage.getItem('iahub_bidatx_oportunidades');if(bxo)bidatxOportunidades=JSON.parse(bxo);
-    const bxcl=localStorage.getItem('iahub_bidatx_clientes');if(bxcl)bidatxClientes=JSON.parse(bxcl);
-    const bxsl=localStorage.getItem('iahub_bidatx_sla');if(bxsl)bidatxSlaConfig=JSON.parse(bxsl);
-    const bxfu=localStorage.getItem('iahub_bidatx_followup');if(bxfu)bidatxFollowUpConfig=JSON.parse(bxfu);
-    const bxmt=localStorage.getItem('iahub_bidatx_meta');if(bxmt)bidatxMetaMensal=JSON.parse(bxmt);
   }catch(e){console.warn('loadData failed',e);}
 }
 
+// ===================== ONBOARDING (Item 14) =====================
+function mostrarOnboarding(){
+  const u=currentUser;
+  const temAtiv=u.ativ&&(typeof u.ativ==='string'?u.ativ.length>0:u.ativ.length>0);
+  const temConexao=conexoes.some(c=>c.criadorId===u.id);
+  const viuMatches=!!u.viuMatches;
+  const item=(ok,txt)=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.12)">
+    <div style="width:22px;height:22px;border-radius:50%;background:${ok?'#4ade80':'rgba(255,255,255,.25)'};display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0">${ok?'✓':'○'}</div>
+    <span style="font-size:13px;color:${ok?'rgba(255,255,255,.7)':'#fff'};text-decoration:${ok?'line-through':''}">${txt}</span>
+  </div>`;
+  const el=document.getElementById('ov-onboarding');
+  if(!el)return;
+  document.getElementById('onboarding-body').innerHTML=`
+    ${item(temAtiv,'Complete seu perfil — descreva suas atividades')}
+    ${item(temConexao,'Cadastre sua primeira conexão na rede')}
+    ${item(viuMatches,'Veja seus matches na aba Conexões')}
+    <p style="margin-top:14px;font-size:12px;color:rgba(255,255,255,.6);line-height:1.7">Esses passos ajudam o sistema a fazer matches mais precisos e aumentar sua relevância na rede IA Hub.</p>
+  `;
+  el.classList.add('open');
+}
+function fecharOnboarding(){
+  const idx=users.findIndex(u=>u.id===currentUser.id);
+  if(idx>=0){users[idx].onboardingConcluido=true;currentUser.onboardingConcluido=true;saveData();}
+  document.getElementById('ov-onboarding').classList.remove('open');
+}
+
+// ===================== OPERADOR VIEW (Item 16) =====================
+function renderOperadorView(){
+  const el=document.getElementById('con-inner');if(!el)return;
+  el.innerHTML=`
+    <div style="background:linear-gradient(135deg,#0a1628,#1e3a5f);border-radius:14px;padding:24px;margin-bottom:20px;color:#fff">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+        <span style="font-size:24px">🏦</span>
+        <div>
+          <div style="font-size:17px;font-weight:700">CorpLink — Portal do Operador</div>
+          <div style="font-size:12px;opacity:.7;margin-top:2px">Cadastre conexões externas para a rede IA Hub</div>
+        </div>
+      </div>
+      <p style="font-size:13px;opacity:.8;line-height:1.7;margin-top:8px">As conexões enviadas por aqui entram como <strong>pendente</strong> e precisam ser aprovadas pelos sócios antes de aparecerem para os membros.</p>
+    </div>
+    <div style="background:#fff;border:1px solid #eee;border-radius:12px;padding:20px">
+      <div style="font-size:14px;font-weight:600;color:#0a1628;margin-bottom:16px">📋 Nova conexão CorpLink</div>
+      <div class="fg">
+        <div style="background:#eff6ff;border-radius:8px;padding:10px 12px;margin-bottom:4px;font-size:12px;color:#2554C7;grid-column:1/-1">
+          🏦 Esta conexão será enviada com origem <strong>CorpLink</strong> e ficará pendente até aprovação de um sócio.
+        </div>
+        <div class="full"><label style="font-size:12px;color:#555;font-weight:500">Segmento / Indústria *</label>
+          <input id="op-seg" placeholder="Ex: Agronegócio, Tecnologia, Varejo..." style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-top:4px"></div>
+        <div><label style="font-size:12px;color:#555;font-weight:500;margin-top:12px;display:block">Porte da empresa</label>
+          <select id="op-porte" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-top:4px">
+            <option value="">Não informado</option>
+            <option>Startup</option><option>Pequena empresa</option><option>Média empresa</option><option>Grande empresa</option><option>Multinacional</option>
+          </select></div>
+        <div><label style="font-size:12px;color:#555;font-weight:500;margin-top:12px;display:block">Índice de relacionamento (1–5)</label>
+          <select id="op-nivel" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-top:4px">
+            <option value="5">5 — Tomei café com o decisor</option>
+            <option value="4">4 — Contato frequente</option>
+            <option value="3" selected>3 — Já tratei negócios</option>
+            <option value="2">2 — Contato pontual</option>
+            <option value="1">1 — Conheço de vista</option>
+          </select></div>
+        <div class="full"><label style="font-size:12px;color:#555;font-weight:500;margin-top:12px;display:block">Hierarquia de influência</label>
+          <select id="op-acesso" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-top:4px">
+            <option value="">Não informado</option>
+            <option>C-Level (CEO / Owner / Presidente)</option>
+            <option>Diretoria (CFO / CMO / CTO)</option>
+            <option>Gerência de Compras / Suprimentos</option>
+            <option>Gerência Operacional</option>
+            <option>Contato operacional / Analista</option>
+          </select></div>
+        <div class="full"><label style="font-size:12px;color:#555;font-weight:500;margin-top:12px;display:block">Descrição mascarada do contato *</label>
+          <textarea id="op-desc" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;height:90px;resize:vertical;margin-top:4px" placeholder="Descreva sem identificar. Ex: Empresa de médio porte em SP buscando gestão fiscal. Decisor receptivo..."></textarea></div>
+        <div class="full"><label style="font-size:12px;color:#555;font-weight:500;margin-top:12px;display:block">Fit sugerido com a rede</label>
+          <input id="op-fit" placeholder="Ex: Contabilidade, Advocacia..." style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-top:4px"></div>
+      </div>
+      <button class="btn-p" style="width:100%;margin-top:16px" onclick="salvarConexaoOperador()">🏦 Enviar conexão CorpLink para moderação</button>
+    </div>`;
+}
+function salvarConexaoOperador(){
+  const seg=(document.getElementById('op-seg')||{value:''}).value.trim();
+  const desc=(document.getElementById('op-desc')||{value:''}).value.trim();
+  if(!seg||!desc){alert('Segmento e descrição são obrigatórios.');return;}
+  const obj={seg,porte:(document.getElementById('op-porte')||{value:''}).value,acesso:(document.getElementById('op-acesso')||{value:''}).value,nivel:(document.getElementById('op-nivel')||{value:'3'}).value,desc,fitSegs:(document.getElementById('op-fit')||{value:''}).value.trim(),obs:'',criadorId:currentUser.id,desde:new Date().toLocaleDateString('pt-BR'),origem:'CorpLink',status:'pendente'};
+  conexoes.push({...obj,id:Date.now()});
+  // Notificar sócios
+  const socios=users.filter(u=>u.perfil==='Sócio').map(u=>u.id);
+  notificacoes.push({id:Date.now(),txt:`🏦 Nova conexão CorpLink enviada pelo Operador: "${seg}". Aguardando aprovação.`,ts:Date.now(),lido:false,destinos:socios});
+  updateNotifBadge();saveData();
+  showToast('✅ Conexão CorpLink enviada para moderação dos sócios!');
+  renderOperadorView();
+}
+
 // ===================== INIT =====================
-loadData(); // carrega localStorage como base inicial
+loadData();
 injectLogos();
-// carrega Supabase em seguida — sobrescreve se houver dados na nuvem
 (async()=>{
   const loaded=await loadFromSupabase();
   if(loaded){
-    console.log('✅ Dados carregados do Supabase');
-    // re-renderiza tudo com dados da nuvem se já estiver logado
-    if(currentUser){
-      showTab(currentTabName||'rede');
-      updateNotifBadge();
-    }
+    if(currentUser){ showTab(currentTabName||'rede'); updateNotifBadge(); }
   }
 })();
 showScreen('login');
 </script>
 </body>
 </html>
-
