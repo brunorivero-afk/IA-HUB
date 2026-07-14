@@ -2243,7 +2243,7 @@ function gerarWhy(segA, segB, membrosA, membrosB) {
 }
 
 function gerarSinergias(andSave=true) {
-  const manuais = sinergias.filter(s=>!s.auto);
+  const manuais = sinergias.filter(s=>s.manual===true);
   const segMap = {};
   users.filter(u=>u.status==='Ativo'&&u.perfil!=='Operador').forEach(u=>{
     (u.seg||'').split(',').map(s=>s.trim()).filter(Boolean).forEach(seg=>{
@@ -3845,7 +3845,7 @@ injectLogos();
   if(loaded){
     if(currentUser){ showTab(currentTabName||'rede'); updateNotifBadge(); }
   }
-  if(sinergias.length===0) gerarSinergias();
+  if(!sinergias.some(s=>s.auto)) gerarSinergias();
 })();
 showScreen('login');
 </script>
