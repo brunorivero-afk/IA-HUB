@@ -526,6 +526,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
         <select id="syn-f" onchange="renderSin()"><option value="all">Todas</option><option value="alta">Alta prioridade</option></select>
         <select id="syn-seg" onchange="renderSin()"><option value="">Todos os segmentos</option></select>
         <button class="btn-p" id="btn-nova-sin" style="display:none" onclick="openAddSin()">+ Nova sinergia</button>
+        <button class="btn-p" id="btn-regen-sin" style="display:none;background:#e8f0ff;color:#2554C7;border:1.5px solid #2554C7" onclick="regenerarSinBtn()">⚡ Regenerar</button>
       </div>
       <div class="syn-grid" id="syn-grid"></div>
     </div>
@@ -1032,8 +1033,8 @@ let sinergias=[
   {id:11,a:'Construção',b:'Imobiliária',p:'alta',why:'O ciclo é direto e recorrente: Anselmo (Lasant) constrói as unidades que Paulo BH e Rafael Matias vendem ou alugam. Parceria estratégica que pode gerar projetos de longo prazo com desenvolvimento imobiliário completo.',ppl_a:['Anselmo'],ppl_b:['Paulo BH','Rafael Matias']},
   {id:12,a:'Construção',b:'Loja de Tintas',p:'alta',why:'Obras em escala são o maior canal de venda de tintas em volume. Fabio Sampaio (Mundo das Cores) pode ser fornecedor exclusivo de Anselmo (Lasant), com contrato de fornecimento que garante previsibilidade de receita para ambos.',ppl_a:['Anselmo'],ppl_b:['Fabio Sampaio']},
   {id:13,a:'Restaurante',b:'Produtos de Limpeza',p:'media',why:'Restaurantes são grandes consumidores de produtos de limpeza em volume contínuo. Diego Braga (Aliança) pode ter contrato de fornecimento mensal com Bernardo Montenegro (Grupo Malta) — múltiplas unidades, demanda previsível e recorrente.',ppl_a:['Bernardo Montenegro'],ppl_b:['Diego Braga']},
-  {id:14,a:'Lar de Idosos',b:'Clínica Médica',p:'alta',why:'Diego Braga atua simultaneamente em Lar de Idosos, Home Care e Clínica Médica com fornecimento de insumos de limpeza e higiene. A sinergia interna é total: produtos de higiene para toda a cadeia de saúde com contrato centralizado e economia de escala.',ppl_a:['Diego Braga'],ppl_b:['Diego Braga']},
 ];
+sinergias = []; // substituído por geração automática
 
 let notificacoes=[];
 let currentUser=null;
@@ -1782,7 +1783,7 @@ function saveUsr(){
   Object.keys(obj).forEach(k=>obj[k]===undefined&&delete obj[k]);
   if(editUsrId){const i=users.findIndex(u=>u.id===editUsrId);users[i]={...users[i],...obj};}
   else users.push({...obj,id:Date.now()});
-  closeOv('ov-usr');renderMembros();initFilters();autoUpdateSinergiaPpl();updateAprovacaoBadge();saveData();
+  closeOv('ov-usr');renderMembros();initFilters();gerarSinergias(false);updateAprovacaoBadge();saveData();
 }
 function removeUsr(id){
   if(!confirm('Remover este usuário?'))return;
@@ -2216,9 +2217,74 @@ function autoUpdateSinergiaPpl(){
   });
 }
 
+function calcPrioridade(segA, segB) {
+  const ALTA = [
+    ['Advocacia','Contabilidade'],['Advocacia','Tributarista'],['Advocacia','Imobiliária'],
+    ['Advocacia','Lobista'],['Advocacia','Corretora de Seguros'],['Advocacia','Mercado Financeiro'],
+    ['Contabilidade','Tributarista'],['Contabilidade','Mercado Financeiro'],
+    ['Mercado Financeiro','Imobiliária'],['Mercado Financeiro','Corretora de Seguros'],
+    ['Imobiliária','Corretagem de Imóveis'],['Imobiliária','Construção'],
+    ['Eventos Corporativos','Mercado Esportivo'],['Eventos Corporativos','Restaurante'],
+    ['Restaurante','Produtos de Limpeza'],['Lar de Idosos','Home Care'],
+    ['Construção','Loja de Tintas'],['Venda de Veículos','Corretora de Seguros'],
+    ['Locação de Veículos','Corretora de Seguros'],['Venda de Veículos','Blindagem de Veículos'],
+  ];
+  return ALTA.some(([a,b])=>(a===segA&&b===segB)||(a===segB&&b===segA)) ? 'alta' : 'media';
+}
+
+function gerarWhy(segA, segB, membrosA, membrosB) {
+  const nomeA = membrosA.length===1 ? membrosA[0].nome : `membros de ${segA}`;
+  const nomeB = membrosB.length===1 ? membrosB[0].nome : `membros de ${segB}`;
+  const ativA = (typeof membrosA[0]?.ativ==='string' ? membrosA[0].ativ : '').split('.')[0].trim();
+  const ativB = (typeof membrosB[0]?.ativ==='string' ? membrosB[0].ativ : '').split('.')[0].trim();
+  const descA = ativA || segA;
+  const descB = ativB ? ativB.charAt(0).toLowerCase()+ativB.slice(1) : segB.toLowerCase();
+  return `${nomeA} (${segA}) e ${nomeB} (${segB}) possuem atuações complementares dentro do IA Hub. ${descA}. ${descB ? descB+'.' : ''} Essa conexão abre espaço para indicações cruzadas, projetos conjuntos e ampliação de carteira de clientes para ambos os lados.`;
+}
+
+function gerarSinergias(andSave=true) {
+  const manuais = sinergias.filter(s=>!s.auto);
+  const segMap = {};
+  users.filter(u=>u.status==='Ativo'&&u.perfil!=='Operador').forEach(u=>{
+    (u.seg||'').split(',').map(s=>s.trim()).filter(Boolean).forEach(seg=>{
+      if(!segMap[seg]) segMap[seg]=[];
+      if(!segMap[seg].find(m=>m.id===u.id)) segMap[seg].push(u);
+    });
+  });
+  const segs = Object.keys(segMap);
+  const autoSins = [];
+  let nextId = Date.now();
+  for(let i=0;i<segs.length;i++){
+    for(let j=i+1;j<segs.length;j++){
+      const segA=segs[i], segB=segs[j];
+      const mA=segMap[segA], mB=segMap[segB];
+      const idsA=new Set(mA.map(m=>m.id)), idsB=new Set(mB.map(m=>m.id));
+      const soloSelf=[...idsA].every(id=>idsB.has(id))&&[...idsB].every(id=>idsA.has(id));
+      if(soloSelf) continue;
+      autoSins.push({id:nextId++,auto:true,a:segA,b:segB,
+        p:calcPrioridade(segA,segB),
+        why:gerarWhy(segA,segB,mA,mB),
+        ppl_a:mA.map(u=>u.nome),
+        ppl_b:mB.map(u=>u.nome)
+      });
+    }
+  }
+  sinergias=[...manuais,...autoSins];
+  if(andSave) saveData();
+  if(document.getElementById('syn-grid')) renderSin();
+  return autoSins.length;
+}
+
+function regenerarSinBtn(){
+  if(!confirm('Regenerar todas as sinergias automáticas?\nAs sinergias manuais serão mantidas.')) return;
+  const n=gerarSinergias();
+  showToast(`✅ ${n} sinergias geradas automaticamente.`);
+}
+
 function renderSin(){
   autoUpdateSinergiaPpl();
   document.getElementById('btn-nova-sin').style.display=isSocio()?'inline-block':'none';
+  document.getElementById('btn-regen-sin').style.display=isSocio()?'inline-block':'none';
   const f=document.getElementById('syn-f').value;
   const seg=document.getElementById('syn-seg').value;
   const list=sinergias.filter(s=>(!f||f==='all'||s.p===f)&&(!seg||(s.a===seg||s.b===seg)));
@@ -3779,6 +3845,7 @@ injectLogos();
   if(loaded){
     if(currentUser){ showTab(currentTabName||'rede'); updateNotifBadge(); }
   }
+  if(sinergias.length===0) gerarSinergias();
 })();
 showScreen('login');
 </script>
