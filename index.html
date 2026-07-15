@@ -4360,6 +4360,129 @@ function _redrawVitDocs(){
 function addVitDoc(){_vitDocs.push({titulo:'',url:''});_redrawVitDocs();}
 
 // ── DETALHE (read-only) ──
+function exportVitPDF(id){
+  const p=projetosVitrine.find(p=>p.id===id);if(!p)return;
+  const cotas=p.cotas||50;
+  const hubN=p.cotasHub??Math.round(cotas*(p.pctIAHub||50)/100);
+  const comp=p.cotasComprometidas||0;
+  const pct=Math.round(comp/cotas*100);
+  const sec=(title,body)=>`<div class="sec"><h2>${title}</h2>${body}</div>`;
+  const kpi=(label,val,color)=>val?`<div class="kpi"><div class="kpi-label">${label}</div><div class="kpi-val"${color?` style="color:${color}"`:''}>${val}</div></div>`:'';
+  const swotQ=(bg,label,txt)=>txt?`<div class="swot-q" style="background:${bg}"><div class="swot-label">${label}</div>${txt.split('\n').filter(Boolean).map(l=>`<div class="swot-item">· ${l}</div>`).join('')}</div>`:'';
+  const w=window.open('','_blank','width=900,height=1100');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${p.nome||'Projeto'} — IA Hub</title><style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#1a1a1a;background:#fff;padding:40px 48px;max-width:800px;margin:0 auto}
+    .header{border-bottom:3px solid #0891b2;padding-bottom:20px;margin-bottom:28px}
+    .hub-label{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#0891b2;margin-bottom:8px}
+    .proj-nome{font-size:26px;font-weight:700;color:#0a1628;margin-bottom:6px}
+    .proj-tagline{font-size:13px;color:#555;line-height:1.6;margin-bottom:12px}
+    .badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+    .badge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;background:#e0f2fe;color:#0369a1}
+    .badge.green{background:#dcfce7;color:#166534}
+    .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
+    .kpi{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px}
+    .kpi-label{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+    .kpi-val{font-size:17px;font-weight:700;color:#0a1628}
+    .sec{margin-bottom:24px;page-break-inside:avoid}
+    h2{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#0891b2;margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid #e2e8f0}
+    p{line-height:1.7;color:#333;margin-bottom:8px}
+    .swot-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+    .swot-q{border-radius:8px;padding:12px 14px}
+    .swot-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;opacity:.7;margin-bottom:6px}
+    .swot-item{font-size:12px;line-height:1.5;margin-bottom:2px}
+    .team-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f0f0f0}
+    .avatar{width:30px;height:30px;border-radius:50%;background:#e0f2fe;color:#0891b2;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+    .uso-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+    .uso-bar-bg{flex:1;height:5px;background:#e2e8f0;border-radius:10px}
+    .uso-bar-fill{height:100%;border-radius:10px;background:#0891b2}
+    .prog-bg{height:8px;background:#f0f0f0;border-radius:10px;margin:8px 0}
+    .prog-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,#2554C7,#06b6d4)}
+    .faq-item{margin-bottom:12px}
+    .faq-q{font-weight:600;margin-bottom:3px}
+    .faq-a{color:#555;line-height:1.6}
+    .footer{margin-top:36px;padding-top:16px;border-top:2px solid #e2e8f0;display:flex;justify-content:space-between;align-items:flex-end}
+    .footer-sign{text-align:right}
+    .footer-sign .name{font-weight:700;color:#0a1628}
+    .footer-sign .role{font-size:11px;color:#888}
+    @media print{body{padding:20px 28px}@page{margin:1.2cm}}
+  </style></head><body>
+
+  <div class="header">
+    <div class="hub-label">IA Hub — Vitrine de Investimentos</div>
+    <div class="proj-nome">${esc(p.nome||'Sem título')}</div>
+    ${p.tagline?`<div class="proj-tagline">${esc(p.tagline)}</div>`:''}
+    <div class="badges">
+      <span class="badge">${vitStatusLabel(p.status)}</span>
+      ${p.setor?`<span class="badge">${esc(p.setor)}</span>`:''}
+      ${p.estagio?`<span class="badge green">${esc(p.estagio)}</span>`:''}
+    </div>
+  </div>
+
+  ${(p.numArr||p.numCrescimento||p.numClientes||p.numMargem)?`
+  <div class="kpi-row">
+    ${kpi('ARR',p.numArr,'#0F6E56')}
+    ${kpi('Crescimento',p.numCrescimento,'#0891b2')}
+    ${kpi('Clientes',p.numClientes,'')}
+    ${kpi('Margem bruta',p.numMargem,'')}
+  </div>`:''}
+
+  ${(p.problema||p.solucao||p.modeloReceita||p.tracao)?sec('Plano de Negócios',`
+    ${p.problema?`<p><strong>Problema:</strong> ${esc(p.problema)}</p>`:''}
+    ${p.solucao?`<p><strong>Solução:</strong> ${esc(p.solucao)}</p>`:''}
+    ${p.modeloReceita?`<p><strong>Modelo de Receita:</strong> ${esc(p.modeloReceita)}</p>`:''}
+    ${p.tracao?`<p><strong>Tração:</strong> ${esc(p.tracao)}</p>`:''}
+  `):''}
+
+  ${(p.numTAM||p.numSAM||p.numSOM)?sec('Tamanho de Mercado',`
+  <div class="kpi-row" style="grid-template-columns:repeat(3,1fr)">
+    ${kpi('TAM',p.numTAM,'')}${kpi('SAM',p.numSAM,'#0891b2')}${kpi('SOM',p.numSOM,'#0F6E56')}
+  </div>`):''}
+
+  ${(p.swotF||p.swotW||p.swotO||p.swotT)?sec('Análise SWOT',`
+  <div class="swot-grid">
+    ${swotQ('#f0fdf4','✅ Forças',p.swotF)}
+    ${swotQ('#fffbeb','⚠ Fraquezas',p.swotW)}
+    ${swotQ('#eff6ff','🚀 Oportunidades',p.swotO)}
+    ${swotQ('#fff1f2','⚡ Ameaças',p.swotT)}
+  </div>`):''}
+
+  ${p.time?.length?sec('Time',p.time.map(m=>`
+  <div class="team-row">
+    <div class="avatar">${(m.nome||'?')[0].toUpperCase()}</div>
+    <div><strong>${esc(m.nome)}</strong> <span style="color:#888;font-size:12px">— ${esc(m.papel)}</span></div>
+  </div>`).join('')):''}
+
+  ${(p.captacaoTotal||p.ticketMinimo||p.retornoPrev||p.usoRecursos?.length)?sec('Oportunidade de Investimento',`
+  <div class="kpi-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:12px">
+    ${kpi('Captação total',p.captacaoTotal,'#2554C7')}
+    ${kpi('Ticket mínimo',p.ticketMinimo,'')}
+    ${kpi('Retorno previsto',p.retornoPrev,'#0F6E56')}
+  </div>
+  <p style="font-size:12px;color:#888;margin-bottom:10px">${comp}/${cotas} cotas comprometidas (${pct}%) · ${hubN} reservadas IA Hub · ${cotas-hubN} mercado${p.prazoMeses?` · Prazo: ${p.prazoMeses} meses`:''}</p>
+  <div class="prog-bg"><div class="prog-fill" style="width:${pct}%"></div></div>
+  ${p.usoRecursos?.length?`<div style="margin-top:14px">${p.usoRecursos.map(u=>`<div class="uso-row"><div style="width:140px;color:#555;font-size:12px">${esc(u.desc)}</div><div class="uso-bar-bg"><div class="uso-bar-fill" style="width:${u.pct}%"></div></div><div style="width:36px;text-align:right;font-weight:600;font-size:12px">${u.pct}%</div></div>`).join('')}</div>`:''}
+  `):''}
+
+  ${p.faq?.length?sec('Perguntas Frequentes',p.faq.map(f=>`
+  <div class="faq-item">
+    <div class="faq-q">${esc(f.pergunta)}</div>
+    <div class="faq-a">${esc(f.resposta)}</div>
+  </div>`).join('')):''}
+
+  <div class="footer">
+    <div style="font-size:11px;color:#aaa">Documento gerado pelo sistema IA Hub · ${new Date().toLocaleDateString('pt-BR')}</div>
+    <div class="footer-sign">
+      <div class="name">Bruno Rivero</div>
+      <div class="role">Curador — Vitrine IA Hub</div>
+    </div>
+  </div>
+
+  <script>window.onload=()=>{window.print();}<\/script>
+  </body></html>`);
+  w.document.close();
+}
+
 function openVitDetalhe(id){
   const p=projetosVitrine.find(p=>p.id===id);if(!p)return;
   const el=document.getElementById('vit-detalhe-inner');
@@ -4379,6 +4502,7 @@ function openVitDetalhe(id){
         <div style="font-size:20px;font-weight:700;color:#0a1628;margin-bottom:4px">${esc(p.nome||'Sem título')}</div>
         ${p.tagline?`<div style="font-size:13px;color:#555;line-height:1.5">${esc(p.tagline)}</div>`:''}
       </div>
+      <button class="btn-s" onclick="exportVitPDF('${p.id}')">📄 PDF</button>
       <button class="btn-p" onclick="closeOv('ov-vit-detalhe');openVitProj('${p.id}')">✏ Editar</button>
     </div>
     ${(p.numArr||p.numCrescimento||p.numClientes||p.numMargem)?`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
