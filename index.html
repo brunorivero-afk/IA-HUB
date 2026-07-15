@@ -1151,7 +1151,10 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
   <div style="background:#fff;border-radius:14px;width:760px;max-width:96vw;margin:auto;padding:24px;position:relative">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
       <h2 style="font-size:16px;font-weight:600;color:#0a1628">Projeto — Visão Completa</h2>
-      <button class="btn-s" onclick="closeOv('ov-vit-detalhe')" style="font-size:18px;line-height:1;padding:4px 10px">✕</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn-s" onclick="exportVitPDF(_vitDetalheId)">📄 PDF</button>
+        <button class="btn-s" onclick="closeOv('ov-vit-detalhe')" style="font-size:18px;line-height:1;padding:4px 10px">✕</button>
+      </div>
     </div>
     <div id="vit-detalhe-inner"></div>
   </div>
@@ -4244,7 +4247,7 @@ function deleteVitProj(id){
 }
 
 // ── FORM ──
-let _vitEditId=null,_vitTab='ident';
+let _vitEditId=null,_vitTab='ident',_vitDetalheId=null;
 let _vitTime=[],_vitUso=[],_vitFAQ=[],_vitDocs=[];
 
 function openVitProj(id){
@@ -4484,6 +4487,7 @@ function exportVitPDF(id){
 }
 
 function openVitDetalhe(id){
+  _vitDetalheId=id;
   const p=projetosVitrine.find(p=>p.id===id);if(!p)return;
   const el=document.getElementById('vit-detalhe-inner');
   const swotQ=(bg,label,txt)=>txt?`<div style="background:${bg};border-radius:8px;padding:12px 14px"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;opacity:.7;margin-bottom:7px">${label}</div>${txt.split('\n').filter(Boolean).map(l=>`<div style="font-size:12px;line-height:1.5;margin-bottom:3px">· ${esc(l)}</div>`).join('')}</div>`:'';
@@ -4502,7 +4506,6 @@ function openVitDetalhe(id){
         <div style="font-size:20px;font-weight:700;color:#0a1628;margin-bottom:4px">${esc(p.nome||'Sem título')}</div>
         ${p.tagline?`<div style="font-size:13px;color:#555;line-height:1.5">${esc(p.tagline)}</div>`:''}
       </div>
-      <button class="btn-s" onclick="exportVitPDF('${p.id}')">📄 PDF</button>
       <button class="btn-p" onclick="closeOv('ov-vit-detalhe');openVitProj('${p.id}')">✏ Editar</button>
     </div>
     ${(p.numArr||p.numCrescimento||p.numClientes||p.numMargem)?`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
