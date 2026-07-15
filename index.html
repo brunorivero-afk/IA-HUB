@@ -991,6 +991,16 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
           </select>
         </div>
         <div class="full"><label>Tagline (uma frase)</label><input id="vit-f-tagline" placeholder="O que é o projeto em uma linha..."></div>
+        <div class="full" style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:14px;margin:4px 0 8px">
+          <div style="font-size:12px;font-weight:600;color:#0891b2;margin-bottom:8px">✨ Gerar Business Plan com IA</div>
+          <label style="color:#555">Descreva o negócio em 2–3 frases</label>
+          <textarea id="vit-f-desc-ia" placeholder="Ex: Sistema que automatiza obrigações fiscais para PMEs. Reduz em 80% o tempo do contador. Já tem 12 clientes pagantes em beta." style="height:64px;margin-top:4px"></textarea>
+          <button id="btn-gerar-ia" class="btn-p" onclick="gerarBPcomIA()" style="margin-top:8px;width:100%">✨ Gerar com IA</button>
+          <div style="font-size:10px;color:#94a3b8;margin-top:5px;display:flex;justify-content:space-between;align-items:center">
+            <span>Preencha Nome e Setor antes de gerar · Cria: Tagline · SWOT · FAQ e mais</span>
+            <button onclick="configGeminiKey()" style="font-size:10px;color:#0891b2;background:none;border:none;cursor:pointer;padding:0;text-decoration:underline">⚙ key</button>
+          </div>
+        </div>
         <div class="full fg-sec">Business Plan</div>
         <div class="full"><label>Problema</label><textarea id="vit-f-problema" placeholder="Qual dor o projeto resolve?"></textarea></div>
         <div class="full"><label>Solução</label><textarea id="vit-f-solucao" placeholder="Como o projeto resolve o problema?"></textarea></div>
@@ -3794,6 +3804,7 @@ function gerarPDFRede(){
 // ===================== PERSISTÊNCIA =====================
 const SUPA_URL='https://pxcqyzbgfbwwkazmonzx.supabase.co';
 const SUPA_KEY='sb_publishable_6QT2f_wCkTmpfoO_EEZlpA_BCcC8Fv8';
+// GEMINI_KEY armazenada em localStorage — nunca hardcoded no fonte
 let supaClient=null;
 try{supaClient=supabase.createClient(SUPA_URL,SUPA_KEY);}catch(e){console.warn('Supabase init failed',e);}
 
@@ -3965,6 +3976,92 @@ function salvarConexaoOperador(){
   updateNotifBadge();saveData();
   showToast('✅ Conexão CorpLink enviada para moderação dos sócios!');
   renderOperadorView();
+}
+
+// ===================== GEMINI =====================
+
+function configGeminiKey(){
+  const atual=localStorage.getItem('gemini_key')||'';
+  const k=prompt('Cole sua Gemini API key:',atual);
+  if(k&&k.trim()){localStorage.setItem('gemini_key',k.trim());showToast('✅ Key salva');}
+}
+
+async function gerarBPcomIA(){
+  const nome=document.getElementById('vit-f-nome').value.trim();
+  const setor=document.getElementById('vit-f-setor').value.trim();
+  const estagio=document.getElementById('vit-f-estagio').value;
+  const desc=document.getElementById('vit-f-desc-ia').value.trim();
+  if(!nome){showToast('⚠ Preencha o nome do projeto primeiro');return;}
+  if(!desc){showToast('⚠ Descreva o negócio em 2–3 frases');return;}
+  const GEMINI_KEY=localStorage.getItem('gemini_key');
+  if(!GEMINI_KEY){
+    const k=prompt('Cole sua Gemini API key para ativar a geração com IA:');
+    if(!k||!k.trim()){return;}
+    localStorage.setItem('gemini_key',k.trim());
+  }
+  const btn=document.getElementById('btn-gerar-ia');
+  btn.disabled=true;btn.textContent='⏳ Gerando...';
+  const prompt=`Você é um consultor especialista em startups e business plans para investidores. Com base nas informações abaixo, gere um Business Plan resumido para uma vitrine de investimentos.
+
+Projeto: ${nome}
+Setor: ${setor||'não informado'}
+Estágio: ${estagio}
+Descrição: ${desc}
+
+Retorne APENAS um objeto JSON válido, sem markdown, sem código, sem explicações. Estrutura exata:
+{
+  "tagline": "frase de até 12 palavras",
+  "problema": "3 a 5 frases sobre a dor do mercado",
+  "solucao": "3 a 5 frases sobre como o projeto resolve",
+  "modeloReceita": "como o projeto gera receita",
+  "tracao": "tração atual ou esperada com dados realistas para o setor",
+  "swotF": "força 1\\nforça 2\\nforça 3",
+  "swotW": "fraqueza 1\\nfraqueza 2\\nfraqueza 3",
+  "swotO": "oportunidade 1\\noportunidade 2\\noportunidade 3",
+  "swotT": "ameaça 1\\nameaça 2\\nameaça 3",
+  "faq": [
+    {"pergunta": "pergunta de investidor 1","resposta": "resposta 1"},
+    {"pergunta": "pergunta de investidor 2","resposta": "resposta 2"},
+    {"pergunta": "pergunta de investidor 3","resposta": "resposta 3"},
+    {"pergunta": "pergunta de investidor 4","resposta": "resposta 4"},
+    {"pergunta": "pergunta de investidor 5","resposta": "resposta 5"}
+  ]
+}
+
+Escreva em português brasileiro. Seja específico para o setor informado.`;
+  try{
+    const activeKey=localStorage.getItem('gemini_key');
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${activeKey}`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        contents:[{parts:[{text:prompt}]}],
+        generationConfig:{temperature:0.7,maxOutputTokens:2048}
+      })
+    });
+    if(!res.ok){const e=await res.json();throw new Error(e?.error?.message||`HTTP ${res.status}`);}
+    const data=await res.json();
+    const text=data.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    const match=text.match(/\{[\s\S]*\}/);
+    if(!match)throw new Error('Resposta inesperada da IA');
+    const bp=JSON.parse(match[0]);
+    if(bp.tagline)document.getElementById('vit-f-tagline').value=bp.tagline;
+    if(bp.problema)document.getElementById('vit-f-problema').value=bp.problema;
+    if(bp.solucao)document.getElementById('vit-f-solucao').value=bp.solucao;
+    if(bp.modeloReceita)document.getElementById('vit-f-receita').value=bp.modeloReceita;
+    if(bp.tracao)document.getElementById('vit-f-tracao').value=bp.tracao;
+    if(bp.swotF)document.getElementById('vit-f-swotf').value=bp.swotF;
+    if(bp.swotW)document.getElementById('vit-f-swotw').value=bp.swotW;
+    if(bp.swotO)document.getElementById('vit-f-swoto').value=bp.swotO;
+    if(bp.swotT)document.getElementById('vit-f-swott').value=bp.swotT;
+    if(bp.faq?.length)_vitFAQSet(bp.faq);
+    showToast('✅ BP gerado! Revise os campos e complete com dados reais.');
+  }catch(e){
+    console.error(e);
+    showToast('⚠ Erro: '+e.message);
+  }finally{
+    btn.disabled=false;btn.textContent='✨ Gerar com IA';
+  }
 }
 
 // ===================== VITRINE DE INVESTIMENTOS =====================
