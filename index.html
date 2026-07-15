@@ -3970,6 +3970,8 @@ function salvarConexaoOperador(){
 
 // ===================== VITRINE DE INVESTIMENTOS =====================
 
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
 function vitUID(){return 'vp'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
 function vitStatusLabel(s){return{rascunho:'Rascunho',revisao:'Em Revisão',aprovado:'Aprovado',aberto:'Aberto',encerrado:'Encerrado'}[s]||s;}
 function vitStatusCls(s){return{rascunho:'vit-s-ras',revisao:'vit-s-rev',aprovado:'vit-s-apr',aberto:'vit-s-abe',encerrado:'vit-s-enc'}[s]||'';}
