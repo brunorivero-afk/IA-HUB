@@ -4031,7 +4031,7 @@ Retorne APENAS um objeto JSON válido, sem markdown, sem código, sem explicaç�
 Escreva em português brasileiro. Seja específico para o setor informado.`;
   try{
     const activeKey=localStorage.getItem('gemini_key');
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${activeKey}`,{
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${activeKey}`,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
