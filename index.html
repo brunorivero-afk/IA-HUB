@@ -259,6 +259,20 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 /* ===== NOTIF BAR ===== */
 .notif-bar{background:#0d2240;color:#fff;border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;}
 .notif-bar-txt{flex:1;font-size:13px;line-height:1.7;}
+
+/* ===== VITRINE DE INVESTIMENTOS ===== */
+.vit-card{background:#fff;border:1px solid #eee;border-radius:12px;padding:18px;margin-bottom:12px;}
+.vit-prog-track{height:7px;background:#f0f0f0;border-radius:10px;overflow:hidden;margin-bottom:2px;}
+.vit-prog-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,#2554C7,#06b6d4);transition:width .4s;}
+.vit-s-ras{background:#f5f5f3;color:#888;}
+.vit-s-rev{background:#FAEEDA;color:#633806;}
+.vit-s-apr{background:#f0f4ff;color:#2554C7;}
+.vit-s-abe{background:#E1F5EE;color:#085041;}
+.vit-s-enc{background:#fee2e2;color:#991b1b;}
+.vit-form-tabs{display:flex;gap:0;border-bottom:1px solid #eee;margin-bottom:18px;overflow-x:auto;}
+.vit-ftab{padding:8px 14px;font-size:12px;cursor:pointer;color:#888;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;white-space:nowrap;}
+.vit-ftab:hover{color:#0a1628;}
+.vit-ftab.active{color:#0891b2;border-bottom-color:#0891b2;font-weight:500;}
 </style>
 </head>
 <body>
@@ -532,6 +546,10 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <div class="panel" id="tab-meus-rendimentos"></div>
     <!-- RELATÓRIO DA REDE -->
     <div class="panel" id="tab-relatorio-rede"></div>
+    <!-- VITRINE DE INVESTIMENTOS -->
+    <div class="panel" id="tab-vitrine">
+      <div class="app" id="vit-inner"></div>
+    </div>
     <!-- AGENDA -->
     <div class="panel" id="tab-agenda">
       <div id="agenda-inner"></div>
@@ -947,6 +965,118 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
   </div>
 </div>
 
+<!-- ===== VITRINE: FORM PROJETO ===== -->
+<div class="overlay" id="ov-vit-form">
+  <div style="background:#fff;border-radius:14px;width:700px;max-width:96vw;max-height:92vh;overflow-y:auto;padding:24px;position:relative">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <h2 id="vit-form-title" style="font-size:16px;font-weight:600;color:#0a1628">Novo Projeto</h2>
+      <button class="btn-s" onclick="closeVitForm()" style="font-size:18px;line-height:1;padding:4px 10px">✕</button>
+    </div>
+    <div class="vit-form-tabs">
+      <button class="vit-ftab active" id="vit-ftab-ident"   onclick="vitShowFormTab('ident')">1. Identidade & BP</button>
+      <button class="vit-ftab"        id="vit-ftab-numeros" onclick="vitShowFormTab('numeros')">2. Números & Mercado</button>
+      <button class="vit-ftab"        id="vit-ftab-swot"    onclick="vitShowFormTab('swot')">3. SWOT & Time</button>
+      <button class="vit-ftab"        id="vit-ftab-deal"    onclick="vitShowFormTab('deal')">4. Deal</button>
+      <button class="vit-ftab"        id="vit-ftab-extras"  onclick="vitShowFormTab('extras')">5. FAQ & Docs</button>
+    </div>
+    <!-- Aba 1 -->
+    <div id="vit-fsec-ident">
+      <div class="fg">
+        <div class="full"><label>Nome do Projeto *</label><input id="vit-f-nome" placeholder="Nome do projeto"></div>
+        <div><label>Setor / Vertical</label><input id="vit-f-setor" placeholder="ex: SaaS B2B, Fintech, Saúde"></div>
+        <div><label>Estágio</label>
+          <select id="vit-f-estagio">
+            <option value="Ideia">Ideia</option>
+            <option value="MVP">MVP</option>
+            <option value="Tração">Tração</option>
+            <option value="Escala">Escala</option>
+          </select>
+        </div>
+        <div class="full"><label>Tagline (uma frase)</label><input id="vit-f-tagline" placeholder="O que é o projeto em uma linha..."></div>
+        <div class="full fg-sec">Business Plan</div>
+        <div class="full"><label>Problema</label><textarea id="vit-f-problema" placeholder="Qual dor o projeto resolve?"></textarea></div>
+        <div class="full"><label>Solução</label><textarea id="vit-f-solucao" placeholder="Como o projeto resolve o problema?"></textarea></div>
+        <div class="full"><label>Modelo de Receita</label><textarea id="vit-f-receita" placeholder="Como o projeto fatura? (ex: SaaS, comissão, licença...)"></textarea></div>
+        <div class="full"><label>Tração atual</label><textarea id="vit-f-tracao" placeholder="Resultados concretos: clientes, MRR, crescimento, parcerias..."></textarea></div>
+      </div>
+    </div>
+    <!-- Aba 2 -->
+    <div id="vit-fsec-numeros" style="display:none">
+      <div class="section-hdr">KPIs do Negócio (texto livre)</div>
+      <div class="fg">
+        <div><label>ARR / Receita atual</label><input id="vit-f-arr" placeholder="ex: R$ 214k"></div>
+        <div><label>Crescimento</label><input id="vit-f-cresc" placeholder="ex: +38% vs. ano anterior"></div>
+        <div><label>Clientes ativos</label><input id="vit-f-clientes" placeholder="ex: 52"></div>
+        <div><label>Margem bruta</label><input id="vit-f-margem" placeholder="ex: 68%"></div>
+      </div>
+      <div class="section-hdr">Tamanho de Mercado</div>
+      <div class="fg">
+        <div><label>TAM — mercado total</label><input id="vit-f-tam" placeholder="ex: R$ 18B"></div>
+        <div><label>SAM — endereçável</label><input id="vit-f-sam" placeholder="ex: R$ 2.4B"></div>
+        <div class="full"><label>SOM — meta realista (3 anos)</label><input id="vit-f-som" placeholder="ex: R$ 42M"></div>
+      </div>
+    </div>
+    <!-- Aba 3 -->
+    <div id="vit-fsec-swot" style="display:none">
+      <div class="section-hdr">Análise SWOT — uma ideia por linha</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">
+        <div><label style="color:#0F6E56">✅ Forças</label><textarea id="vit-f-swotf" placeholder="Uma por linha..." style="height:90px;border-color:#bbf7d0"></textarea></div>
+        <div><label style="color:#854F0B">⚠ Fraquezas</label><textarea id="vit-f-swotw" placeholder="Uma por linha..." style="height:90px;border-color:#fde68a"></textarea></div>
+        <div><label style="color:#1e40af">🚀 Oportunidades</label><textarea id="vit-f-swoto" placeholder="Uma por linha..." style="height:90px;border-color:#bfdbfe"></textarea></div>
+        <div><label style="color:#991b1b">⚡ Ameaças</label><textarea id="vit-f-swott" placeholder="Uma por linha..." style="height:90px;border-color:#fecaca"></textarea></div>
+      </div>
+      <div class="section-hdr">Time <button class="btn-s btn-sm" onclick="addVitTime()" style="margin-left:8px">+ Adicionar</button></div>
+      <div id="vit-time-list"></div>
+    </div>
+    <!-- Aba 4 -->
+    <div id="vit-fsec-deal" style="display:none">
+      <div class="fg">
+        <div><label>Captação total buscada</label><input id="vit-f-captacao" placeholder="ex: R$ 500.000"></div>
+        <div><label>Ticket mínimo</label><input id="vit-f-ticket" placeholder="ex: R$ 10.000"></div>
+        <div><label>% reservado IA Hub</label><input id="vit-f-pcthub" type="number" min="0" max="100" placeholder="50" value="50"></div>
+        <div><label>Total de cotas</label><input id="vit-f-cotas" type="number" placeholder="50" value="50"></div>
+        <div><label>Retorno previsto</label><input id="vit-f-retorno" placeholder="ex: 12% a.a. ou 30% em 24 meses"></div>
+        <div><label>Prazo (meses)</label><input id="vit-f-prazo" placeholder="ex: 24"></div>
+        <div class="full fg-sec">Uso dos Recursos <button class="btn-s btn-sm" onclick="addVitUso()" style="margin-left:8px">+ Linha</button></div>
+        <div class="full" id="vit-uso-list"></div>
+      </div>
+    </div>
+    <!-- Aba 5 -->
+    <div id="vit-fsec-extras" style="display:none">
+      <div class="section-hdr">Perguntas Frequentes (FAQ) <button class="btn-s btn-sm" onclick="addVitFAQ()" style="margin-left:8px">+ Adicionar</button></div>
+      <div id="vit-faq-list"></div>
+      <div class="section-hdr" style="margin-top:16px">Documentos & Links <button class="btn-s btn-sm" onclick="addVitDoc()" style="margin-left:8px">+ Adicionar</button></div>
+      <div id="vit-doc-list"></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:12px;border-top:1px solid #f0f0f0">
+      <button class="btn-s" onclick="closeVitForm()">Cancelar</button>
+      <button class="btn-p" onclick="saveVitProj()">Salvar Projeto</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== VITRINE: DETALHE (read-only) ===== -->
+<div class="overlay" id="ov-vit-detalhe" style="align-items:flex-start;overflow-y:auto;padding:20px 0">
+  <div style="background:#fff;border-radius:14px;width:760px;max-width:96vw;margin:auto;padding:24px;position:relative">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <h2 style="font-size:16px;font-weight:600;color:#0a1628">Projeto — Visão Completa</h2>
+      <button class="btn-s" onclick="closeOv('ov-vit-detalhe')" style="font-size:18px;line-height:1;padding:4px 10px">✕</button>
+    </div>
+    <div id="vit-detalhe-inner"></div>
+  </div>
+</div>
+
+<!-- ===== VITRINE: INTERESSES ===== -->
+<div class="overlay" id="ov-vit-int">
+  <div style="background:#fff;border-radius:14px;width:600px;max-width:96vw;max-height:90vh;overflow-y:auto;padding:24px;position:relative">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h2 style="font-size:16px;font-weight:600;color:#0a1628">Gestão de Interesses</h2>
+      <button class="btn-s" onclick="closeOv('ov-vit-int')" style="font-size:18px;line-height:1;padding:4px 10px">✕</button>
+    </div>
+    <div id="vit-int-inner"></div>
+  </div>
+</div>
+
 <script>
 // ===================== DADOS =====================
 const SEG_C={
@@ -1146,6 +1276,7 @@ function buildTabs(){
     {id:'pipeline',label:'Pipeline',socio:true},
     {id:'meus-rendimentos',label:'Meus Rendimentos',notSocio:true},
     {id:'relatorio-rede',label:'Relatório da Rede',socio:true},
+    {id:'vitrine',label:'💼 Vitrine',socio:true},
   ];
   const bar=document.getElementById('tabs-bar');
   bar.innerHTML='';
@@ -1188,6 +1319,7 @@ function showTab(name){
   if(name==='pipeline')renderPipeline();
   if(name==='meus-rendimentos')renderMeusRendimentos();
   if(name==='relatorio-rede')renderRelatorioRede();
+  if(name==='vitrine')renderVitrine();
   // Marcar que o user viu a aba de conexões (para onboarding)
   if(name==='rede-membros'||name==='conexoes'){
     const idx=users.findIndex(u=>u.id===currentUser.id);
@@ -1206,7 +1338,7 @@ function initFilters(){
 
 function closeOv(id){document.getElementById(id).classList.remove('open');}
 window.addEventListener('click',e=>{
-  ['ov-usr','ov-proj','ov-fu','ov-lanc','ov-sin','ov-notif','ov-evento','ov-con','ov-relatorio','ov-propor','ov-moderacao','ov-aprovacao','ov-revelar','ov-onboarding'].forEach(id=>{if(e.target.id===id)closeOv(id);});
+  ['ov-usr','ov-proj','ov-fu','ov-lanc','ov-sin','ov-notif','ov-evento','ov-con','ov-relatorio','ov-propor','ov-moderacao','ov-aprovacao','ov-revelar','ov-onboarding','ov-vit-detalhe','ov-vit-int'].forEach(id=>{if(e.target.id===id)closeOv(id);});
 });
 
 // ===================== REDE / CHARTS =====================
@@ -3403,6 +3535,7 @@ function pedirMaisInfo(id){
 
 // ===================== INTERESSES PENDENTES =====================
 let interessesPendentes=[];
+let projetosVitrine=[];
 
 function interesseCon(conId,userId){
   const c=conexoes.find(x=>x.id===conId);
@@ -3669,7 +3802,8 @@ function getStateSnapshot(){
   return{
     users,projetos,lancamentos,sinergias,conexoes,
     agendaLocalEvents,notificacoes,oportunidadesPendentes,
-    convidadosExternos,customGroups,interessesPendentes
+    convidadosExternos,customGroups,interessesPendentes,
+    projetosVitrine
   };
 }
 
@@ -3686,6 +3820,7 @@ function applyStateSnapshot(d){
   if(d.convidadosExternos)convidadosExternos=d.convidadosExternos;
   if(d.customGroups)customGroups=d.customGroups;
   if(d.interessesPendentes)interessesPendentes=d.interessesPendentes;
+  if(d.projetosVitrine)projetosVitrine=d.projetosVitrine;
 }
 
 let _syncTimer=null;
@@ -3831,6 +3966,368 @@ function salvarConexaoOperador(){
   updateNotifBadge();saveData();
   showToast('✅ Conexão CorpLink enviada para moderação dos sócios!');
   renderOperadorView();
+}
+
+// ===================== VITRINE DE INVESTIMENTOS =====================
+
+function vitUID(){return 'vp'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+function vitStatusLabel(s){return{rascunho:'Rascunho',revisao:'Em Revisão',aprovado:'Aprovado',aberto:'Aberto',encerrado:'Encerrado'}[s]||s;}
+function vitStatusCls(s){return{rascunho:'vit-s-ras',revisao:'vit-s-rev',aprovado:'vit-s-apr',aberto:'vit-s-abe',encerrado:'vit-s-enc'}[s]||'';}
+
+function renderVitrine(){
+  const el=document.getElementById('vit-inner'); if(!el)return;
+  const q=(document.getElementById('vit-srch')||{value:''}).value.toLowerCase();
+  const sf=(document.getElementById('vit-filt')||{value:''}).value;
+  let list=[...projetosVitrine].sort((a,b)=>(b.criadoEm||'').localeCompare(a.criadoEm||''));
+  if(q)list=list.filter(p=>(p.nome||'').toLowerCase().includes(q)||(p.tagline||'').toLowerCase().includes(q)||(p.setor||'').toLowerCase().includes(q));
+  if(sf)list=list.filter(p=>p.status===sf);
+  const totInt=projetosVitrine.reduce((a,p)=>a+(p.interesses||[]).length,0);
+  const emCap=projetosVitrine.filter(p=>p.status==='aberto').length;
+  el.innerHTML=`
+  <div class="stats">
+    <div class="stat"><div class="stat-label">Projetos</div><div class="stat-value">${projetosVitrine.length}</div></div>
+    <div class="stat"><div class="stat-label">Em captação</div><div class="stat-value" style="color:#0891b2">${emCap}</div></div>
+    <div class="stat"><div class="stat-label">Interesses registrados</div><div class="stat-value" style="color:#0F6E56">${totInt}</div></div>
+  </div>
+  <div class="controls">
+    <input id="vit-srch" placeholder="Buscar projeto..." oninput="renderVitrine()" value="${esc(q)}" style="flex:1">
+    <select id="vit-filt" onchange="renderVitrine()">
+      <option value="">Todos os status</option>
+      <option value="rascunho"${sf==='rascunho'?' selected':''}>Rascunho</option>
+      <option value="revisao"${sf==='revisao'?' selected':''}>Em Revisão</option>
+      <option value="aprovado"${sf==='aprovado'?' selected':''}>Aprovado</option>
+      <option value="aberto"${sf==='aberto'?' selected':''}>Aberto</option>
+      <option value="encerrado"${sf==='encerrado'?' selected':''}>Encerrado</option>
+    </select>
+    ${isSocio()?'<button class="btn-p" onclick="openVitProj(null)">+ Novo Projeto</button>':''}
+  </div>
+  <div id="vit-list">${list.length?list.map(vitCardHTML).join(''):'<div class="empty-msg">Nenhum projeto cadastrado. Clique em "+ Novo Projeto" para começar.</div>'}</div>`;
+}
+
+function vitCardHTML(p){
+  const cotas=p.cotas||50;
+  const hubN=p.cotasHub??Math.round(cotas*(p.pctIAHub||50)/100);
+  const comp=p.cotasComprometidas||0;
+  const pct=Math.round(comp/cotas*100);
+  const ints=(p.interesses||[]).length;
+  const showBar=p.status==='aberto'||p.status==='aprovado';
+  return`<div class="vit-card">
+    <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">
+      <div style="flex:1">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:5px">
+          <span class="badge ${vitStatusCls(p.status)}">${vitStatusLabel(p.status)}</span>
+          ${p.setor?`<span class="badge" style="background:#f0f4ff;color:#2554C7">${esc(p.setor)}</span>`:''}
+          ${p.estagio?`<span class="badge" style="background:#f0fdf4;color:#166534">${esc(p.estagio)}</span>`:''}
+        </div>
+        <div class="pj-title">${esc(p.nome||'Sem título')}</div>
+        ${p.tagline?`<div style="font-size:12px;color:#555;margin-top:3px;line-height:1.5">${esc(p.tagline)}</div>`:''}
+      </div>
+    </div>
+    ${showBar?`<div style="margin:8px 0">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:#888;margin-bottom:4px">
+        <span>${comp}/${cotas} cotas comprometidas</span>
+        <span style="font-weight:600;color:${pct>=80?'#0F6E56':'#0891b2'}">${pct}%</span>
+      </div>
+      <div class="vit-prog-track"><div class="vit-prog-fill" style="width:${pct}%"></div></div>
+      <div style="font-size:10px;color:#aaa;margin-top:3px">${hubN} reservadas IA Hub (${p.pctIAHub||50}%) · ${cotas-hubN} mercado externo</div>
+    </div>`:''}
+    <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:#555;margin:8px 0">
+      ${p.captacaoTotal?`<span>💰 ${esc(p.captacaoTotal)}</span>`:''}
+      ${p.ticketMinimo?`<span>🎟 Mín. ${esc(p.ticketMinimo)}</span>`:''}
+      ${p.pctIAHub?`<span>🏛 ${p.pctIAHub}% IA Hub</span>`:''}
+      ${p.retornoPrev?`<span>📈 ${esc(p.retornoPrev)}</span>`:''}
+      ${ints?`<span style="color:#0F6E56;font-weight:600">✋ ${ints} interesse${ints>1?'s':''}</span>`:''}
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
+      <button class="btn-s btn-sm" onclick="openVitProj('${p.id}')">✏ Editar</button>
+      <button class="btn-s btn-sm" onclick="openVitDetalhe('${p.id}')">👁 Ver completo</button>
+      <button class="btn-s btn-sm" onclick="openVitInteresses('${p.id}')">✋ Interesses (${ints})</button>
+      ${p.status==='rascunho'?`<button class="btn-s btn-sm" style="border-color:#854F0B;color:#854F0B" onclick="vitMudaStatus('${p.id}','revisao')">→ Enviar para revisão</button>`:''}
+      ${p.status==='revisao'&&isSocio()?`<button class="btn-s btn-sm" style="border-color:#0F6E56;color:#0F6E56" onclick="vitMudaStatus('${p.id}','aprovado')">✓ Aprovar</button>`:''}
+      ${p.status==='aprovado'&&isSocio()?`<button class="btn-s btn-sm" style="border-color:#0891b2;color:#0891b2" onclick="vitMudaStatus('${p.id}','aberto')">🚀 Abrir para captação</button>`:''}
+      ${p.status==='aberto'?`<button class="btn-s btn-sm" style="border-color:#888;color:#888" onclick="vitMudaStatus('${p.id}','encerrado')">Encerrar</button>`:''}
+      <button class="btn-d btn-sm" onclick="deleteVitProj('${p.id}')">✕</button>
+    </div>
+  </div>`;
+}
+
+function vitMudaStatus(id,s){
+  const p=projetosVitrine.find(p=>p.id===id);if(!p)return;
+  p.status=s; saveData();syncToSupabase();renderVitrine();
+  showToast('Status: '+vitStatusLabel(s));
+}
+function deleteVitProj(id){
+  if(!confirm('Excluir este projeto da vitrine?'))return;
+  projetosVitrine=projetosVitrine.filter(p=>p.id!==id);
+  saveData();syncToSupabase();renderVitrine();showToast('Projeto excluído');
+}
+
+// ── FORM ──
+let _vitEditId=null,_vitTab='ident';
+let _vitTime=[],_vitUso=[],_vitFAQ=[],_vitDocs=[];
+
+function openVitProj(id){
+  _vitEditId=id;
+  const p=id?projetosVitrine.find(p=>p.id===id):null;
+  const v=f=>p?(p[f]||''):'';
+  const vn=f=>p?(p[f]??''):'';
+  document.getElementById('vit-form-title').textContent=p?'Editar Projeto':'Novo Projeto';
+  ['nome','setor','tagline','problema','solucao','receita','tracao',
+   'arr','cresc','clientes','margem','tam','sam','som',
+   'swotf','swotw','swoto','swott','captacao','ticket','retorno','prazo']
+    .forEach(f=>{const el=document.getElementById('vit-f-'+f);if(el)el.value=v({
+      nome:'nome',setor:'setor',tagline:'tagline',problema:'problema',solucao:'solucao',
+      receita:'modeloReceita',tracao:'tracao',arr:'numArr',cresc:'numCrescimento',
+      clientes:'numClientes',margem:'numMargem',tam:'numTAM',sam:'numSAM',som:'numSOM',
+      swotf:'swotF',swotw:'swotW',swoto:'swotO',swott:'swotT',
+      captacao:'captacaoTotal',ticket:'ticketMinimo',retorno:'retornoPrev',prazo:'prazoMeses'
+    }[f]);});
+  document.getElementById('vit-f-estagio').value=v('estagio')||'Tração';
+  document.getElementById('vit-f-pcthub').value=vn('pctIAHub')||50;
+  document.getElementById('vit-f-cotas').value=vn('cotas')||50;
+  _vitTimeSet(p?p.time||[]:[]);
+  _vitUsoSet(p?p.usoRecursos||[]:[{desc:'Tecnologia & Produto',pct:60},{desc:'Comercial & Marketing',pct:25},{desc:'Operações',pct:15}]);
+  _vitFAQSet(p?p.faq||[]:[]);
+  _vitDocsSet(p?p.docs||[]:[]);
+  vitShowFormTab('ident');
+  document.getElementById('ov-vit-form').classList.add('open');
+}
+function closeVitForm(){document.getElementById('ov-vit-form').classList.remove('open');_vitEditId=null;}
+function vitShowFormTab(t){
+  _vitTab=t;
+  ['ident','numeros','swot','deal','extras'].forEach(k=>{
+    document.getElementById('vit-ftab-'+k).classList.toggle('active',k===t);
+    document.getElementById('vit-fsec-'+k).style.display=k===t?'block':'none';
+  });
+}
+function saveVitProj(){
+  const nome=document.getElementById('vit-f-nome').value.trim();
+  if(!nome){showToast('⚠ Preencha o nome do projeto');vitShowFormTab('ident');return;}
+  const g=id=>document.getElementById(id)?.value.trim()||'';
+  const gn=id=>parseInt(document.getElementById(id)?.value)||0;
+  const data={
+    nome,setor:g('vit-f-setor'),estagio:g('vit-f-estagio'),tagline:g('vit-f-tagline'),
+    problema:g('vit-f-problema'),solucao:g('vit-f-solucao'),modeloReceita:g('vit-f-receita'),tracao:g('vit-f-tracao'),
+    numArr:g('vit-f-arr'),numCrescimento:g('vit-f-cresc'),numClientes:g('vit-f-clientes'),numMargem:g('vit-f-margem'),
+    numTAM:g('vit-f-tam'),numSAM:g('vit-f-sam'),numSOM:g('vit-f-som'),
+    swotF:g('vit-f-swotf'),swotW:g('vit-f-swotw'),swotO:g('vit-f-swoto'),swotT:g('vit-f-swott'),
+    captacaoTotal:g('vit-f-captacao'),ticketMinimo:g('vit-f-ticket'),
+    pctIAHub:gn('vit-f-pcthub')||50,cotas:gn('vit-f-cotas')||50,
+    retornoPrev:g('vit-f-retorno'),prazoMeses:g('vit-f-prazo'),
+    time:_vitTime.filter(m=>m.nome),usoRecursos:_vitUso.filter(u=>u.desc),
+    faq:_vitFAQ.filter(f=>f.pergunta),docs:_vitDocs.filter(d=>d.titulo),
+  };
+  if(_vitEditId){
+    const i=projetosVitrine.findIndex(p=>p.id===_vitEditId);
+    if(i>=0)projetosVitrine[i]={...projetosVitrine[i],...data};
+  } else {
+    projetosVitrine.push({id:vitUID(),...data,status:'rascunho',interesses:[],cotasComprometidas:0,criadoEm:new Date().toISOString(),criadoPor:currentUser?.nome||''});
+  }
+  saveData();syncToSupabase();renderVitrine();closeVitForm();
+  showToast(_vitEditId?'✅ Projeto atualizado':'✅ Projeto criado');
+}
+
+// Time dinâmico
+function _vitTimeSet(arr){_vitTime=arr.map(m=>({...m}));_redrawVitTime();}
+function _redrawVitTime(){
+  document.getElementById('vit-time-list').innerHTML=_vitTime.map((m,i)=>`
+    <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:6px;margin-bottom:6px;align-items:center">
+      <input placeholder="Nome" value="${esc(m.nome||'')}" oninput="_vitTime[${i}].nome=this.value" style="padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px">
+      <input placeholder="Papel / cargo" value="${esc(m.papel||'')}" oninput="_vitTime[${i}].papel=this.value" style="padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px">
+      <button onclick="_vitTime.splice(${i},1);_redrawVitTime()" class="btn-d btn-sm" style="padding:4px 8px">✕</button>
+    </div>`).join('');
+}
+function addVitTime(){_vitTime.push({nome:'',papel:''});_redrawVitTime();}
+
+// Uso dinâmico
+function _vitUsoSet(arr){_vitUso=arr.map(u=>({...u}));_redrawVitUso();}
+function _redrawVitUso(){
+  document.getElementById('vit-uso-list').innerHTML=_vitUso.map((u,i)=>`
+    <div style="display:grid;grid-template-columns:1fr 70px auto;gap:6px;margin-bottom:6px;align-items:center">
+      <input placeholder="Destino" value="${esc(u.desc||'')}" oninput="_vitUso[${i}].desc=this.value" style="padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px">
+      <input type="number" min="0" max="100" placeholder="%" value="${u.pct||''}" oninput="_vitUso[${i}].pct=parseInt(this.value)||0" style="padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px;text-align:center">
+      <button onclick="_vitUso.splice(${i},1);_redrawVitUso()" class="btn-d btn-sm" style="padding:4px 8px">✕</button>
+    </div>`).join('');
+}
+function addVitUso(){_vitUso.push({desc:'',pct:0});_redrawVitUso();}
+
+// FAQ dinâmico
+function _vitFAQSet(arr){_vitFAQ=arr.map(f=>({...f}));_redrawVitFAQ();}
+function _redrawVitFAQ(){
+  document.getElementById('vit-faq-list').innerHTML=_vitFAQ.map((f,i)=>`
+    <div style="background:#f9f9f9;border:1px solid #eee;border-radius:8px;padding:10px 12px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-size:11px;font-weight:600;color:#888">Pergunta ${i+1}</span>
+        <button onclick="_vitFAQ.splice(${i},1);_redrawVitFAQ()" class="btn-d btn-sm" style="padding:2px 7px">✕</button>
+      </div>
+      <input placeholder="Pergunta" value="${esc(f.pergunta||'')}" oninput="_vitFAQ[${i}].pergunta=this.value" style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px;margin-bottom:6px">
+      <textarea placeholder="Resposta" oninput="_vitFAQ[${i}].resposta=this.value" style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px;height:58px;resize:vertical">${esc(f.resposta||'')}</textarea>
+    </div>`).join('');
+}
+function addVitFAQ(){_vitFAQ.push({pergunta:'',resposta:''});_redrawVitFAQ();}
+
+// Docs dinâmico
+function _vitDocsSet(arr){_vitDocs=arr.map(d=>({...d}));_redrawVitDocs();}
+function _redrawVitDocs(){
+  document.getElementById('vit-doc-list').innerHTML=_vitDocs.map((d,i)=>`
+    <div style="display:grid;grid-template-columns:1fr 2fr auto;gap:6px;margin-bottom:6px;align-items:center">
+      <input placeholder="Título" value="${esc(d.titulo||'')}" oninput="_vitDocs[${i}].titulo=this.value" style="padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px">
+      <input placeholder="URL (link do PDF ou Google Drive)" value="${esc(d.url||'')}" oninput="_vitDocs[${i}].url=this.value" style="padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px">
+      <button onclick="_vitDocs.splice(${i},1);_redrawVitDocs()" class="btn-d btn-sm" style="padding:4px 8px">✕</button>
+    </div>`).join('');
+}
+function addVitDoc(){_vitDocs.push({titulo:'',url:''});_redrawVitDocs();}
+
+// ── DETALHE (read-only) ──
+function openVitDetalhe(id){
+  const p=projetosVitrine.find(p=>p.id===id);if(!p)return;
+  const el=document.getElementById('vit-detalhe-inner');
+  const swotQ=(bg,label,txt)=>txt?`<div style="background:${bg};border-radius:8px;padding:12px 14px"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;opacity:.7;margin-bottom:7px">${label}</div>${txt.split('\n').filter(Boolean).map(l=>`<div style="font-size:12px;line-height:1.5;margin-bottom:3px">· ${esc(l)}</div>`).join('')}</div>`:'';
+  const cotas=p.cotas||50;
+  const hubN=p.cotasHub??Math.round(cotas*(p.pctIAHub||50)/100);
+  const comp=p.cotasComprometidas||0;
+  const pct=Math.round(comp/cotas*100);
+  el.innerHTML=`
+    <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:20px">
+      <div style="flex:1">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+          <span class="badge ${vitStatusCls(p.status)}">${vitStatusLabel(p.status)}</span>
+          ${p.setor?`<span class="badge" style="background:#f0f4ff;color:#2554C7">${esc(p.setor)}</span>`:''}
+          ${p.estagio?`<span class="badge" style="background:#f0fdf4;color:#166534">${esc(p.estagio)}</span>`:''}
+        </div>
+        <div style="font-size:20px;font-weight:700;color:#0a1628;margin-bottom:4px">${esc(p.nome||'Sem título')}</div>
+        ${p.tagline?`<div style="font-size:13px;color:#555;line-height:1.5">${esc(p.tagline)}</div>`:''}
+      </div>
+      <button class="btn-p" onclick="closeOv('ov-vit-detalhe');openVitProj('${p.id}')">✏ Editar</button>
+    </div>
+    ${(p.numArr||p.numCrescimento||p.numClientes||p.numMargem)?`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
+      ${p.numArr?`<div class="stat"><div class="stat-label">ARR</div><div class="stat-value" style="font-size:18px;color:#0F6E56">${esc(p.numArr)}</div></div>`:''}
+      ${p.numCrescimento?`<div class="stat"><div class="stat-label">Crescimento</div><div class="stat-value" style="font-size:18px;color:#0891b2">${esc(p.numCrescimento)}</div></div>`:''}
+      ${p.numClientes?`<div class="stat"><div class="stat-label">Clientes</div><div class="stat-value" style="font-size:18px">${esc(p.numClientes)}</div></div>`:''}
+      ${p.numMargem?`<div class="stat"><div class="stat-label">Margem bruta</div><div class="stat-value" style="font-size:18px">${esc(p.numMargem)}</div></div>`:''}
+    </div>`:''}
+    ${(p.status==='aberto'||p.status==='aprovado')?`<div class="rel-box" style="margin-bottom:16px">
+      <h3>Captação</h3>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:#888;margin:8px 0 4px"><span>${comp}/${cotas} cotas comprometidas</span><span style="font-weight:600;color:#0891b2">${pct}%</span></div>
+      <div class="vit-prog-track"><div class="vit-prog-fill" style="width:${pct}%"></div></div>
+      <div style="font-size:11px;color:#aaa;margin-top:4px">${hubN} reservadas IA Hub · ${cotas-hubN} mercado externo</div>
+    </div>`:''}
+    ${(p.problema||p.solucao||p.modeloReceita||p.tracao)?`<div class="rel-box" style="margin-bottom:16px"><h3>Plano de Negócios</h3>
+      ${p.problema?`<div class="divider"></div><div class="stat-label">Problema</div><p style="font-size:13px;color:#333;line-height:1.7;margin-top:4px">${esc(p.problema)}</p>`:''}
+      ${p.solucao?`<div class="divider"></div><div class="stat-label">Solução</div><p style="font-size:13px;color:#333;line-height:1.7;margin-top:4px">${esc(p.solucao)}</p>`:''}
+      ${p.modeloReceita?`<div class="divider"></div><div class="stat-label">Modelo de Receita</div><p style="font-size:13px;color:#333;line-height:1.7;margin-top:4px">${esc(p.modeloReceita)}</p>`:''}
+      ${p.tracao?`<div class="divider"></div><div class="stat-label">Tração</div><p style="font-size:13px;color:#333;line-height:1.7;margin-top:4px">${esc(p.tracao)}</p>`:''}
+    </div>`:''}
+    ${(p.numTAM||p.numSAM||p.numSOM)?`<div class="rel-box" style="margin-bottom:16px"><h3>Tamanho de Mercado</h3>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px">
+        ${p.numTAM?`<div class="stat"><div class="stat-label">TAM</div><div class="stat-value" style="font-size:16px">${esc(p.numTAM)}</div></div>`:''}
+        ${p.numSAM?`<div class="stat"><div class="stat-label">SAM</div><div class="stat-value" style="font-size:16px;color:#0891b2">${esc(p.numSAM)}</div></div>`:''}
+        ${p.numSOM?`<div class="stat"><div class="stat-label">SOM (meta)</div><div class="stat-value" style="font-size:16px;color:#0F6E56">${esc(p.numSOM)}</div></div>`:''}
+      </div>
+    </div>`:''}
+    ${(p.swotF||p.swotW||p.swotO||p.swotT)?`<div class="rel-box" style="margin-bottom:16px"><h3>Análise SWOT</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+        ${swotQ('#f0fdf4','✅ Forças',p.swotF)}${swotQ('#fffbeb','⚠ Fraquezas',p.swotW)}
+        ${swotQ('#eff6ff','🚀 Oportunidades',p.swotO)}${swotQ('#fff1f2','⚡ Ameaças',p.swotT)}
+      </div>
+    </div>`:''}
+    ${p.time&&p.time.length?`<div class="rel-box" style="margin-bottom:16px"><h3>Time</h3>
+      ${p.time.map(m=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f3">
+        <div class="avatar" style="background:#e0f2fe;color:#0891b2">${(m.nome||'?')[0].toUpperCase()}</div>
+        <div><div style="font-size:13px;font-weight:600">${esc(m.nome)}</div><div style="font-size:12px;color:#888">${esc(m.papel)}</div></div>
+      </div>`).join('')}
+    </div>`:''}
+    ${(p.captacaoTotal||p.ticketMinimo||p.retornoPrev||(p.usoRecursos&&p.usoRecursos.length))?`<div class="rel-box" style="margin-bottom:16px"><h3>Deal</h3>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0">
+        ${p.captacaoTotal?`<div class="stat"><div class="stat-label">Captação</div><div class="stat-value" style="font-size:16px;color:#2554C7">${esc(p.captacaoTotal)}</div></div>`:''}
+        ${p.ticketMinimo?`<div class="stat"><div class="stat-label">Ticket mín.</div><div class="stat-value" style="font-size:16px">${esc(p.ticketMinimo)}</div></div>`:''}
+        ${p.retornoPrev?`<div class="stat"><div class="stat-label">Retorno prev.</div><div class="stat-value" style="font-size:16px;color:#0F6E56">${esc(p.retornoPrev)}</div></div>`:''}
+      </div>
+      ${p.pctIAHub?`<div style="font-size:12px;color:#888;margin-bottom:10px">🏛 ${p.pctIAHub}% reservado para rede IA Hub · ${100-(p.pctIAHub||0)}% mercado externo${p.prazoMeses?' · Prazo: '+p.prazoMeses+' meses':''}</div>`:''}
+      ${p.usoRecursos&&p.usoRecursos.length?p.usoRecursos.map(u=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+        <div style="color:#555;width:140px;flex-shrink:0">${esc(u.desc)}</div>
+        <div style="flex:1;height:5px;background:#f0f0f0;border-radius:10px;overflow:hidden"><div style="height:100%;border-radius:10px;background:#2554C7;width:${u.pct}%"></div></div>
+        <div style="font-weight:600;width:30px;text-align:right">${u.pct}%</div>
+      </div>`).join(''):''}
+    </div>`:''}
+    ${p.faq&&p.faq.length?`<div class="rel-box" style="margin-bottom:16px"><h3>Perguntas Frequentes</h3>
+      ${p.faq.map((f,i)=>`<div style="${i?'border-top:1px solid #f5f5f3;':''}padding:10px 0">
+        <div style="font-size:13px;font-weight:600;color:#0a1628;margin-bottom:4px">${esc(f.pergunta)}</div>
+        <div style="font-size:12px;color:#555;line-height:1.6">${esc(f.resposta)}</div>
+      </div>`).join('')}
+    </div>`:''}
+    ${p.docs&&p.docs.length?`<div class="rel-box"><h3>Documentos</h3>
+      ${p.docs.map(d=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f5f5f3">
+        <span>📄</span>
+        ${d.url?`<a href="${esc(d.url)}" target="_blank" style="color:#0891b2;font-size:13px;text-decoration:none">${esc(d.titulo||d.url)}</a>`:`<span style="font-size:13px">${esc(d.titulo)}</span>`}
+      </div>`).join('')}
+    </div>`:''}`;
+  document.getElementById('ov-vit-detalhe').classList.add('open');
+}
+
+// ── INTERESSES ──
+function openVitInteresses(id){
+  const p=projetosVitrine.find(p=>p.id===id);if(!p)return;
+  const el=document.getElementById('vit-int-inner');
+  const cotas=p.cotas||50;
+  const hubN=p.cotasHub??Math.round(cotas*(p.pctIAHub||50)/100);
+  const comp=p.cotasComprometidas||0;
+  el.innerHTML=`
+    <div style="font-size:15px;font-weight:600;margin-bottom:3px">${esc(p.nome)}</div>
+    <div style="font-size:12px;color:#888;margin-bottom:16px">${comp}/${cotas} cotas comprometidas · ${hubN} reservadas IA Hub</div>
+    <div class="section-hdr">Registrar novo interesse</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div><label style="font-size:11px;color:#888">Nome do investidor</label><input id="vit-int-nome" placeholder="Nome" style="width:100%;padding:7px 9px;border:1px solid #ddd;border-radius:7px;font-size:13px;margin-top:3px"></div>
+      <div><label style="font-size:11px;color:#888">Contato (WhatsApp)</label><input id="vit-int-tel" placeholder="(XX) XXXXX-XXXX" style="width:100%;padding:7px 9px;border:1px solid #ddd;border-radius:7px;font-size:13px;margin-top:3px"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div><label style="font-size:11px;color:#888">Valor pretendido</label><input id="vit-int-val" placeholder="ex: R$ 10.000" style="width:100%;padding:7px 9px;border:1px solid #ddd;border-radius:7px;font-size:13px;margin-top:3px"></div>
+      <div><label style="font-size:11px;color:#888">Perfil</label>
+        <select id="vit-int-perfil" style="width:100%;padding:7px 9px;border:1px solid #ddd;border-radius:7px;font-size:13px;margin-top:3px">
+          <option value="IA Hub">IA Hub (membro)</option>
+          <option value="Externo">Externo</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-bottom:12px"><label style="font-size:11px;color:#888">Nota</label><input id="vit-int-nota" placeholder="Observações..." style="width:100%;padding:7px 9px;border:1px solid #ddd;border-radius:7px;font-size:13px;margin-top:3px"></div>
+    <button class="btn-p" style="margin-bottom:20px" onclick="salvarVitInteresse('${id}')">+ Registrar interesse</button>
+    <div class="section-hdr">Registrados (${(p.interesses||[]).length})</div>
+    ${(p.interesses||[]).length
+      ?(p.interesses||[]).map((int,i)=>`<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f5f5f3">
+          <div>
+            <div style="font-size:13px;font-weight:600">${esc(int.nome)} <span class="badge" style="${int.perfil==='IA Hub'?'background:#FAEEDA;color:#633806':'background:#f0f4ff;color:#2554C7'}">${esc(int.perfil||'Externo')}</span></div>
+            ${int.contato?`<div style="font-size:11px;color:#888">${esc(int.contato)}</div>`:''}
+            ${int.valor?`<div style="font-size:12px;color:#0F6E56;font-weight:600">${esc(int.valor)}</div>`:''}
+            ${int.nota?`<div style="font-size:12px;color:#555;font-style:italic">${esc(int.nota)}</div>`:''}
+            <div style="font-size:10px;color:#aaa">${int.data||''}</div>
+          </div>
+          <button class="btn-d btn-sm" onclick="removeVitInteresse('${id}',${i})">✕</button>
+        </div>`).join('')
+      :'<div class="empty-msg" style="padding:20px">Nenhum interesse registrado</div>'}`;
+  document.getElementById('ov-vit-int').classList.add('open');
+}
+function salvarVitInteresse(projId){
+  const p=projetosVitrine.find(p=>p.id===projId);if(!p)return;
+  const nome=document.getElementById('vit-int-nome').value.trim();
+  if(!nome){showToast('⚠ Informe o nome do investidor');return;}
+  if(!p.interesses)p.interesses=[];
+  p.interesses.push({
+    nome,
+    contato:document.getElementById('vit-int-tel').value.trim(),
+    valor:document.getElementById('vit-int-val').value.trim(),
+    perfil:document.getElementById('vit-int-perfil').value,
+    nota:document.getElementById('vit-int-nota').value.trim(),
+    data:new Date().toLocaleDateString('pt-BR'),
+  });
+  p.cotasComprometidas=(p.interesses||[]).length;
+  saveData();syncToSupabase();openVitInteresses(projId);renderVitrine();
+  showToast('✅ Interesse registrado');
+}
+function removeVitInteresse(projId,idx){
+  const p=projetosVitrine.find(p=>p.id===projId);if(!p||!p.interesses)return;
+  p.interesses.splice(idx,1);
+  p.cotasComprometidas=(p.interesses||[]).length;
+  saveData();syncToSupabase();openVitInteresses(projId);renderVitrine();
 }
 
 // ===================== INIT =====================
