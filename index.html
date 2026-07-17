@@ -4087,7 +4087,7 @@ async function gerarBPcomIA(){
   }
   const btn=document.getElementById('btn-gerar-ia');
   btn.disabled=true;btn.textContent='⏳ Gerando...';
-  const prompt=`Você é um consultor especialista em startups e business plans para investidores. Com base nas informações abaixo, gere um Business Plan resumido para uma vitrine de investimentos.
+  const aiPrompt=`Você é um consultor especialista em startups e business plans para investidores. Com base nas informações abaixo, gere um Business Plan resumido para uma vitrine de investimentos.
 
 Projeto: ${nome}
 Setor: ${setor||'não informado'}
@@ -4121,7 +4121,7 @@ Escreva em português brasileiro. Seja específico para o setor informado.`;
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        contents:[{parts:[{text:prompt}]}],
+        contents:[{parts:[{text:aiPrompt}]}],
         generationConfig:{temperature:0.7,maxOutputTokens:2048}
       })
     });
