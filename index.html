@@ -998,7 +998,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
           <button id="btn-gerar-ia" class="btn-p" onclick="gerarBPcomIA()" style="margin-top:8px;width:100%">✨ Gerar com IA</button>
           <div style="font-size:10px;color:#94a3b8;margin-top:5px;display:flex;justify-content:space-between;align-items:center">
             <span>Preencha Nome e Setor antes de gerar · Cria: Tagline · SWOT · FAQ e mais</span>
-            <button onclick="configGeminiKey()" style="font-size:10px;color:#0891b2;background:none;border:none;cursor:pointer;padding:0;text-decoration:underline">⚙ key</button>
+            <button onclick="configGroqKey()" style="font-size:10px;color:#0891b2;background:none;border:none;cursor:pointer;padding:0;text-decoration:underline">⚙ key Groq</button>
           </div>
         </div>
         <div class="full fg-sec">Business Plan</div>
@@ -4066,10 +4066,10 @@ function salvarConexaoOperador(){
 
 // ===================== GEMINI =====================
 
-function configGeminiKey(){
-  const atual=localStorage.getItem('gemini_key')||'';
-  const k=prompt('Cole sua Gemini API key:',atual);
-  if(k&&k.trim()){localStorage.setItem('gemini_key',k.trim());showToast('✅ Key salva');}
+function configGroqKey(){
+  const atual=localStorage.getItem('groq_key')||'';
+  const k=window.prompt('Cole sua Groq API key (console.groq.com):',atual);
+  if(k&&k.trim()){localStorage.setItem('groq_key',k.trim());showToast('✅ Key Groq salva');}
 }
 
 async function gerarBPcomIA(){
@@ -4079,11 +4079,12 @@ async function gerarBPcomIA(){
   const desc=document.getElementById('vit-f-desc-ia').value.trim();
   if(!nome){showToast('⚠ Preencha o nome do projeto primeiro');return;}
   if(!desc){showToast('⚠ Descreva o negócio em 2–3 frases');return;}
-  const GEMINI_KEY=localStorage.getItem('gemini_key');
-  if(!GEMINI_KEY){
-    const k=prompt('Cole sua Gemini API key para ativar a geração com IA:');
+  let key=localStorage.getItem('groq_key');
+  if(!key){
+    const k=window.prompt('Cole sua Groq API key (console.groq.com):');
     if(!k||!k.trim()){return;}
-    localStorage.setItem('gemini_key',k.trim());
+    localStorage.setItem('groq_key',k.trim());
+    key=k.trim();
   }
   const btn=document.getElementById('btn-gerar-ia');
   btn.disabled=true;btn.textContent='⏳ Gerando...';
@@ -4116,18 +4117,19 @@ Retorne APENAS um objeto JSON válido, sem markdown, sem código, sem explicaç�
 
 Escreva em português brasileiro. Seja específico para o setor informado.`;
   try{
-    const activeKey=localStorage.getItem('gemini_key');
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${activeKey}`,{
+    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
       body:JSON.stringify({
-        contents:[{parts:[{text:aiPrompt}]}],
-        generationConfig:{temperature:0.7,maxOutputTokens:2048}
+        model:'llama-3.3-70b-versatile',
+        messages:[{role:'user',content:aiPrompt}],
+        temperature:0.7,
+        max_tokens:2048
       })
     });
     if(!res.ok){const e=await res.json();throw new Error(e?.error?.message||`HTTP ${res.status}`);}
     const data=await res.json();
-    const text=data.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    const text=data.choices?.[0]?.message?.content||'';
     const match=text.match(/\{[\s\S]*\}/);
     if(!match)throw new Error('Resposta inesperada da IA');
     const bp=JSON.parse(match[0]);
