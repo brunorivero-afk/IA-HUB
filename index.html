@@ -1039,6 +1039,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <!-- Aba 4 -->
     <div id="vit-fsec-deal" style="display:none">
       <div class="fg">
+        <div class="full"><label>Tese do Curador</label><textarea id="vit-f-tese" placeholder="Acredito porque..." style="width:100%;height:80px;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:13px;resize:vertical;font-family:Georgia,'Times New Roman',serif;line-height:1.6"></textarea><div style="font-size:11px;color:#888;margin-top:3px">3–5 linhas. Aparece em destaque no card e na página pública.</div></div>
         <div><label>Captação total buscada</label><input id="vit-f-captacao" placeholder="ex: R$ 500.000"></div>
         <div><label>Ticket mínimo</label><input id="vit-f-ticket" placeholder="ex: R$ 10.000"></div>
         <div><label>% reservado IA Hub</label><input id="vit-f-pcthub" type="number" min="0" max="100" placeholder="50" value="50"></div>
@@ -4154,6 +4155,91 @@ Escreva em português brasileiro. Seja específico para o setor informado.`;
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 function vitUID(){return 'vp'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+
+function vitPublicLink(id){
+  const p=projetosVitrine.find(p=>p.id===id);if(!p)return;
+  if(!p.publicToken){p.publicToken='vi'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);saveData();syncToSupabase();}
+  const url=location.origin+location.pathname+'?invest='+p.publicToken;
+  navigator.clipboard.writeText(url).then(()=>showToast('🔗 Link copiado!'),()=>prompt('Copie o link:',url));
+}
+
+function renderPublicPage(p){
+  const cotas=p.cotas||20;
+  const hubN=p.cotasHub??Math.round(cotas*(p.pctIAHub||50)/100);
+  const comp=p.cotasComprometidas||0;
+  const hubPct=Math.round(hubN/cotas*100);
+  const waMsg=encodeURIComponent('Olá Bruno! Tenho interesse no projeto '+p.nome+' da Vitrine IA Hub. Pode me dar mais detalhes?');
+  const waUrl='https://wa.me/5521?text='+waMsg;
+  const rules=[
+    'Manifeste interesse abaixo. Bruno entra em contato para explicar o deal completo.',
+    'Relatório trimestral para todos os cotistas enquanto o projeto estiver ativo.',
+    p.prazoMeses?'Captação encerra em '+p.prazoMeses+' meses ou quando as cotas esgotarem.':'Captação encerra quando as cotas esgotarem.'
+  ];
+  document.body.style.cssText='margin:0;padding:0;background:#f5f4f0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh;';
+  document.body.innerHTML=`
+  <div style="max-width:480px;margin:0 auto;padding:20px 0 40px">
+    <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 20px rgba(0,0,0,.08)">
+      <div style="padding:14px 20px 0;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:10px;font-weight:700;letter-spacing:.15em;color:#888;text-transform:uppercase">IA Hub · Vitrine</span>
+        ${p.status==='aberto'?'<span style="font-size:10px;font-weight:700;background:#d1fae5;color:#065f46;padding:3px 9px;border-radius:12px">Captação aberta</span>':''}
+      </div>
+      <div style="padding:20px">
+        <div style="width:44px;height:44px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#1d4ed8;margin-bottom:12px">BR</div>
+        <div style="font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Bruno Rivero indica</div>
+        <div style="font-size:18px;font-weight:700;color:#0a1628;line-height:1.3;margin-bottom:4px">${esc(p.nome||'')}</div>
+        ${p.setor?'<span style="display:inline-block;font-size:11px;background:#f3f4f6;border:1px solid #e5e7eb;color:#6b7280;padding:3px 10px;border-radius:20px;margin-bottom:14px">'+esc(p.setor)+'</span>':''}
+        ${p.teseCurador?`<div style="background:#f8faff;border-left:3px solid #3b82f6;border-radius:0 8px 8px 0;padding:14px 16px;margin:${p.setor?'0':'14px 0 0'}">
+          <p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.7;color:#1a1a1a;margin:0">"${esc(p.teseCurador)}"</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+          <div style="height:1px;flex:1;background:#e5e7eb"></div>
+          <span style="font-size:11px;color:#9ca3af;white-space:nowrap">Bruno Rivero · ${new Date().getFullYear()}</span>
+          <div style="height:1px;flex:1;background:#e5e7eb"></div>
+        </div>`:''}
+      </div>
+      <div style="height:1px;background:#f0f0f0;margin:0 20px"></div>
+      <div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        ${p.captacaoTotal?`<div style="background:#f9fafb;border:1px solid #f0f0f0;border-radius:10px;padding:10px 12px"><div style="font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Captação total</div><div style="font-size:17px;font-weight:700;color:#0a1628">${esc(p.captacaoTotal)}</div><div style="font-size:10px;color:#6b7280;margin-top:2px">${cotas} cotas</div></div>`:''}
+        ${p.ticketMinimo?`<div style="background:#f9fafb;border:1px solid #f0f0f0;border-radius:10px;padding:10px 12px"><div style="font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Cota mínima</div><div style="font-size:17px;font-weight:700;color:#0a1628">${esc(p.ticketMinimo)}</div><div style="font-size:10px;color:#6b7280;margin-top:2px">por investidor</div></div>`:''}
+        ${p.prazoMeses?`<div style="background:#f9fafb;border:1px solid #f0f0f0;border-radius:10px;padding:10px 12px"><div style="font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Prazo</div><div style="font-size:17px;font-weight:700;color:#0a1628">${esc(p.prazoMeses)} meses</div></div>`:''}
+        ${p.retornoPrev?`<div style="background:#f9fafb;border:1px solid #f0f0f0;border-radius:10px;padding:10px 12px"><div style="font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Retorno projetado</div><div style="font-size:17px;font-weight:700;color:#0a1628">${esc(p.retornoPrev)}</div><div style="font-size:10px;color:#d97706;margin-top:2px">projeção não garantida</div></div>`:''}
+      </div>
+      <div style="margin:0 20px 16px;background:#f0fdf4;border:1px solid #a7f3d0;border-radius:10px;padding:12px 14px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <span style="font-size:14px">🛡</span>
+          <span style="font-size:12px;font-weight:700;color:#065f46">IA Hub tem skin in the game</span>
+        </div>
+        <div style="font-size:12px;color:#065f46;line-height:1.5;opacity:.9">Reservamos ${p.pctIAHub||50}% das cotas para a rede IA Hub antes de abrir para terceiros. Se não compramos, não indicamos.</div>
+      </div>
+      ${(p.status==='aberto'||p.status==='aprovado')?`<div style="padding:0 20px 16px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin-bottom:6px"><span>Cotas preenchidas</span><span style="font-weight:700;color:#0a1628">${comp}/${cotas}</span></div>
+        <div style="display:flex;height:6px;border-radius:3px;overflow:hidden;border:1px solid #e5e7eb">
+          <div style="width:${hubPct}%;background:#10b981"></div>
+          <div style="width:${Math.max(0,Math.round((comp-hubN)/cotas*100))}%;background:#3b82f6"></div>
+          <div style="flex:1;background:#f3f4f6"></div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:6px">
+          <span style="font-size:10px;color:#6b7280;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#10b981;display:inline-block"></span>IA Hub (${hubN})</span>
+          <span style="font-size:10px;color:#6b7280;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#3b82f6;display:inline-block"></span>Rede (${Math.max(0,comp-hubN)})</span>
+          <span style="font-size:10px;color:#6b7280;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#e5e7eb;border:1px solid #d1d5db;display:inline-block"></span>Disponíveis (${cotas-comp})</span>
+        </div>
+      </div>`:''}
+      <div style="height:1px;background:#f0f0f0;margin:0 20px"></div>
+      <div style="padding:16px 20px">
+        <div style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Como funciona</div>
+        ${rules.map((r,i)=>`<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:12px;color:#6b7280;line-height:1.5"><span style="font-size:10px;font-weight:700;color:#3b82f6;min-width:16px;margin-top:2px">${i+1}</span><span>${r}</span></div>`).join('')}
+      </div>
+      <div style="padding:0 20px 20px">
+        <a href="${waUrl}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;background:#10b981;border-radius:10px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;box-sizing:border-box">
+          <span>💬</span> Tenho interesse — falar com Bruno
+        </a>
+        <div style="text-align:center;font-size:11px;color:#9ca3af;margin-top:8px">Sem compromisso. Resposta em até 24h.</div>
+      </div>
+    </div>
+    <div style="text-align:center;font-size:11px;color:#bbb;margin-top:16px;padding:0 20px">Curadoria IA Hub · Projeções de retorno não constituem garantia de rentabilidade. Investimentos envolvem riscos.</div>
+  </div>`;
+}
+
 function vitStatusLabel(s){return{rascunho:'Rascunho',revisao:'Em Revisão',aprovado:'Aprovado',aberto:'Aberto',encerrado:'Encerrado'}[s]||s;}
 function vitStatusCls(s){return{rascunho:'vit-s-ras',revisao:'vit-s-rev',aprovado:'vit-s-apr',aberto:'vit-s-abe',encerrado:'vit-s-enc'}[s]||'';}
 
@@ -4205,6 +4291,7 @@ function vitCardHTML(p){
         </div>
         <div class="pj-title">${esc(p.nome||'Sem título')}</div>
         ${p.tagline?`<div style="font-size:12px;color:#555;margin-top:3px;line-height:1.5">${esc(p.tagline)}</div>`:''}
+        ${p.teseCurador?`<div style="background:#f8faff;border-left:3px solid #3b82f6;border-radius:0 7px 7px 0;padding:9px 12px;margin-top:8px;font-family:Georgia,'Times New Roman',serif;font-size:12px;color:#1a1a1a;line-height:1.6">"${esc(p.teseCurador)}"</div>`:''}
       </div>
     </div>
     ${showBar?`<div style="margin:8px 0">
@@ -4230,6 +4317,7 @@ function vitCardHTML(p){
       ${p.status==='revisao'&&isSocio()?`<button class="btn-s btn-sm" style="border-color:#0F6E56;color:#0F6E56" onclick="vitMudaStatus('${p.id}','aprovado')">✓ Aprovar</button>`:''}
       ${p.status==='aprovado'&&isSocio()?`<button class="btn-s btn-sm" style="border-color:#0891b2;color:#0891b2" onclick="vitMudaStatus('${p.id}','aberto')">🚀 Abrir para captação</button>`:''}
       ${p.status==='aberto'?`<button class="btn-s btn-sm" style="border-color:#888;color:#888" onclick="vitMudaStatus('${p.id}','encerrado')">Encerrar</button>`:''}
+      ${(p.status==='aberto'||p.status==='aprovado')?`<button class="btn-s btn-sm" onclick="vitPublicLink('${p.id}')" style="border-color:#0891b2;color:#0891b2">🔗 Link público</button>`:''}
       <button class="btn-d btn-sm" onclick="deleteVitProj('${p.id}')">✕</button>
     </div>
   </div>`;
@@ -4269,6 +4357,7 @@ function openVitProj(id){
   document.getElementById('vit-f-estagio').value=v('estagio')||'Tração';
   document.getElementById('vit-f-pcthub').value=vn('pctIAHub')||50;
   document.getElementById('vit-f-cotas').value=vn('cotas')||50;
+  const teseEl=document.getElementById('vit-f-tese');if(teseEl)teseEl.value=p?(p.teseCurador||''):'';
   _vitTimeSet(p?p.time||[]:[]);
   _vitUsoSet(p?p.usoRecursos||[]:[{desc:'Tecnologia & Produto',pct:60},{desc:'Comercial & Marketing',pct:25},{desc:'Operações',pct:15}]);
   _vitFAQSet(p?p.faq||[]:[]);
@@ -4295,6 +4384,7 @@ function saveVitProj(){
     numArr:g('vit-f-arr'),numCrescimento:g('vit-f-cresc'),numClientes:g('vit-f-clientes'),numMargem:g('vit-f-margem'),
     numTAM:g('vit-f-tam'),numSAM:g('vit-f-sam'),numSOM:g('vit-f-som'),
     swotF:g('vit-f-swotf'),swotW:g('vit-f-swotw'),swotO:g('vit-f-swoto'),swotT:g('vit-f-swott'),
+    teseCurador:g('vit-f-tese'),
     captacaoTotal:g('vit-f-captacao'),ticketMinimo:g('vit-f-ticket'),
     pctIAHub:gn('vit-f-pcthub')||50,cotas:gn('vit-f-cotas')||50,
     retornoPrev:g('vit-f-retorno'),prazoMeses:g('vit-f-prazo'),
@@ -4642,13 +4732,21 @@ function removeVitInteresse(projId,idx){
 loadData();
 injectLogos();
 (async()=>{
+  const investToken=new URLSearchParams(location.search).get('invest');
+  if(investToken){
+    // Public page: load data without auth and render
+    const loaded=await loadFromSupabase();
+    const proj=(loaded?projetosVitrine:JSON.parse(localStorage.getItem('iahub_data')||'{}').projetosVitrine||[])
+      .find(p=>p.publicToken===investToken);
+    if(proj){renderPublicPage(proj);return;}
+  }
   const loaded=await loadFromSupabase();
   if(loaded){
     if(currentUser){ showTab(currentTabName||'rede'); updateNotifBadge(); }
   }
   if(!sinergias.some(s=>s.auto)) gerarSinergias();
+  showScreen('login');
 })();
-showScreen('login');
 </script>
 </body>
 </html>
