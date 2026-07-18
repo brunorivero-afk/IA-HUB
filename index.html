@@ -906,7 +906,10 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <label>Segmento B *</label><input id="sin-b" placeholder="Ex: Contabilidade">
     <label>Prioridade</label>
     <select id="sin-p"><option value="alta">Alta</option><option value="media">Média</option></select>
-    <label>Descrição detalhada *</label>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;margin-bottom:4px">
+      <label style="margin:0">Descrição detalhada *</label>
+      <button id="btn-sin-ia" class="btn-s" style="font-size:11px;padding:3px 10px" onclick="enriquecerSinergia()">✨ Gerar com IA</button>
+    </div>
     <textarea id="sin-why" placeholder="Explique como esses segmentos se complementam, quais oportunidades existem e como membros podem se beneficiar..." style="height:100px"></textarea>
     <label style="margin-top:10px;display:flex;align-items:center;gap:6px">
       <span style="background:#0a1628;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px">IA Hub</span>
@@ -2579,6 +2582,58 @@ function renderSin(){
   if(!list.length)document.getElementById('syn-grid').innerHTML=`<div class="empty-msg">Nenhuma sinergia encontrada.</div>`;
 }
 
+async function enriquecerSinergia(){
+  const a=document.getElementById('sin-a').value.trim();
+  const b=document.getElementById('sin-b').value.trim();
+  if(!a||!b){alert('Preencha os segmentos A e B antes de gerar.');return;}
+  let key=localStorage.getItem('groq_key');
+  if(!key){
+    const k=window.prompt('Cole sua Groq API key (console.groq.com):','');
+    if(!k||!k.trim())return;
+    localStorage.setItem('groq_key',k.trim());key=k.trim();
+  }
+  const btn=document.getElementById('btn-sin-ia');
+  btn.disabled=true;btn.textContent='⏳ Gerando...';
+  // Monta contexto com membros dos segmentos envolvidos
+  const membrosA=users.filter(u=>u.status==='Ativo'&&(u.seg||'').toLowerCase().split(',').map(s=>s.trim()).some(s=>s.includes(a.toLowerCase())));
+  const membrosB=users.filter(u=>u.status==='Ativo'&&(u.seg||'').toLowerCase().split(',').map(s=>s.trim()).some(s=>s.includes(b.toLowerCase())));
+  const perfilMembro=u=>`${u.nome}${u.emp&&u.emp!=='?'?' ('+u.emp+')':''}${u.ativ?' — '+u.ativ.substring(0,120):''}`;
+  const ctxA=membrosA.length?membrosA.map(perfilMembro).join('\n'):'(nenhum membro cadastrado neste segmento)';
+  const ctxB=membrosB.length?membrosB.map(perfilMembro).join('\n'):'(nenhum membro cadastrado neste segmento)';
+  const aiPrompt=`Você é curador de uma rede de negócios premium chamada IA Hub.
+
+Escreva um texto de sinergia estratégica entre os segmentos "${a}" e "${b}" da rede.
+
+Membros do segmento ${a}:
+${ctxA}
+
+Membros do segmento ${b}:
+${ctxB}
+
+Escreva 2 a 3 parágrafos que:
+1. Expliquem o complemento real e específico entre esses segmentos (sem clichês genéricos)
+2. Identifiquem que tipo de cliente ou situação dispara a apresentação entre eles
+3. Se houver membros cadastrados, mencione-os pelo nome e como cada um se encaixa na sinergia
+
+Seja direto, estratégico e específico. Responda apenas com os parágrafos, sem títulos.`;
+  try{
+    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:aiPrompt}],temperature:0.7,max_tokens:600})
+    });
+    const data=await res.json();
+    if(data.error){throw new Error(data.error.message||'Erro Groq');}
+    const txt=data.choices?.[0]?.message?.content||'';
+    if(txt)document.getElementById('sin-why').value=txt.trim();
+    else showToast('⚠ IA não retornou texto. Tente novamente.');
+  }catch(e){
+    showToast('❌ Erro: '+e.message);
+    if(e.message&&e.message.includes('401')){localStorage.removeItem('groq_key');showToast('⚠ Key inválida — removida. Insira novamente.');}
+  }finally{
+    btn.disabled=false;btn.textContent='✨ Gerar com IA';
+  }
+}
 function openAddSin(){
   editSinId=null;document.getElementById('sin-ttl').textContent='Nova sinergia';
   ['sin-a','sin-b','sin-why','sin-note'].forEach(id=>document.getElementById(id).value='');
