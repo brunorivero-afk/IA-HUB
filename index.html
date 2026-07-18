@@ -1311,7 +1311,7 @@ function injectLogos(){
 function doLogin(){
   const email=document.getElementById('l-email').value.trim().toLowerCase();
   const senha=document.getElementById('l-senha').value;
-  const u=users.find(x=>x.email.toLowerCase()===email&&x.senha===senha&&x.status==='Ativo');
+  const u=users.find(x=>x.email.toLowerCase()===email&&x.senha===senha&&x.status!=='Pendente'&&x.status!=='Inativo');
   if(!u){document.getElementById('login-err').style.display='block';return;}
   document.getElementById('login-err').style.display='none';
   currentUser=u;
