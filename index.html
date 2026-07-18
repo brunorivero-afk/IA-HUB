@@ -444,8 +444,8 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     </div>
     <!-- MEMBROS (unificado) -->
     <div class="panel" id="tab-rede-membros">
-      <!-- Sub-abas internas -->
-      <div style="display:flex;gap:8px;margin-bottom:20px">
+      <!-- Sub-abas internas (Membros só para sócios) -->
+      <div id="sub-tabs-bar" style="display:flex;gap:8px;margin-bottom:20px">
         <button id="sub-btn-membros" class="btn-p" style="flex:1" onclick="switchMbrTab('membros')">👥 Membros</button>
         <button id="sub-btn-conexoes" class="btn-p" style="flex:1;background:#fff;color:#2554C7;border:1.5px solid #2554C7" onclick="switchMbrTab('conexoes')">🔗 Conexões</button>
       </div>
@@ -898,6 +898,11 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <select id="sin-p"><option value="alta">Alta</option><option value="media">Média</option></select>
     <label>Descrição detalhada *</label>
     <textarea id="sin-why" placeholder="Explique como esses segmentos se complementam, quais oportunidades existem e como membros podem se beneficiar..." style="height:100px"></textarea>
+    <label style="margin-top:10px;display:flex;align-items:center;gap:6px">
+      <span style="background:#0a1628;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px">IA Hub</span>
+      Comentário do curador
+    </label>
+    <textarea id="sin-note" placeholder="Nota interna — aparece destacada no card para os sócios. Ex: Bruno conhece os dois, já conversaram sobre isso em 2025." style="height:72px;border-color:#0a1628"></textarea>
     <div class="modal-btns">
       <button class="btn-s" onclick="closeOv('ov-sin')">Cancelar</button>
       <button class="btn-p" onclick="saveSin()">Salvar</button>
@@ -1363,7 +1368,7 @@ function buildTabs(){
   }
   const tabDefs=[
     {id:'rede',label:'Mapa da Rede',all:true},
-    {id:'rede-membros',label:'Membros',all:true},
+    {id:'rede-membros',label:'Conexões',all:true},
     {id:'financeiro',label:'Financeiro',socio:true},
     {id:'projetos',label:'Projetos',all:true},
     {id:'sinergias',label:'Sinergias',socioAssoc:true},
@@ -1406,7 +1411,7 @@ function showTab(name){
   if(panel)panel.classList.add('active');
   if(tbtn)tbtn.classList.add('active');
   if(name==='rede')renderRede();
-  if(name==='rede-membros'){renderMembros();renderConexoes();}
+  if(name==='rede-membros'){renderMembros();renderConexoes();switchMbrTab(isSocio()?'membros':'conexoes');}
   if(name==='financeiro')renderFinanceiro();
   if(name==='projetos')renderProjetos();
   if(name==='sinergias')renderSin();
@@ -2351,10 +2356,7 @@ function abrirNovoNegocio(){
     openAddProj();
   } else {
     showTab('rede-membros');
-    setTimeout(()=>{
-      switchMbrTab('conexoes');
-      setTimeout(()=>openProporNegocio(),150);
-    },150);
+    setTimeout(()=>{ switchMbrTab('conexoes'); setTimeout(()=>openAddCon(),150); },150);
   }
 }
 
@@ -2524,6 +2526,7 @@ function renderSin(){
       </div>
       ${ppl.length?`<div class="syn-ppl">${ppl.map(n=>`<span class="chip">${n}</span>`).join('')}</div>`:''}
       <div class="syn-why">${syn.why}</div>
+      ${syn.note&&isSocio()?`<div style="background:#0a1628;color:#e2e8f0;border-radius:8px;padding:9px 12px;margin-top:8px;font-size:12px;line-height:1.6"><span style="font-size:10px;font-weight:700;letter-spacing:.08em;opacity:.7;text-transform:uppercase">IA Hub</span><br>${syn.note}</div>`:''}
       ${editBtn}
     </div>`;
   }).join('');
@@ -2532,7 +2535,7 @@ function renderSin(){
 
 function openAddSin(){
   editSinId=null;document.getElementById('sin-ttl').textContent='Nova sinergia';
-  ['sin-a','sin-b','sin-why'].forEach(id=>document.getElementById(id).value='');
+  ['sin-a','sin-b','sin-why','sin-note'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('sin-p').value='alta';
   document.getElementById('ov-sin').classList.add('open');
 }
@@ -2541,12 +2544,14 @@ function openEditSin(id){
   document.getElementById('sin-ttl').textContent='Editar sinergia';
   document.getElementById('sin-a').value=s.a;document.getElementById('sin-b').value=s.b;
   document.getElementById('sin-p').value=s.p;document.getElementById('sin-why').value=s.why;
+  document.getElementById('sin-note').value=s.note||'';
   document.getElementById('ov-sin').classList.add('open');
 }
 function saveSin(){
   const a=document.getElementById('sin-a').value.trim(),b=document.getElementById('sin-b').value.trim(),why=document.getElementById('sin-why').value.trim();
   if(!a||!b||!why){alert('Preencha todos os campos.');return;}
-  const obj={a,b,p:document.getElementById('sin-p').value,why,ppl_a:[],ppl_b:[]};
+  const note=document.getElementById('sin-note').value.trim();
+  const obj={a,b,p:document.getElementById('sin-p').value,why,note,ppl_a:[],ppl_b:[]};
   if(editSinId){const i=sinergias.findIndex(s=>s.id===editSinId);sinergias[i]={...sinergias[i],...obj};}
   else sinergias.push({...obj,id:Date.now()});
   closeOv('ov-sin');renderSin();saveData();
@@ -2950,6 +2955,11 @@ function renderRanking(){
 let evConvidados=[];
 
 function switchMbrTab(tab){
+  // Não-sócios só podem ver conexões
+  if(!isSocio()) tab='conexoes';
+  // Mostrar/ocultar botão Membros conforme perfil
+  const subBar=document.getElementById('sub-tabs-bar');
+  if(subBar) subBar.style.display=isSocio()?'flex':'none';
   ['membros','conexoes'].forEach(t=>{
     const panel=document.getElementById('sub-tab-'+t);
     if(panel)panel.style.display=t===tab?'block':'none';
@@ -3141,7 +3151,6 @@ function renderConexoes(targetEl){
       <p style="font-size:13px;color:#888">Contatos anônimos — sem nome, empresa ou dados pessoais. O sistema cruza os segmentos com a rede e sugere quem tem mais fit.</p>
       <div style="display:flex;gap:8px">
         <button class="btn-p" onclick="openAddCon()">+ Nova conexão</button>
-        ${!isSocio()?`<button class="btn-p" style="background:#fff;color:#2554C7;border:1.5px solid #2554C7" onclick="openProporNegocio()">💡 Propor negócio</button>`:''}
         ${isSocio()?`<button class="btn-p" style="background:#854F0B" onclick="openModeracaoPanel()">🔔 Moderação ${oportunidadesPendentes.length?'('+oportunidadesPendentes.length+')':''}</button>`:''}
       </div>
     </div>
@@ -3174,6 +3183,45 @@ function renderConList(){
   const fseg=(document.getElementById('con-fseg')||{value:''}).value;
   const fnivel=(document.getElementById('con-fnivel')||{value:''}).value;
   const fmine=(document.getElementById('con-fmine')||{value:''}).value;
+
+  // ── MEMBROS DA REDE (anônimos para não-sócios) ──
+  const memActivos=users.filter(u=>u.status==='Ativo'&&u.perfil!=='Sócio'&&u.perfil!=='Operador');
+  const memFilt=(!fnivel&&!fmine)?memActivos.filter(u=>{
+    const segs=(u.seg||'').split(',').map(s=>s.trim()).filter(Boolean);
+    return(!q||segs.some(s=>s.toLowerCase().includes(q))||(isSocio()&&(u.nome||'').toLowerCase().includes(q)))&&(!fseg||segs.includes(fseg));
+  }):[];
+  const memHTML=memFilt.map(u=>{
+    const segs=(u.seg||'').split(',').map(s=>s.trim()).filter(Boolean);
+    const pb=PS[u.perfil]?.bg||'#eee',pt=PS[u.perfil]?.tx||'#555';
+    if(isSocio()){
+      return`<div class="con-card" style="border-left:3px solid ${pb}">
+        <div class="con-header">
+          <div>
+            <div class="con-title">${u.nome}${u.empresa?` <span style="font-weight:400;color:#888;font-size:12px">· ${u.empresa}</span>`:''}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
+              <span class="badge" style="background:${pb};color:${pt}">${u.perfil}</span>
+              ${segs.map(s=>`<span class="badge" style="background:#f0f4ff;color:#2554C7">${s}</span>`).join('')}
+            </div>
+          </div>
+          <button class="btn-s btn-sm" onclick="openEditUsr(${u.id})">Editar</button>
+        </div>
+      </div>`;
+    }else{
+      return`<div class="con-card" style="border-left:3px solid ${pb}">
+        <div class="con-header">
+          <div>
+            <div class="con-title">${segs.join(' · ')||'Membro da rede'}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
+              <span class="badge" style="background:${pb};color:${pt}">${u.perfil}</span>
+              <span style="font-size:11px;color:#aaa">Membro da rede IA Hub</span>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
+  }).join('');
+
+  // ── CONEXÕES EXTERNAS ──
   let data=conexoes.filter(c=>{
     const mq=!q||(c.seg||'').toLowerCase().includes(q)||(c.desc||'').toLowerCase().includes(q);
     const ms=!fseg||c.seg===fseg;
@@ -3182,8 +3230,9 @@ function renderConList(){
     const mm=!fmine||c.criadorId===currentUser.id;
     return mq&&ms&&mn&&mm;
   });
-  if(!data.length){el.innerHTML='<div class="empty-msg">Nenhuma conexão encontrada. Clique em "+ Nova conexão" para cadastrar seu primeiro contato.</div>';return;}
-  el.innerHTML=data.map(c=>{
+  if(!data.length&&!memFilt.length){el.innerHTML='<div class="empty-msg">Nenhuma conexão encontrada. Clique em "+ Nova conexão" para cadastrar seu primeiro contato.</div>';return;}
+  const secLabel=(txt,n)=>`<div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.08em;margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid #eee">${txt} (${n})</div>`;
+  const conHTML=data.map(c=>{
     const owner=users.find(u=>u.id===c.criadorId);
     const matches=matchConexao(c);
     const porteCls=PORTE_CLS[c.porte]||'';
@@ -3261,6 +3310,9 @@ function renderConList(){
       </div>`:''}
     </div>`;
   }).join('');
+  el.innerHTML=
+    (memFilt.length?secLabel('Membros da rede',memFilt.length)+memHTML:'')+
+    (data.length?secLabel('Conexões externas',data.length)+conHTML:'');
 }
 
 function calcTrustScore(userId){
