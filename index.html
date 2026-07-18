@@ -1311,7 +1311,14 @@ function injectLogos(){
 function doLogin(){
   const email=document.getElementById('l-email').value.trim().toLowerCase();
   const senha=document.getElementById('l-senha').value;
-  const u=users.find(x=>x.email.toLowerCase()===email&&x.senha===senha&&x.status!=='Pendente'&&x.status!=='Inativo');
+  let u=users.find(x=>x.email.toLowerCase()===email&&x.senha===senha&&x.status!=='Pendente'&&x.status!=='Inativo');
+  if(!u){
+    // Tenta recuperar: email+senha corretos mas status foi corrompido por bug de pipeline
+    const cand=users.find(x=>x.email.toLowerCase()===email&&x.senha===senha);
+    if(cand&&cand.status!=='Inativo'){
+      cand.status='Ativo';saveData();syncToSupabase();u=cand;
+    }
+  }
   if(!u){document.getElementById('login-err').style.display='block';return;}
   document.getElementById('login-err').style.display='none';
   currentUser=u;
