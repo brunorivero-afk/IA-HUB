@@ -2041,7 +2041,7 @@ function saveUsr(){
   const obj={nome,tipo:document.getElementById('u-tipo').value,emp:document.getElementById('u-emp').value.trim(),email,
     tel:document.getElementById('u-tel').value.trim(),
     perfil,
-    status:isSocio()?document.getElementById('u-status').value:'Em prospecção',
+    status:isSocio()?document.getElementById('u-status').value:(editUsrId?(users.find(u=>u.id===editUsrId)||{}).status||'Em prospecção':'Em prospecção'),
     seg:document.getElementById('u-seg').value.trim(),
     ativ:document.getElementById('u-ativ').value.trim(),
     obs:document.getElementById('u-obs').value.trim(),
