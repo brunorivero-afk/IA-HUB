@@ -3356,6 +3356,7 @@ function renderConList(){
     const niv=parseInt(c.nivel)||1;
     const nivelBorderColor=niv>=4?'#16a34a':niv===3?'#ca8a04':'#dc2626';
     const editBtns=isMine||isSocio()?`<div style="display:flex;gap:4px">
+      ${isSocio()||isMine?`<button class="btn-s btn-sm" onclick="gerarPDFConexao(${c.id})" title="Gerar PDF">📄</button>`:''}
       <button class="btn-s btn-sm" onclick="openEditCon(${c.id})">Editar</button>
       <button class="btn-d btn-sm" onclick="deleteCon(${c.id})">✕</button>
     </div>`:'';
@@ -3898,6 +3899,96 @@ function salvarRevelacao(){
   updateNotifBadge();saveData();
   closeOv('ov-revelar');
   showToast('✅ Dados enviados ao interessado!');
+}
+
+function gerarPDFConexao(conId){
+  const c=conexoes.find(x=>x.id===conId);if(!c)return;
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF();
+  const owner=users.find(u=>u.id===c.criadorId);
+  const matches=matchConexao(c);
+  const niv=parseInt(c.nivel)||1;
+  const nivelRGB=niv>=4?[22,163,74]:niv===3?[202,138,11]:[220,38,38];
+  let y=18;
+  const W=170,ML=20;
+  const addTxt=(s,sz,bold,color,xOff)=>{
+    doc.setFontSize(sz||11);doc.setFont('helvetica',bold?'bold':'normal');
+    if(color)doc.setTextColor(...color);else doc.setTextColor(20,20,20);
+    const lines=doc.splitTextToSize(String(s||''),W-(xOff||0));
+    doc.text(lines,(xOff?ML+xOff:ML),y);y+=lines.length*(sz?sz*0.42+1.5:5.5);
+    if(y>272){doc.addPage();y=18;}
+  };
+  const addSep=(h,col)=>{doc.setDrawColor(...(col||[220,220,220]));doc.line(ML,y,ML+W,y);y+=h||5;};
+  const addBar=(label,pct,r,g,b)=>{
+    doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(80,80,80);
+    doc.text(label,ML,y);
+    doc.setFillColor(240,242,245);doc.roundedRect(ML+55,y-3.5,108,5,1,1,'F');
+    doc.setFillColor(r,g,b);doc.roundedRect(ML+55,y-3.5,Math.max(2,108*pct/100),5,1,1,'F');
+    doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(r,g,b);
+    doc.text(pct+'%',ML+W,y,'right');y+=8;
+  };
+  // ── CABEÇALHO ──
+  doc.setFillColor(10,22,40);doc.roundedRect(ML,y,W,18,3,3,'F');
+  doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+  doc.text('IA Hub',ML+4,y+7);
+  doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(180,200,230);
+  doc.text('Relatório de Conexão',ML+4,y+13);
+  doc.text(new Date().toLocaleDateString('pt-BR'),ML+W-25,y+7,'right');
+  y+=26;
+  // ── SEGMENTO E DADOS ──
+  addTxt(c.seg,16,true,[10,22,40]);
+  addSep(3,[8,145,178]);y+=2;
+  const meta=[];
+  if(c.porte)meta.push('Porte: '+c.porte);
+  if(c.acesso)meta.push('Acesso: '+c.acesso);
+  meta.push('Relacionamento: '+niv+'/5');
+  if(c.desde)meta.push('Cadastrado em: '+c.desde);
+  if(owner)meta.push('Responsável: '+owner.nome+' ('+owner.perfil+')');
+  meta.forEach(m=>addTxt(m,10,false,[60,60,60]));
+  y+=4;
+  // ── DESCRIÇÃO ──
+  if(c.desc){
+    addTxt('Sobre a conexão',11,true,[10,22,40]);y+=1;
+    addTxt(c.desc,10,false,[50,50,50]);y+=4;
+  }
+  if(c.fitSegs){addTxt('Segmentos com fit: '+c.fitSegs,10,false,[80,80,80]);y+=4;}
+  // ── RATING ──
+  addTxt('Índice de qualidade',11,true,[10,22,40]);addSep(3);y+=2;
+  addBar('Nível do contato (1–5)',(niv*20),...nivelRGB);
+  if(matches.length>0)addBar('Score de compatibilidade c/ a rede',Math.min(matches[0].score,100),37,99,235);
+  y+=4;
+  // ── MATCHES ──
+  if(matches.length){
+    addTxt('Membros com fit ('+matches.length+')',11,true,[10,22,40]);addSep(3);y+=2;
+    matches.slice(0,8).forEach(m=>{
+      const linha=`${m.user.nome} — ${m.user.perfil}${m.user.seg?' | '+m.user.seg:''}`;
+      doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(30,30,30);
+      const ls=doc.splitTextToSize(linha,W-20);doc.text(ls,ML,y);
+      doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(37,84,199);
+      doc.text(m.score+'%',ML+W,y,'right');
+      y+=ls.length*4.5+1;if(y>272){doc.addPage();y=18;}
+    });y+=4;
+  }
+  // ── SINERGIA ──
+  const segsC=(c.fitSegs||c.seg||'').split(',').map(s=>s.trim().toLowerCase());
+  const sin=sinergias.find(s=>segsC.some(sg=>sg.includes(s.a.toLowerCase())||sg.includes(s.b.toLowerCase())));
+  if(sin){
+    addTxt('Sinergia da rede identificada',11,true,[10,22,40]);addSep(3);y+=2;
+    addTxt(sin.a+' ↔ '+sin.b,10,true,[37,99,235]);
+    addTxt(sin.why,9,false,[60,60,60]);y+=2;
+    if(sin.note){
+      doc.setFillColor(10,22,40);doc.roundedRect(ML,y,W,6,2,2,'F');
+      doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+      doc.text('Curador: '+sin.note.substring(0,90),ML+3,y+4);y+=10;
+    }
+  }
+  // ── OBS INTERNA (só sócios) ──
+  if(c.obs&&isSocio()){y+=2;addTxt('Observação interna',10,true,[10,22,40]);addTxt(c.obs,9,false,[100,100,100]);y+=2;}
+  // ── RODAPÉ ──
+  doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(160,160,160);
+  doc.text('IA Hub · Documento confidencial · '+new Date().toLocaleDateString('pt-BR'),ML,282);
+  doc.save('conexao_'+c.seg.replace(/[\s\/]/g,'_')+'.pdf');
+  showToast('📄 PDF gerado!');
 }
 
 function gerarRelatorioConexaoPDF(){
