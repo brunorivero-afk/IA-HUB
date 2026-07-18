@@ -584,7 +584,16 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <div class="full"><label>Empresa / Cargo</label><input id="u-emp" placeholder="Empresa (se PF, pode deixar em branco)"></div>
       <div><label>Email *</label><input id="u-email" type="email" placeholder="email@exemplo.com"></div>
       <div><label>Telefone</label><input id="u-tel" placeholder="(00) 00000-0000"></div>
-      <div class="full"><label>Segmento(s)</label><input id="u-seg" placeholder="Ex: Advocacia, Contabilidade (vírgula)"></div>
+      <div class="full"><label>Segmento(s)</label><input id="u-seg" placeholder="Ex: Advocacia, Contabilidade (vírgula)" oninput="updateSpecFields()"></div>
+      <div id="u-spec-wrap" class="full" style="display:none;background:#f8faff;border:1px solid #dbeafe;border-radius:10px;padding:12px;margin-top:-4px">
+        <div style="font-size:11px;font-weight:700;color:#2554C7;margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">Especialidade</div>
+        <div id="u-spec-medico" style="display:none"><label>Especialidade médica</label>
+          <input id="u-spec-medico-val" placeholder="Ex: Cardiologista, Ortopedista, Neurologista..."></div>
+        <div id="u-spec-adv" style="display:none"><label>Área do direito</label>
+          <input id="u-spec-adv-val" placeholder="Ex: Direito Empresarial, Tributário, Trabalhista..."></div>
+        <div id="u-spec-cont" style="display:none"><label>Especialização contábil</label>
+          <input id="u-spec-cont-val" placeholder="Ex: Tributário, Auditoria, Contabilidade Rural..."></div>
+      </div>
       <div class="full"><label>Descrição das atividades</label><textarea id="u-ativ" placeholder="Serviços, público-alvo, proposta de valor..."></textarea></div>
       <div class="fg-sec" id="u-sec-acesso">Perfil e acesso</div>
       <div id="u-perfil-wrap"><label>Perfil</label>
@@ -668,11 +677,12 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <textarea id="fu-txt" placeholder="Descreva o avanço, decisão ou próximo passo..." style="height:110px"></textarea>
     <label>Data</label><input id="fu-data" type="date">
     <div style="margin-top:12px;padding:10px;background:#f0f9ff;border-radius:8px;font-size:12px;color:#0891b2">
-      📧 Todos os participantes serão notificados dentro do sistema e por email.
+      📧 "Salvar e notificar" avisa todos os participantes. "Salvar" registra sem notificar.
     </div>
     <div class="modal-btns">
       <button class="btn-s" onclick="closeOv('ov-fu')">Cancelar</button>
-      <button class="btn-p" onclick="saveFu()">Salvar e notificar</button>
+      <button class="btn-s" onclick="saveFu(false)">Salvar</button>
+      <button class="btn-p" onclick="saveFu(true)">Salvar e notificar</button>
     </div>
   </div>
 </div>
@@ -1447,6 +1457,13 @@ function closeOv(id){document.getElementById(id).classList.remove('open');}
 window.addEventListener('click',e=>{
   ['ov-usr','ov-proj','ov-fu','ov-lanc','ov-sin','ov-notif','ov-evento','ov-con','ov-relatorio','ov-propor','ov-moderacao','ov-aprovacao','ov-revelar','ov-onboarding','ov-vit-detalhe','ov-vit-int'].forEach(id=>{if(e.target.id===id)closeOv(id);});
 });
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    ['ov-usr','ov-proj','ov-fu','ov-lanc','ov-sin','ov-notif','ov-evento','ov-con','ov-relatorio','ov-propor','ov-moderacao','ov-aprovacao','ov-revelar','ov-onboarding','ov-vit-detalhe','ov-vit-int','ov-vit-manifesto'].forEach(id=>{
+      const el=document.getElementById(id);if(el&&el.classList.contains('open'))closeOv(id);
+    });
+  }
+});
 
 // ===================== REDE / CHARTS =====================
 function renderRede(){
@@ -1950,10 +1967,23 @@ function removeExterno(id){
 
 
 
+function updateSpecFields(){
+  const seg=(document.getElementById('u-seg')||{value:''}).value.toLowerCase();
+  const isMed=seg.includes('médic')||seg.includes('medic');
+  const isAdv=seg.includes('advog');
+  const isCont=seg.includes('contabil')||seg.includes('contador');
+  const anySpec=isMed||isAdv||isCont;
+  const wrap=document.getElementById('u-spec-wrap');if(wrap)wrap.style.display=anySpec?'block':'none';
+  const elMed=document.getElementById('u-spec-medico');if(elMed)elMed.style.display=isMed?'block':'none';
+  const elAdv=document.getElementById('u-spec-adv');if(elAdv)elAdv.style.display=isAdv?'block':'none';
+  const elCont=document.getElementById('u-spec-cont');if(elCont)elCont.style.display=isCont?'block':'none';
+}
 function openAddUsr(){
   editUsrId=null;
   document.getElementById('usr-modal-ttl').textContent='Novo membro';
   ['u-nome','u-emp','u-email','u-tel','u-seg','u-ativ','u-obs','u-senha','u-comissao','u-comissao-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['u-spec-medico-val','u-spec-adv-val','u-spec-cont-val'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  updateSpecFields();
   document.getElementById('u-perfil').value='Associado';
   document.getElementById('u-tipo').value='PJ';
   document.getElementById('u-status').value='Em prospecção';
@@ -1985,6 +2015,10 @@ function openEditUsr(id){
   const showAccess=isSocio();
   ['u-sec-acesso','u-perfil-wrap','u-senha-wrap','u-vinculo-wrap'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=showAccess?'':'none';});
   if(document.getElementById('u-comissao-sec'))document.getElementById('u-comissao-sec').style.display=showAccess?'block':'none';
+  const sm=document.getElementById('u-spec-medico-val');if(sm)sm.value=u.especMedico||'';
+  const sa=document.getElementById('u-spec-adv-val');if(sa)sa.value=u.especAdv||'';
+  const sc2=document.getElementById('u-spec-cont-val');if(sc2)sc2.value=u.especCont||'';
+  updateSpecFields();
   document.getElementById('ov-usr').classList.add('open');
 }
 function saveUsr(){
@@ -2013,6 +2047,9 @@ function saveUsr(){
     comissao:isSocio()?parseFloat(document.getElementById('u-comissao').value)||0:undefined,
     comissaoModelo:isSocio()?document.getElementById('u-comissao-modelo').value:'',
     comissaoObs:isSocio()?document.getElementById('u-comissao-obs').value.trim():'',
+    especMedico:(document.getElementById('u-spec-medico-val')||{value:''}).value.trim()||undefined,
+    especAdv:(document.getElementById('u-spec-adv-val')||{value:''}).value.trim()||undefined,
+    especCont:(document.getElementById('u-spec-cont-val')||{value:''}).value.trim()||undefined,
     desde:today};
   // strip undefined
   Object.keys(obj).forEach(k=>obj[k]===undefined&&delete obj[k]);
@@ -2421,7 +2458,7 @@ function openFu(projId){
   document.getElementById('fu-data').value=new Date().toISOString().split('T')[0];
   document.getElementById('ov-fu').classList.add('open');
 }
-function saveFu(){
+function saveFu(notify=true){
   const projId=parseInt(document.getElementById('fu-pid').value);
   const texto=document.getElementById('fu-txt').value.trim();
   if(!texto){alert('Descreva a atualização.');return;}
@@ -2431,13 +2468,15 @@ function saveFu(){
   p.followups.push({texto,data,autor:currentUser.nome,ts:Date.now()});
   if(!p.lastSeen)p.lastSeen={};
   p.lastSeen[currentUser.id]=(p.followups||[]).length;
-  const outros=p.participantes.map(id=>users.find(u=>u.id===id)).filter(u=>u&&u.id!==currentUser.id);
-  if(outros.length){
-    const nomes=outros.map(u=>u.nome).join(', ');
-    notificacoes.push({id:Date.now(),txt:`Follow-up em "${p.nome}" por ${currentUser.nome}: "${texto.substring(0,60)}…"`,ts:Date.now(),lido:false,destinos:outros.map(u=>u.id)});
-    updateNotifBadge();
-    showToast(`✅ Atualização salva! Notificação enviada para: ${nomes}`);
-  } else showToast('✅ Atualização salva!');
+  if(notify){
+    const outros=p.participantes.map(id=>users.find(u=>u.id===id)).filter(u=>u&&u.id!==currentUser.id);
+    if(outros.length){
+      const nomes=outros.map(u=>u.nome).join(', ');
+      notificacoes.push({id:Date.now(),txt:`Follow-up em "${p.nome}" por ${currentUser.nome}: "${texto.substring(0,60)}…"`,ts:Date.now(),lido:false,destinos:outros.map(u=>u.id)});
+      updateNotifBadge();
+      showToast(`✅ Atualização salva! Notificação enviada para: ${nomes}`);
+    } else showToast('✅ Atualização salva!');
+  } else showToast('✅ Atualização salva (sem notificar).');
   closeOv('ov-fu');renderProjetos();saveData();
 }
 
@@ -2566,6 +2605,19 @@ function saveSin(){
 function removeSin(id){if(!confirm('Remover sinergia?'))return;sinergias=sinergias.filter(s=>s.id!==id);renderSin();saveData();}
 
 // ===================== PIPELINE =====================
+let _pipDragId=null;
+function pipDragStart(e,uid){_pipDragId=uid;e.dataTransfer.effectAllowed='move';e.currentTarget.style.opacity='.45';}
+function pipDragEnd(e){e.currentTarget.style.opacity='1';}
+function pipDragOver(e){e.preventDefault();e.currentTarget.style.background='#e0e7ff';}
+function pipDragLeave(e){e.currentTarget.style.background='#f5f5f3';}
+function pipDrop(e,col){
+  e.preventDefault();e.currentTarget.style.background='#f5f5f3';
+  if(!_pipDragId)return;
+  const i=users.findIndex(u=>u.id===_pipDragId);
+  if(i===-1){_pipDragId=null;return;}
+  users[i]={...users[i],status:col};
+  saveData();renderPipeline();_pipDragId=null;
+}
 function renderPipeline(){
   if(!isSocio()){document.getElementById('tab-pipeline').innerHTML='<div class="blocked"><h2>Acesso restrito</h2></div>';return;}
   const COLS=['Em prospecção','Em negociação','Proposta enviada','Aguardando aprovação','Ativo','Inativo'];
@@ -2579,17 +2631,17 @@ function renderPipeline(){
         <div style="background:${COL_COLORS[col]};color:#fff;border-radius:8px 8px 0 0;padding:8px 12px;font-size:12px;font-weight:600;display:flex;justify-content:space-between">
           <span>${col}</span><span>${members.length}</span>
         </div>
-        <div style="background:#f5f5f3;border-radius:0 0 8px 8px;min-height:200px;padding:8px;display:flex;flex-direction:column;gap:8px">
+        <div style="background:#f5f5f3;border-radius:0 0 8px 8px;min-height:200px;padding:8px;display:flex;flex-direction:column;gap:8px;transition:background .15s" ondragover="pipDragOver(event)" ondragleave="pipDragLeave(event)" ondrop="pipDrop(event,'${col}')">
           ${members.length?members.map(u=>{
             const ps=PS[u.perfil]||{bg:'#eee',tx:'#555'};
             const segs=(u.seg||'').split(',').map(s=>s.trim()).filter(Boolean);
-            return`<div style="background:#fff;border:1px solid #eee;border-radius:8px;padding:10px;cursor:pointer" onclick="openEditUsr(${u.id})">
+            return`<div draggable="true" ondragstart="pipDragStart(event,${u.id})" ondragend="pipDragEnd(event)" style="background:#fff;border:1px solid #eee;border-radius:8px;padding:10px;cursor:grab" onclick="openEditUsr(${u.id})">
               <div style="font-size:13px;font-weight:600;margin-bottom:4px">${u.nome}</div>
               <span class="badge" style="background:${ps.bg};color:${ps.tx}">${u.perfil}</span>
               <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:2px">${segs.map(s=>`<span class="badge" style="background:${sc(s).bg};color:${sc(s).tx};font-size:10px">${s}</span>`).join('')}</div>
               ${u.emp&&u.emp!=='?'?`<div style="font-size:11px;color:#888;margin-top:4px">${u.emp}</div>`:''}
             </div>`;
-          }).join(''):`<div style="color:#aaa;font-size:12px;text-align:center;padding:20px">Nenhum membro</div>`}
+          }).join(''):`<div style="color:#aaa;font-size:12px;text-align:center;padding:20px">Arraste um membro para cá</div>`}
         </div>
       </div>`;
     }).join('')}
@@ -3246,6 +3298,8 @@ function renderConList(){
     const isMine=c.criadorId===currentUser.id;
     const isCorpLink=c.origem==='CorpLink';
     const isPendente=c.status==='pendente';
+    const niv=parseInt(c.nivel)||1;
+    const nivelBorderColor=niv>=4?'#16a34a':niv===3?'#ca8a04':'#dc2626';
     const editBtns=isMine||isSocio()?`<div style="display:flex;gap:4px">
       <button class="btn-s btn-sm" onclick="openEditCon(${c.id})">Editar</button>
       <button class="btn-d btn-sm" onclick="deleteCon(${c.id})">✕</button>
@@ -3254,13 +3308,13 @@ function renderConList(){
     const corpLinkBadge=isCorpLink?`<span class="badge" style="background:#1e3a5f;color:#7dd3fc;border:1px solid #2554C7;font-weight:700">🏦 CorpLink</span>`:'';
     // Item 18: badge pendente para sócios
     const pendenteBadge=isPendente&&isSocio()?`<span class="badge" style="background:#fef9c3;color:#854d0e">⏳ Aguardando aprovação</span>`:'';
-    return`<div class="con-card" style="${isPendente?'border-color:#fbbf24;':''}" >
+    return`<div class="con-card" style="${isPendente?'border:1px solid #fbbf24;':'border-left:3px solid '+nivelBorderColor+';'}" >
       <div class="con-header">
         <div>
           <div class="con-title">${c.seg}</div>
           <div style="display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap">
             <span class="badge" style="background:${PS[owner?.perfil||'Parceiro']?.bg||'#eee'};color:${PS[owner?.perfil||'Parceiro']?.tx||'#555'}">
-              👤 ${owner?owner.nome:'?'}
+              👤 ${isSocio()||isMine?(owner?owner.nome:'?'):(owner?owner.perfil:'Membro')}
             </span>
             <span class="con-owner">${c.desde||''}</span>
             ${corpLinkBadge}
@@ -3277,7 +3331,15 @@ function renderConList(){
           ${'★'.repeat(parseInt(c.nivel)||1)}${'☆'.repeat(5-(parseInt(c.nivel)||1))} Índice ${c.nivel}/5
         </span>`:''}
       </div>
-      <div class="con-desc">${c.desc}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin:6px 0 8px">
+        <div style="flex:1;height:5px;background:#eee;border-radius:3px;overflow:hidden">
+          <div style="height:100%;width:${niv*20}%;background:${nivelBorderColor};border-radius:3px"></div>
+        </div>
+        <span style="font-size:11px;font-weight:700;color:${nivelBorderColor};min-width:28px">${niv}/5</span>
+        ${matches.length?`<span class="badge" style="background:#eff6ff;color:#1d4ed8;font-weight:700">🎯 ${matches.length} match${matches.length!==1?'es':''}</span>`:'<span class="badge" style="background:#f5f5f3;color:#aaa;font-size:10px">sem match</span>'}
+        ${c.fitSegs?`<span style="font-size:10px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px" title="${c.fitSegs}">🏷 ${c.fitSegs}</span>`:''}
+      </div>
+      <div class="con-desc">${isSocio()||isMine?c.desc:'<em style="color:#aaa;font-size:12px">Descrição disponível para sócios</em>'}</div>
       ${c.obs&&isSocio()?`<div style="font-size:12px;color:#888;margin-bottom:8px">📝 ${c.obs}</div>`:''}
       ${matches.length===0?`<div style="font-size:12px;color:#aaa;margin-top:6px">Nenhum match identificado ainda — adicione mais membros com segmentos compatíveis.</div>`:''}
       ${matches.length?`<div class="con-match">
@@ -4006,7 +4068,7 @@ function renderRelatorioRede(){
         <h3>🏆 Quem mais trouxe conexões</h3>
         ${conPorMembro.length?conPorMembro.map((x,i)=>`<div class="ranking-row">
           <div><span class="ranking-pos">${['🥇','🥈','🥉'][i]||i+1}</span>${x.u.nome} <span style="font-size:11px;color:#888">(${x.u.perfil})</span></div>
-          <div style="text-align:right"><strong>${x.cnt}</strong> conexão${x.cnt!==1?'ões':''}<div class="ranking-bar" style="width:${Math.round(x.cnt/conPorMembro[0].cnt*100)}%"></div></div>
+          <div style="text-align:right"><strong>${x.cnt}</strong> conex${x.cnt!==1?'ões':'ão'}<div class="ranking-bar" style="width:${Math.round(x.cnt/conPorMembro[0].cnt*100)}%"></div></div>
         </div>`).join(''):'<div style="color:#aaa;font-size:13px;padding:8px">Nenhuma conexão cadastrada.</div>'}
       </div>
       <div class="rel-box" style="margin:0">
