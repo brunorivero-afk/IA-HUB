@@ -954,17 +954,24 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 
 <!-- Modal revelar conexão -->
 <div class="overlay" id="ov-revelar">
-  <div class="modal" style="width:440px">
+  <div class="modal" style="width:480px">
     <h2>📋 Revelar dados da conexão</h2>
     <p style="font-size:13px;color:#888;margin-bottom:14px">Informe os dados reais do contato para compartilhar com o interessado.</p>
     <input type="hidden" id="rev-destino-id">
+    <input type="hidden" id="rev-interesse-id">
     <input type="hidden" id="rev-seg">
     <label>Nome da empresa</label><input id="rev-empresa" placeholder="Razão social ou nome comercial">
     <label>Nome do contato</label><input id="rev-contato" placeholder="Nome completo">
     <label>Telefone / WhatsApp</label><input id="rev-tel" placeholder="(00) 00000-0000">
     <label>Observação adicional</label><textarea id="rev-obs" placeholder="Contexto, próximos passos..."></textarea>
+    <label style="display:flex;align-items:center;gap:6px;margin-top:8px">
+      <span style="background:#0a1628;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px">IA Hub</span>
+      Validação — texto que vai no relatório
+    </label>
+    <textarea id="rev-validacao" placeholder="Ex: Bruno conhece os dois. A conexão entre [A] e [B] é direta: [motivo]. Convocamos ambos para um encontro nos próximos 15 dias." style="height:80px;border-color:#0a1628"></textarea>
     <div class="modal-btns">
       <button class="btn-s" onclick="closeOv('ov-revelar')">Cancelar</button>
+      <button class="btn-p" style="background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="gerarRelatorioConexaoPDF()">📄 Gerar relatório PDF</button>
       <button class="btn-p" onclick="salvarRevelacao()">Enviar ao interessado</button>
     </div>
   </div>
@@ -3750,8 +3757,9 @@ function rejeitarInteresse(id){
 function abrirRevelacao(interesseId,destinoId){
   const int=interessesPendentes.find(x=>x.id===interesseId);
   document.getElementById('rev-destino-id').value=int?int.interessadoId:destinoId;
+  document.getElementById('rev-interesse-id').value=interesseId||'';
   document.getElementById('rev-seg').value=int?int.conSeg:'';
-  ['rev-empresa','rev-contato','rev-tel','rev-obs'].forEach(id=>document.getElementById(id).value='');
+  ['rev-empresa','rev-contato','rev-tel','rev-obs','rev-validacao'].forEach(id=>document.getElementById(id).value='');
   closeOv('ov-notif');
   document.getElementById('ov-revelar').classList.add('open');
 }
@@ -3773,6 +3781,123 @@ function salvarRevelacao(){
   updateNotifBadge();saveData();
   closeOv('ov-revelar');
   showToast('✅ Dados enviados ao interessado!');
+}
+
+function gerarRelatorioConexaoPDF(){
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF();
+  const interesseId=parseInt(document.getElementById('rev-interesse-id').value)||0;
+  const seg=document.getElementById('rev-seg').value||'—';
+  const empresa=document.getElementById('rev-empresa').value.trim();
+  const contato=document.getElementById('rev-contato').value.trim();
+  const tel=document.getElementById('rev-tel').value.trim();
+  const obs=document.getElementById('rev-obs').value.trim();
+  const validacao=document.getElementById('rev-validacao').value.trim();
+  const int=interessesPendentes.find(x=>x.id===interesseId);
+  const parteA=int?int.interessadoNome:'—';
+  const parteB=int?(empresa||contato||int.donoNome||'—'):(empresa||contato||'—');
+  const segA=int?(users.find(u=>u.id===int.interessadoId)?.seg||seg):seg;
+  const segB=seg;
+  // Sinergia relevante
+  const sin=sinergias.find(s=>(s.a===segA||s.b===segA)&&(s.a===segB||s.b===segB))
+    ||sinergias.find(s=>s.a===segB||s.b===segB);
+  // Métricas de compatibilidade
+  const fitSeg=sin?(sin.p==='alta'?95:70):45;
+  const tsA=int?Math.min(calcTrustScore(int.interessadoId).score,100):50;
+  const tsB=int?Math.min(calcTrustScore(int.donoId).score,100):50;
+  const matchScore=int?(() => {
+    const con=conexoes.find(c=>c.id===int.conId);
+    const m=con?matchConexao(con).find(m=>m.user.id===int.interessadoId):null;
+    return m?Math.min(m.score,100):fitSeg;
+  })():fitSeg;
+
+  let y=18;
+  const W=190,ML=20;
+  // helpers
+  const txt=(s,sz,bold,color,x)=>{
+    doc.setFontSize(sz||11);doc.setFont('helvetica',bold?'bold':'normal');
+    if(color)doc.setTextColor(...color);else doc.setTextColor(20,20,20);
+    const lines=doc.splitTextToSize(String(s||''),W-(x||ML)-ML+20);
+    doc.text(lines,x||ML,y);y+=lines.length*(sz?sz*0.42+1.5:5.5);
+    if(y>272){doc.addPage();y=18;}
+  };
+  const sep=(h,col)=>{doc.setDrawColor(...(col||[220,220,220]));doc.line(ML,y,ML+W,y);y+=h||5;};
+  const bar=(label,pct,r,g,b)=>{
+    doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(80,80,80);
+    doc.text(label,ML,y);
+    doc.setFillColor(240,242,245);doc.roundedRect(ML+52,y-3.5,110,5,1,1,'F');
+    doc.setFillColor(r,g,b);doc.roundedRect(ML+52,y-3.5,Math.max(2,110*pct/100),5,1,1,'F');
+    doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(r,g,b);
+    doc.text(pct+'%',ML+165,y);y+=8;
+  };
+
+  // ── CABEÇALHO ──
+  doc.setFillColor(10,22,40);doc.roundedRect(ML,y,W,18,3,3,'F');
+  doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+  doc.text('IA Hub',ML+4,y+7);
+  doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(180,200,230);
+  doc.text('Relatório de Conexão',ML+4,y+13);
+  doc.setFontSize(9);doc.setTextColor(180,200,230);
+  doc.text(new Date().toLocaleDateString('pt-BR'),ML+W-28,y+7);
+  y+=24;
+
+  // ── AS PARTES ──
+  txt('Conexão validada',13,true,[8,145,178]);sep(4,[8,145,178]);
+  doc.setFillColor(248,250,255);doc.roundedRect(ML,y,W/2-3,22,3,3,'F');
+  doc.setFillColor(248,255,252);doc.roundedRect(ML+W/2+1,y,W/2-2,22,3,3,'F');
+  doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(120,120,120);
+  doc.text('PARTE A',ML+3,y+5);doc.text('PARTE B',ML+W/2+4,y+5);
+  doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor(10,22,40);
+  doc.text(doc.splitTextToSize(parteA,W/2-8),ML+3,y+12);
+  doc.text(doc.splitTextToSize(parteB,W/2-8),ML+W/2+4,y+12);
+  doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);
+  doc.text(doc.splitTextToSize(segA,W/2-8),ML+3,y+19);
+  doc.text(doc.splitTextToSize(segB,W/2-8),ML+W/2+4,y+19);
+  y+=28;
+
+  // ── SINERGIA ──
+  if(sin){
+    txt('Sinergia mapeada',11,true,[10,22,40]);
+    doc.setFillColor(244,248,255);doc.roundedRect(ML,y,W,1,'F');
+    const sinLines=doc.splitTextToSize(sin.why,W);
+    doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(50,50,50);
+    doc.text(sinLines,ML,y+5);y+=sinLines.length*5+10;
+    if(sin.note){
+      doc.setFillColor(10,22,40);doc.roundedRect(ML,y,3,sinLines.length*4+6,1,1,'F');
+      const nLines=doc.splitTextToSize(sin.note,W-8);
+      doc.setFontSize(9);doc.setFont('helvetica','italic');doc.setTextColor(60,60,60);
+      doc.text(nLines,ML+6,y+4);y+=nLines.length*4+10;
+    }
+    sep(6);
+  }
+
+  // ── GRÁFICO DE COMPATIBILIDADE ──
+  txt('Compatibilidade',11,true,[10,22,40]);y+=2;
+  bar('Fit de segmento',fitSeg,8,145,178);
+  bar('Score de match',matchScore,15,110,86);
+  bar('Engajamento — Parte A',tsA,37,99,235);
+  bar('Engajamento — Parte B',tsB,124,58,237);
+  y+=4;sep(6);
+
+  // ── VALIDAÇÃO IA HUB ──
+  if(validacao){
+    doc.setFillColor(10,22,40);doc.roundedRect(ML,y,W,1.5,'F');y+=6;
+    txt('Validação do IA Hub',11,true,[10,22,40]);
+    const vLines=doc.splitTextToSize(validacao,W);
+    doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(30,30,30);
+    doc.text(vLines,ML,y);y+=vLines.length*5.5+6;
+    sep(6);
+  }
+
+  // ── PRÓXIMOS PASSOS ──
+  if(obs){txt('Próximos passos',11,true,[10,22,40]);txt(obs,10,false);}
+  if(tel){txt(`Contato: ${tel}`,10,false,[80,80,80]);}
+  y+=6;
+  doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(170,170,170);
+  doc.text('IA Hub · Conexão curada e validada pelos sócios · Documento confidencial',ML,y);
+
+  doc.save('relatorio_conexao_'+parteA.replace(/\s/g,'_')+'_'+parteB.replace(/\s/g,'_')+'.pdf');
+  showToast('📄 Relatório gerado!');
 }
 
 // ===================== WHATSAPP =====================
@@ -3911,7 +4036,32 @@ function renderRelatorioRede(){
     <div class="table-wrap"><table>
       <thead><tr><th>Mês</th><th>Receita</th></tr></thead>
       <tbody>${mesesSort.map(m=>{const[y,mo]=m.split('-');return`<tr><td>${mn[parseInt(mo)-1]} ${y}</td><td style="color:#0F6E56;font-weight:500">R$ ${recMes[m].toLocaleString('pt-BR',{minimumFractionDigits:2})}</td></tr>`;}).join('')}</tbody>
-    </table></div>`:''}`;
+    </table></div>`:''}
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:28px">
+      <div class="section-hdr" style="margin:0;border:none">🔗 Lista de Conexões</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <select id="lst-con-fseg" onchange="renderListaConexoes()" style="font-size:12px;padding:4px 8px;border:1px solid #ddd;border-radius:6px">
+          <option value="">Todos os segmentos</option>
+          ${[...new Set(conexoes.map(c=>c.seg))].sort().map(s=>`<option>${s}</option>`).join('')}
+        </select>
+        <select id="lst-con-fnivel" onchange="renderListaConexoes()" style="font-size:12px;padding:4px 8px;border:1px solid #ddd;border-radius:6px">
+          <option value="">Todos os níveis</option>
+          <option value="5">★★★★★ 5</option><option value="4">★★★★ 4</option><option value="3">★★★ 3</option><option value="2">★★ 2</option><option value="1">★ 1</option>
+        </select>
+        <button class="btn-s" onclick="exportCSVConexoes()" style="font-size:12px">⬇ CSV</button>
+        <button class="btn-s" onclick="exportPDFLista('conexoes')" style="font-size:12px">⬇ PDF</button>
+      </div>
+    </div>
+    <div class="table-wrap" style="margin-top:10px"><div id="lst-conexoes-table"></div></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:28px">
+      <div class="section-hdr" style="margin:0;border:none">🏷 Lista de Segmentos</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-s" onclick="exportCSVSegmentos()" style="font-size:12px">⬇ CSV</button>
+        <button class="btn-s" onclick="exportPDFLista('segmentos')" style="font-size:12px">⬇ PDF</button>
+      </div>
+    </div>
+    <div class="table-wrap" style="margin-top:10px"><div id="lst-segmentos-table"></div></div>`;
+  setTimeout(()=>{renderListaConexoes();renderListaSegmentos();},0);
 }
 
 function gerarPDFRede(){
@@ -3937,6 +4087,103 @@ function gerarPDFRede(){
     addLine(`  ${u.nome} (${u.perfil}): ${projs.length} projeto(s) · R$ ${rend.toLocaleString('pt-BR')}`,10);
   });
   doc.save('relatorio_rede_'+new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')+'.pdf');
+}
+
+function renderListaConexoes(){
+  const el=document.getElementById('lst-conexoes-table');if(!el)return;
+  const fseg=(document.getElementById('lst-con-fseg')||{value:''}).value;
+  const fnivel=(document.getElementById('lst-con-fnivel')||{value:''}).value;
+  let data=conexoes.filter(c=>(!fseg||c.seg===fseg)&&(!fnivel||String(parseInt(c.nivel)||1)===fnivel));
+  if(!data.length){el.innerHTML='<div style="color:#aaa;font-size:13px;padding:8px">Nenhuma conexão encontrada.</div>';return;}
+  el.innerHTML=`<table><thead><tr><th>Segmento</th><th>Nível</th><th>Porte</th><th>Matches</th><th>Criador</th><th>Cadastrada em</th></tr></thead><tbody>
+    ${data.map(c=>{
+      const owner=users.find(u=>u.id===c.criadorId);
+      const matches=matchConexao(c).length;
+      return`<tr>
+        <td><strong>${c.seg}</strong>${c.desc?`<div style="font-size:11px;color:#888;max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.desc}</div>`:''}</td>
+        <td>${c.nivel?'★'.repeat(parseInt(c.nivel)||1):'-'}</td>
+        <td>${c.porte||'-'}</td>
+        <td style="color:${matches>0?'#0F6E56':'#aaa'};font-weight:${matches>0?'600':'400'}">${matches>0?matches+' match'+(matches>1?'es':''):'-'}</td>
+        <td>${owner?owner.nome:'?'}</td>
+        <td>${c.desde||'-'}</td>
+      </tr>`;
+    }).join('')}
+  </tbody></table>`;
+}
+
+function renderListaSegmentos(){
+  const el=document.getElementById('lst-segmentos-table');if(!el)return;
+  const segMap={};
+  users.filter(u=>u.status==='Ativo').forEach(u=>(u.seg||'').split(',').map(s=>s.trim()).filter(Boolean).forEach(s=>{
+    if(!segMap[s])segMap[s]={membros:0,conexoes:0,sinergias:0};segMap[s].membros++;
+  }));
+  conexoes.forEach(c=>(c.seg||'').split(',').map(s=>s.trim()).filter(Boolean).forEach(s=>{
+    if(!segMap[s])segMap[s]={membros:0,conexoes:0,sinergias:0};segMap[s].conexoes++;
+  }));
+  sinergias.forEach(s=>{
+    [s.a,s.b].forEach(seg=>{if(segMap[seg])segMap[seg].sinergias++;});
+  });
+  const rows=Object.entries(segMap).sort((a,b)=>(b[1].membros+b[1].conexoes)-(a[1].membros+a[1].conexoes));
+  if(!rows.length){el.innerHTML='<div style="color:#aaa;font-size:13px;padding:8px">Nenhum segmento encontrado.</div>';return;}
+  el.innerHTML=`<table><thead><tr><th>Segmento</th><th>Membros</th><th>Conexões</th><th>Sinergias</th></tr></thead><tbody>
+    ${rows.map(([seg,v])=>`<tr>
+      <td><strong>${seg}</strong></td>
+      <td>${v.membros||0}</td>
+      <td>${v.conexoes||0}</td>
+      <td>${v.sinergias||0}</td>
+    </tr>`).join('')}
+  </tbody></table>`;
+}
+
+function exportCSV(rows,filename){
+  const csv=rows.map(r=>r.map(c=>'"'+String(c||'').replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,﻿'+encodeURIComponent(csv);
+  a.download=filename;a.click();
+}
+function exportCSVConexoes(){
+  const fseg=(document.getElementById('lst-con-fseg')||{value:''}).value;
+  const fnivel=(document.getElementById('lst-con-fnivel')||{value:''}).value;
+  const data=conexoes.filter(c=>(!fseg||c.seg===fseg)&&(!fnivel||String(parseInt(c.nivel)||1)===fnivel));
+  const rows=[['Segmento','Descrição','Nível','Porte','Acesso','Matches','Criador','Cadastrada em']];
+  data.forEach(c=>{
+    const owner=users.find(u=>u.id===c.criadorId);
+    rows.push([c.seg,c.desc||'',c.nivel||'',c.porte||'',c.acesso||'',matchConexao(c).length,owner?owner.nome:'',c.desde||'']);
+  });
+  exportCSV(rows,'conexoes_'+new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')+'.csv');
+}
+function exportCSVSegmentos(){
+  const segMap={};
+  users.filter(u=>u.status==='Ativo').forEach(u=>(u.seg||'').split(',').map(s=>s.trim()).filter(Boolean).forEach(s=>{if(!segMap[s])segMap[s]={membros:0,conexoes:0,sinergias:0};segMap[s].membros++;}));
+  conexoes.forEach(c=>(c.seg||'').split(',').map(s=>s.trim()).filter(Boolean).forEach(s=>{if(!segMap[s])segMap[s]={membros:0,conexoes:0,sinergias:0};segMap[s].conexoes++;}));
+  sinergias.forEach(s=>{[s.a,s.b].forEach(seg=>{if(segMap[seg])segMap[seg].sinergias++;});});
+  const rows=[['Segmento','Membros','Conexões','Sinergias']];
+  Object.entries(segMap).sort((a,b)=>(b[1].membros+b[1].conexoes)-(a[1].membros+a[1].conexoes))
+    .forEach(([seg,v])=>rows.push([seg,v.membros,v.conexoes,v.sinergias]));
+  exportCSV(rows,'segmentos_'+new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')+'.csv');
+}
+function exportPDFLista(tipo){
+  const{jsPDF}=window.jspdf;const doc=new jsPDF();let y=20;
+  const addLine=(txt,sz,bold,color)=>{doc.setFontSize(sz||11);doc.setFont('helvetica',bold?'bold':'normal');if(color)doc.setTextColor(...color);else doc.setTextColor(26,26,26);const lines=doc.splitTextToSize(txt,170);doc.text(lines,20,y);y+=lines.length*(sz?sz*0.45+2:6);if(y>275){doc.addPage();y=20;}};
+  const addSep=()=>{doc.setDrawColor(220,220,220);doc.line(20,y,190,y);y+=5;};
+  if(tipo==='conexoes'){
+    addLine('IA Hub — Lista de Conexões',15,true,[8,145,178]);addSep();
+    addLine('Gerado em: '+new Date().toLocaleDateString('pt-BR')+' | Total: '+conexoes.length+' conexões',9,false,[150,150,150]);y+=3;
+    conexoes.forEach(c=>{
+      const owner=users.find(u=>u.id===c.criadorId);
+      const m=matchConexao(c).length;
+      addLine(`${c.seg} ${c.nivel?'(★'+c.nivel+')':''} ${c.porte?'· '+c.porte:''} — por ${owner?owner.nome:'?'}${m?' · '+m+' match(es)':''}`,10,false);
+      if(c.desc)addLine('  '+c.desc.slice(0,100),9,false,[130,130,130]);
+    });
+  } else {
+    addLine('IA Hub — Lista de Segmentos',15,true,[8,145,178]);addSep();
+    addLine('Gerado em: '+new Date().toLocaleDateString('pt-BR'),9,false,[150,150,150]);y+=3;
+    const segMap={};
+    users.filter(u=>u.status==='Ativo').forEach(u=>(u.seg||'').split(',').map(s=>s.trim()).filter(Boolean).forEach(s=>{if(!segMap[s])segMap[s]={membros:0,conexoes:0};segMap[s].membros++;}));
+    conexoes.forEach(c=>(c.seg||'').split(',').map(s=>s.trim()).filter(Boolean).forEach(s=>{if(!segMap[s])segMap[s]={membros:0,conexoes:0};segMap[s].conexoes++;}));
+    Object.entries(segMap).sort((a,b)=>(b[1].membros+b[1].conexoes)-(a[1].membros+a[1].conexoes))
+      .forEach(([seg,v])=>addLine(`${seg} — ${v.membros} membro(s) · ${v.conexoes} conexão(ões)`,11));
+  }
+  doc.save((tipo==='conexoes'?'lista_conexoes':'lista_segmentos')+'_'+new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')+'.pdf');
 }
 
 // ===================== PERSISTÊNCIA =====================
