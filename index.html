@@ -415,7 +415,6 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:4px">
         <div class="section-hdr" style="margin-top:0;border-bottom:none;margin-bottom:0">Mapa de Sinergias da Rede</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn-p" onclick="abrirNovoNegocio()">💼 Novo Negócio / Oportunidade</button>
           <button class="btn-p" style="background:#fff;color:#2554C7;border:1.5px solid #2554C7" onclick="abrirNovaConexao()">🔗 Nova Conexão</button>
         </div>
       </div>
@@ -1594,7 +1593,7 @@ function renderDashboardConexoes(){
       destaqueEl.innerHTML=`<div style="background:linear-gradient(135deg,#2554C7,#06b6d4);border-radius:12px;padding:16px 18px;margin-bottom:16px;color:#fff;cursor:pointer" onclick="showTab('rede-membros');setTimeout(()=>switchMbrTab('conexoes'),100)">
         <div style="font-size:11px;opacity:.85;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">⭐ Conexão em destaque da semana</div>
         <div style="font-size:15px;font-weight:600;margin-bottom:4px">${destaque.c.seg}</div>
-        <div style="font-size:12px;opacity:.9;margin-bottom:8px">por ${dono?dono.nome:'?'} · ${topMatch.score}% de match com ${topMatch.user.nome}</div>
+        <div style="font-size:12px;opacity:.9;margin-bottom:8px">${isSocio()?'por '+(dono?dono.nome:'?')+' · ':''}${topMatch.score}% de match com ${isSocio()?topMatch.user.nome:topMatch.user.perfil||'Membro'}</div>
         <div style="font-size:13px;opacity:.95;line-height:1.5">${destaque.c.desc.length>120?destaque.c.desc.substring(0,120)+'…':destaque.c.desc}</div>
       </div>`;
     } else {
@@ -3432,7 +3431,7 @@ function renderConList(){
           return`<div class="con-match-item">
           <div class="con-match-score">${m.score}%</div>
           <div style="flex:1">
-            <div style="font-weight:500">${m.user.nome}</div>
+            <div style="font-weight:500">${isSocio()?m.user.nome:m.user.perfil||'Membro da rede'}</div>
             <div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:3px">${chips.join('')}</div>
           </div>
           <span class="badge" style="background:${PS[m.user.perfil]?.bg||'#eee'};color:${PS[m.user.perfil]?.tx||'#555'}">${m.user.perfil}</span>
@@ -3836,7 +3835,7 @@ function interesseCon(conId,userId){
   const socios=users.filter(x=>x.perfil==='Sócio').map(x=>x.id);
   notificacoes.push({id:Date.now(),txt:`💡 ${currentUser.nome} manifestou interesse na conexão "${c.seg}" (match com ${u.nome}). Aguardando sua aprovação para prosseguir.`,ts:Date.now(),lido:false,destinos:socios});
   updateNotifBadge();saveData();
-  showToast(`✅ Interesse registrado! Aguardando aprovação dos sócios para conectar você com ${u.nome}.`);
+  showToast(`✅ Interesse registrado! Aguardando aprovação dos sócios para prosseguir com a conexão.`);
   renderConList();
 }
 
