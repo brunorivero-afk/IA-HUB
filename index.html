@@ -47,7 +47,13 @@ body{font-family:system-ui,sans-serif;background:#f5f5f3;color:#1a1a1a;font-size
 .topbar-brand{display:flex;align-items:center;gap:10px;}
 .topbar-brand span{font-size:17px;font-weight:700;color:#0a1628;}
 .topbar-right{display:flex;align-items:center;gap:8px;}
-.user-pill{font-size:12px;background:#f5f5f3;border:1px solid #eee;border-radius:20px;padding:5px 12px;color:#555;}
+.user-pill{font-size:12px;background:#f5f5f3;border:1px solid #eee;border-radius:20px;padding:5px 12px;color:#555;cursor:pointer;}
+.user-dropdown{position:relative;}
+.user-menu{position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid #eee;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.12);min-width:175px;display:none;z-index:200;overflow:hidden;}
+.user-menu.open{display:block;}
+.user-menu button{display:block;width:100%;text-align:left;padding:10px 14px;background:none;border:none;cursor:pointer;font-size:13px;color:#0a1628;}
+.user-menu button:hover{background:#f5f5f3;}
+.user-menu-sep{border:none;border-top:1px solid #eee;margin:3px 0;}
 .notif-btn{position:relative;background:#f5f5f3;border:1px solid #eee;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;}
 .notif-count{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;display:flex;align-items:center;justify-content:center;font-weight:700;}
 
@@ -399,11 +405,16 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
         🔔 <span class="notif-count" id="notif-count" style="display:none">0</span>
       </button>
       <button id="btn-aprovacao" class="notif-btn" onclick="openAprovacaoPanel()" style="display:none" title="Membros aguardando aprovação">👥 <span class="notif-count" id="aprovacao-count" style="display:none">0</span></button>
-      <span class="user-pill" id="user-pill"></span>
       <button id="btn-reservar-sala" class="btn-p" style="display:none" onclick="openAddEvento()" title="Reservar sala de reunião">📅 Reservar sala</button>
-      <button class="btn-p" onclick="abrirMinhaArea()" title="Minha área">👤 Minha Área</button>
-      <button class="btn-s" onclick="openMeuPerfil()" title="Editar meu perfil">✏ Meu perfil</button>
-      <button class="btn-s" onclick="doLogout()">Sair</button>
+      <div class="user-dropdown" id="user-dropdown">
+        <button class="user-pill" id="user-pill" onclick="toggleUserMenu(event)">—</button>
+        <div class="user-menu" id="user-menu">
+          <button id="um-minha-area" onclick="abrirMinhaArea();closeUserMenu()">👤 Minha Área</button>
+          <button id="um-meu-perfil" onclick="openMeuPerfil();closeUserMenu()">✏ Meu perfil</button>
+          <hr class="user-menu-sep">
+          <button onclick="doLogout()">🚪 Sair</button>
+        </div>
+      </div>
     </div>
   </div>
   <div class="tabs-wrap">
@@ -1082,8 +1093,9 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <div id="vit-doc-list"></div>
     </div>
     </div><!-- end min-height wrapper -->
-    <div class="modal-btns">
+    <div class="modal-btns" style="flex-wrap:wrap;gap:8px">
       <button class="btn-s" onclick="closeVitForm()">Cancelar</button>
+      <button class="btn-s" id="btn-vit-discard" style="display:none;color:#dc2626" onclick="vitClearDraft();document.getElementById('btn-vit-discard').style.display='none';showToast('🗑 Rascunho descartado')">Limpar rascunho</button>
       <button class="btn-p" onclick="saveVitProj()">Salvar Projeto</button>
     </div>
   </div>
@@ -1334,6 +1346,9 @@ function doLogin(){
   }
 }
 function doLogout(){currentUser=null;showScreen('login');}
+function toggleUserMenu(e){e.stopPropagation();document.getElementById('user-menu').classList.toggle('open');}
+function closeUserMenu(){document.getElementById('user-menu').classList.remove('open');}
+document.addEventListener('click',function(){closeUserMenu();});
 function isSocio(){return currentUser&&currentUser.perfil==='Sócio';}
 function initials(n){const p=(n||'?').trim().split(' ');return(p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();}
 
@@ -1371,9 +1386,9 @@ function setupMain(){
     ['btn-aprovacao','notif-btn','btn-reservar-sala'].forEach(id=>{
       const el=document.getElementById(id);if(el)el.style.display='none';
     });
-    const btnMinhaArea=document.querySelector('button[onclick="abrirMinhaArea()"]');
+    const btnMinhaArea=document.getElementById('um-minha-area');
     if(btnMinhaArea)btnMinhaArea.style.display='none';
-    const btnPerfil=document.querySelector('button[onclick="openMeuPerfil()"]');
+    const btnPerfil=document.getElementById('um-meu-perfil');
     if(btnPerfil)btnPerfil.style.display='none';
   }
 }
@@ -1446,10 +1461,10 @@ function showTab(name){
   if(name==='meus-rendimentos')renderMeusRendimentos();
   if(name==='relatorio-rede')renderRelatorioRede();
   if(name==='vitrine')renderVitrine();
-  // Marcar que o user viu a aba de conexões (para onboarding)
-  if(name==='rede-membros'||name==='conexoes'){
+  // Rastrear abas visitadas (para onboarding)
+  if(name==='sinergias'){
     const idx=users.findIndex(u=>u.id===currentUser.id);
-    if(idx>=0&&!users[idx].viuMatches){users[idx].viuMatches=true;currentUser.viuMatches=true;saveData();}
+    if(idx>=0&&!users[idx].viuSinergias){users[idx].viuSinergias=true;currentUser.viuSinergias=true;saveData();}
   }
 }
 
@@ -4490,7 +4505,7 @@ function mostrarOnboarding(){
   const u=currentUser;
   const temAtiv=u.ativ&&(typeof u.ativ==='string'?u.ativ.length>0:u.ativ.length>0);
   const temConexao=conexoes.some(c=>c.criadorId===u.id);
-  const viuMatches=!!u.viuMatches;
+  const viuSinergias=!!u.viuSinergias;
   const item=(ok,txt)=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.12)">
     <div style="width:22px;height:22px;border-radius:50%;background:${ok?'#4ade80':'rgba(255,255,255,.25)'};display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0">${ok?'✓':'○'}</div>
     <span style="font-size:13px;color:${ok?'rgba(255,255,255,.7)':'#fff'};text-decoration:${ok?'line-through':''}">${txt}</span>
@@ -4500,7 +4515,7 @@ function mostrarOnboarding(){
   document.getElementById('onboarding-body').innerHTML=`
     ${item(temAtiv,'Complete seu perfil — descreva suas atividades')}
     ${item(temConexao,'Cadastre sua primeira conexão na rede')}
-    ${item(viuMatches,'Veja seus matches na aba Conexões')}
+    ${item(viuSinergias,'Explore as sinergias da rede')}
     <p style="margin-top:14px;font-size:12px;color:rgba(255,255,255,.6);line-height:1.7">Esses passos ajudam o sistema a fazer matches mais precisos e aumentar sua relevância na rede IA Hub.</p>
   `;
   el.classList.add('open');
@@ -4850,6 +4865,24 @@ function deleteVitProj(id){
 }
 
 // ── FORM ──
+// ===================== VITRINE DRAFT =====================
+const _VIT_DRAFT='ia_hub_vit_draft';
+function vitSaveDraft(){
+  const g=id=>document.getElementById(id)?.value||'';
+  const draft={nome:g('vit-f-nome'),setor:g('vit-f-setor'),estagio:g('vit-f-estagio'),tagline:g('vit-f-tagline'),desc_ia:g('vit-f-desc-ia'),problema:g('vit-f-problema'),solucao:g('vit-f-solucao'),receita:g('vit-f-receita'),tracao:g('vit-f-tracao'),arr:g('vit-f-arr'),cresc:g('vit-f-cresc'),clientes:g('vit-f-clientes'),margem:g('vit-f-margem'),tam:g('vit-f-tam'),sam:g('vit-f-sam'),som:g('vit-f-som'),swotf:g('vit-f-swotf'),swotw:g('vit-f-swotw'),swoto:g('vit-f-swoto'),swott:g('vit-f-swott'),tese:g('vit-f-tese'),captacao:g('vit-f-captacao'),ticket:g('vit-f-ticket'),pcthub:g('vit-f-pcthub'),cotas:g('vit-f-cotas'),retorno:g('vit-f-retorno'),prazo:g('vit-f-prazo'),_ts:Date.now()};
+  localStorage.setItem(_VIT_DRAFT,JSON.stringify(draft));
+}
+function vitRestoreDraft(){
+  try{
+    const raw=localStorage.getItem(_VIT_DRAFT);if(!raw)return false;
+    const d=JSON.parse(raw);
+    const s=(id,val)=>{const el=document.getElementById(id);if(el&&val!==undefined&&val!=='')el.value=val;};
+    s('vit-f-nome',d.nome);s('vit-f-setor',d.setor);s('vit-f-estagio',d.estagio);s('vit-f-tagline',d.tagline);s('vit-f-desc-ia',d.desc_ia);s('vit-f-problema',d.problema);s('vit-f-solucao',d.solucao);s('vit-f-receita',d.receita);s('vit-f-tracao',d.tracao);s('vit-f-arr',d.arr);s('vit-f-cresc',d.cresc);s('vit-f-clientes',d.clientes);s('vit-f-margem',d.margem);s('vit-f-tam',d.tam);s('vit-f-sam',d.sam);s('vit-f-som',d.som);s('vit-f-swotf',d.swotf);s('vit-f-swotw',d.swotw);s('vit-f-swoto',d.swoto);s('vit-f-swott',d.swott);s('vit-f-tese',d.tese);s('vit-f-captacao',d.captacao);s('vit-f-ticket',d.ticket);s('vit-f-pcthub',d.pcthub);s('vit-f-cotas',d.cotas);s('vit-f-retorno',d.retorno);s('vit-f-prazo',d.prazo);
+    return !!(d.nome||d.problema||d.solucao);
+  }catch(e){return false;}
+}
+function vitClearDraft(){localStorage.removeItem(_VIT_DRAFT);}
+
 let _vitEditId=null,_vitTab='ident',_vitDetalheId=null;
 let _vitTime=[],_vitUso=[],_vitFAQ=[],_vitDocs=[];
 
@@ -4878,10 +4911,20 @@ function openVitProj(id){
   _vitFAQSet(p?p.faq||[]:[]);
   _vitDocsSet(p?p.docs||[]:[]);
   vitShowFormTab('ident');
+  if(!id){
+    const restored=vitRestoreDraft();
+    const discardBtn=document.getElementById('btn-vit-discard');
+    if(discardBtn)discardBtn.style.display=restored?'inline-block':'none';
+    if(restored)showToast('📝 Rascunho restaurado — continue de onde parou');
+  } else {
+    const discardBtn=document.getElementById('btn-vit-discard');
+    if(discardBtn)discardBtn.style.display='none';
+  }
   document.getElementById('ov-vit-form').classList.add('open');
 }
 function closeVitForm(){document.getElementById('ov-vit-form').classList.remove('open');_vitEditId=null;}
 function vitShowFormTab(t){
+  if(_vitEditId===null&&_vitTab!==t)vitSaveDraft();
   _vitTab=t;
   ['ident','numeros','swot','deal','extras'].forEach(k=>{
     document.getElementById('vit-ftab-'+k).classList.toggle('active',k===t);
@@ -4912,6 +4955,7 @@ function saveVitProj(){
   } else {
     projetosVitrine.push({id:vitUID(),...data,status:'rascunho',interesses:[],cotasComprometidas:0,criadoEm:new Date().toISOString(),criadoPor:currentUser?.nome||''});
   }
+  vitClearDraft();
   saveData();syncToSupabase();renderVitrine();closeVitForm();
   showToast(_vitEditId?'✅ Projeto atualizado':'✅ Projeto criado');
 }
