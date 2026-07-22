@@ -665,7 +665,8 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
         <div style="margin-bottom:12px">
           <label style="font-size:12px;color:#555;display:block;margin-bottom:6px">Perfil de valor na rede</label>
           <div id="u-tags-wrap" style="display:flex;flex-wrap:wrap;gap:6px">
-            <label class="tag-chip"><input type="checkbox" value="investidor"> 💰 Investidor</label>
+            <label class="tag-chip"><input type="checkbox" value="investidor" onchange="toggleInvProfile()"> 💰 Investidor ativo</label>
+            <label class="tag-chip"><input type="checkbox" value="inv_potencial" onchange="toggleInvProfile()"> 🌱 Investidor potencial</label>
             <label class="tag-chip"><input type="checkbox" value="superconector"> 🌐 Superconector</label>
             <label class="tag-chip"><input type="checkbox" value="autoridade"> 🏆 Autoridade</label>
             <label class="tag-chip"><input type="checkbox" value="decisor"> 🎯 Decisor</label>
@@ -675,6 +676,42 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
             <label class="tag-chip"><input type="checkbox" value="nacional"> 🌍 Alcance nacional</label>
             <label class="tag-chip"><input type="checkbox" value="mentor"> 🤲 Mentor</label>
             <label class="tag-chip"><input type="checkbox" value="captador"> 💼 Captador de recursos</label>
+          </div>
+        </div>
+        <div id="u-inv-profile" style="display:none;border-top:1px solid #e9d5ff;padding-top:12px;margin-top:4px;margin-bottom:4px">
+          <div style="font-size:11px;font-weight:700;color:#7c3aed;margin-bottom:10px">💰 Perfil de Investimento</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div>
+              <label style="font-size:12px;color:#555">Ticket disponível</label>
+              <select id="u-inv-ticket" style="width:100%;margin-top:3px;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px">
+                <option value="">— Não informado —</option>
+                <option value="micro">Até R$ 25k</option>
+                <option value="pequeno">R$ 25k – 100k</option>
+                <option value="medio">R$ 100k – 500k</option>
+                <option value="grande">R$ 500k – 2M</option>
+                <option value="institucional">R$ 2M+</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:12px;color:#555">Perfil</label>
+              <select id="u-inv-perfil" style="width:100%;margin-top:3px;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px">
+                <option value="">—</option>
+                <option value="anjo">Anjo</option>
+                <option value="seed">Seed / Pré-seed</option>
+                <option value="imoveis">Imóveis / FII</option>
+                <option value="growth">Growth / Expansão</option>
+                <option value="family">Family Office</option>
+                <option value="estrategico">Estratégico (operacional)</option>
+              </select>
+            </div>
+            <div style="grid-column:1/-1">
+              <label style="font-size:12px;color:#555">Setores de interesse</label>
+              <input id="u-inv-setores" placeholder="Ex: SaaS, Saúde, Agronegócio, Imóveis..." style="width:100%;margin-top:3px;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px">
+            </div>
+            <div style="grid-column:1/-1">
+              <label style="font-size:12px;color:#555">Instrumento preferido</label>
+              <input id="u-inv-instrumento" placeholder="Ex: Participação societária, mútuo conversível, royalties..." style="width:100%;margin-top:3px;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px">
+            </div>
           </div>
         </div>
         <div style="margin-bottom:12px">
@@ -1153,13 +1190,13 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <button onclick="closeOv('ov-vit-manifesto')" style="position:absolute;top:18px;right:20px;background:none;border:none;font-size:20px;color:#aaa;cursor:pointer;line-height:1">✕</button>
 
     <div style="text-align:center;margin-bottom:36px">
-      <div style="font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#0891b2;margin-bottom:10px">Vitrine IA Hub</div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#0891b2;margin-bottom:10px">Investimentos IA Hub</div>
       <div style="font-size:22px;font-weight:700;color:#0a1628;margin-bottom:12px">Princípios de Investimento</div>
       <div style="width:48px;height:3px;background:#0891b2;margin:0 auto"></div>
     </div>
 
     <p style="font-size:13.5px;color:#444;line-height:1.8;margin-bottom:32px;text-align:center;max-width:540px;margin-left:auto;margin-right:auto">
-      A Vitrine IA Hub não é um marketplace de oportunidades. É uma curadoria ativa de negócios em que acreditamos com convicção suficiente para colocar nosso próprio capital.
+      A Investimentos IA Hub não é um marketplace de oportunidades. É uma curadoria ativa de negócios em que acreditamos com convicção suficiente para colocar nosso próprio capital.
     </p>
 
     <div style="display:flex;flex-direction:column;gap:0">
@@ -1168,7 +1205,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
         <div style="font-size:13px;font-weight:800;color:#0891b2;width:28px;flex-shrink:0;padding-top:1px">I</div>
         <div>
           <div style="font-size:13px;font-weight:700;color:#0a1628;margin-bottom:5px">Skin in the game</div>
-          <div style="font-size:13px;color:#555;line-height:1.7">O IA Hub reserva no mínimo 50% das cotas de todo projeto publicado nesta Vitrine. Nunca colocamos no mercado algo que não estamos dispostos a comprar. Essa regra não tem exceção.</div>
+          <div style="font-size:13px;color:#555;line-height:1.7">O IA Hub reserva no mínimo 50% das cotas de todo projeto publicado nesta curadoria. Nunca colocamos no mercado algo que não estamos dispostos a comprar. Essa regra não tem exceção.</div>
         </div>
       </div>
 
@@ -1216,7 +1253,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
         <div style="font-size:13px;font-weight:800;color:#0891b2;width:28px;flex-shrink:0;padding-top:1px">VII</div>
         <div>
           <div style="font-size:13px;font-weight:700;color:#0a1628;margin-bottom:5px">Resultado público</div>
-          <div style="font-size:13px;color:#555;line-height:1.7">Quando um projeto encerra, o retorno entregue versus o prometido fica registrado no histórico da Vitrine. Construímos reputação com transparência, não com silêncio.</div>
+          <div style="font-size:13px;color:#555;line-height:1.7">Quando um projeto encerra, o retorno entregue versus o prometido fica registrado no histórico da aba. Construímos reputação com transparência, não com silêncio.</div>
         </div>
       </div>
 
@@ -1224,7 +1261,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 
     <div style="margin-top:36px;padding-top:24px;border-top:2px solid #f0f0f0;text-align:right">
       <div style="font-size:13px;font-weight:700;color:#0a1628">Bruno Rivero</div>
-      <div style="font-size:11px;color:#888;margin-top:2px">Curador — Vitrine IA Hub</div>
+      <div style="font-size:11px;color:#888;margin-top:2px">Curador — Investimentos IA Hub</div>
     </div>
   </div>
 </div>
@@ -1403,6 +1440,11 @@ function renderPesoStars(val){
     +(val?`<span style="font-size:12px;color:#7c3aed;margin-left:8px;align-self:center">${labels[val]}</span>`:'');
 }
 function setPesoRede(v){_pesoRede=(_pesoRede===v)?0:v;renderPesoStars(_pesoRede);}
+function toggleInvProfile(){
+  const isInv=['investidor','inv_potencial'].some(v=>document.querySelector(`#u-tags-wrap input[value="${v}"]`)?.checked);
+  const wrap=document.getElementById('u-inv-profile');
+  if(wrap)wrap.style.display=isInv?'block':'none';
+}
 function isSocio(){return currentUser&&currentUser.perfil==='Sócio';}
 function initials(n){const p=(n||'?').trim().split(' ');return(p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();}
 
@@ -1471,7 +1513,7 @@ function buildTabs(){
     {id:'pipeline',label:'Pipeline',socio:true},
     {id:'meus-rendimentos',label:'Meus Rendimentos',notSocio:true},
     {id:'relatorio-rede',label:'Relatório da Rede',socio:true},
-    {id:'vitrine',label:'💼 Vitrine',socio:true},
+    {id:'vitrine',label:'📈 Investimentos',socio:true},
   ];
   const bar=document.getElementById('tabs-bar');
   bar.innerHTML='';
@@ -1992,8 +2034,8 @@ function renderMembros(){
     const comissaoTxt=u.comissao?`${u.comissao}% (${(u.comissaoModelo||'').replace('por_projeto','por projeto')||'—'})`:'—';
     const ts=(() => { try { return calcTrustScore(u.id); } catch(e){ return {score:0,detalhes:[]}; } })();
     const tl=trustLabel(ts.score);
-    const TAG_ICONS={investidor:'💰',superconector:'🌐',autoridade:'🏆',decisor:'🎯',influenciador:'📣',indicador:'🤝',serial:'🏗',nacional:'🌍',mentor:'🤲',captador:'💼'};
-    const TAG_LABELS={investidor:'Investidor',superconector:'Superconector',autoridade:'Autoridade',decisor:'Decisor',influenciador:'Influenciador',indicador:'Indicador ativo',serial:'Empreendedor serial',nacional:'Alcance nacional',mentor:'Mentor',captador:'Captador'};
+    const TAG_ICONS={investidor:'💰',inv_potencial:'🌱',superconector:'🌐',autoridade:'🏆',decisor:'🎯',influenciador:'📣',indicador:'🤝',serial:'🏗',nacional:'🌍',mentor:'🤲',captador:'💼'};
+    const TAG_LABELS={investidor:'Investidor ativo',inv_potencial:'Investidor potencial',superconector:'Superconector',autoridade:'Autoridade',decisor:'Decisor',influenciador:'Influenciador',indicador:'Indicador ativo',serial:'Empreendedor serial',nacional:'Alcance nacional',mentor:'Mentor',captador:'Captador'};
     const tagsHtml=socio&&u.tagsRede&&u.tagsRede.length?`<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:5px">${u.tagsRede.map(t=>`<span style="background:#ede9fe;color:#5b21b6;border-radius:20px;font-size:10px;padding:2px 7px;font-weight:600">${TAG_ICONS[t]||'•'} ${TAG_LABELS[t]||t}</span>`).join('')}</div>`:'';
     const pesoHtml=socio&&u.pesoRede?`<div style="font-size:11px;margin-top:3px">${'⭐'.repeat(u.pesoRede)}<span style="color:#7c3aed;margin-left:5px;font-size:10px">${['','Básico','Razoável','Relevante','Muito valioso','Estratégico'][u.pesoRede]||''}</span></div>`:'';
     // Item 12: selo de membro verificado
@@ -2073,6 +2115,9 @@ function openAddUsr(){
   ['u-spec-medico-val','u-spec-adv-val','u-spec-cont-val','u-spec-eng-val','u-spec-corr-val','u-spec-consul-val','u-spec-dent-val','u-spec-psico-val'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.querySelectorAll('#u-tags-wrap input[type=checkbox]').forEach(cb=>cb.checked=false);
   _pesoRede=0;renderPesoStars(0);
+  ['u-inv-ticket','u-inv-perfil'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['u-inv-setores','u-inv-instrumento'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const invP=document.getElementById('u-inv-profile');if(invP)invP.style.display='none';
   document.getElementById('u-curator-wrap').style.display='none';
   updateSpecFields();
   document.getElementById('u-perfil').value='Associado';
@@ -2123,6 +2168,12 @@ function openEditUsr(id){
     document.querySelectorAll('#u-tags-wrap input[type=checkbox]').forEach(cb=>cb.checked=tags.includes(cb.value));
     _pesoRede=u.pesoRede||0;renderPesoStars(_pesoRede);
     const nc=document.getElementById('u-nota-curador');if(nc)nc.value=u.notaCurador||'';
+    // perfil de investidor
+    const it=document.getElementById('u-inv-ticket');if(it)it.value=u.invTicket||'';
+    const ip=document.getElementById('u-inv-perfil');if(ip)ip.value=u.invPerfil||'';
+    const is=document.getElementById('u-inv-setores');if(is)is.value=u.invSetores||'';
+    const ii=document.getElementById('u-inv-instrumento');if(ii)ii.value=u.invInstrumento||'';
+    toggleInvProfile();
   }
   updateSpecFields();
   document.getElementById('ov-usr').classList.add('open');
@@ -2168,6 +2219,10 @@ function saveUsr(){
       tagsRede:[...document.querySelectorAll('#u-tags-wrap input[type=checkbox]:checked')].map(cb=>cb.value),
       pesoRede:_pesoRede||undefined,
       notaCurador:(document.getElementById('u-nota-curador')||{value:''}).value.trim()||undefined,
+      invTicket:(document.getElementById('u-inv-ticket')||{value:''}).value||undefined,
+      invPerfil:(document.getElementById('u-inv-perfil')||{value:''}).value||undefined,
+      invSetores:(document.getElementById('u-inv-setores')||{value:''}).value.trim()||undefined,
+      invInstrumento:(document.getElementById('u-inv-instrumento')||{value:''}).value.trim()||undefined,
     }:{}),
     desde:today};
   // strip undefined
@@ -3658,7 +3713,12 @@ function matchConexao(con){
     // Bônus por tags do curador
     if(u.tagsRede&&u.tagsRede.length){
       if(u.pesoRede)score+=u.pesoRede*3;
-      if(u.tagsRede.includes('investidor')&&conTexto.match(/capta|investimento|aporte|funding|seed|série/)){score+=20;razoes.push('💰 investidor · potencial aporte');}
+      if((u.tagsRede.includes('investidor')||u.tagsRede.includes('inv_potencial'))&&conTexto.match(/capta|investimento|aporte|funding|seed|série/)){
+        score+=u.tagsRede.includes('investidor')?20:10;
+        razoes.push(u.tagsRede.includes('investidor')?'💰 investidor ativo':'🌱 investidor potencial');
+        // bônus adicional se setor de interesse bate
+        if(u.invSetores){const setores=u.invSetores.toLowerCase();const conSeg=(con.seg||'').toLowerCase();if(setores.split(/[,\s]+/).some(s=>s.length>2&&conSeg.includes(s))){score+=10;razoes.push('setor de interesse alinhado');}}
+      }
       if(u.tagsRede.includes('decisor')&&con.acesso&&con.acesso.match(/C-Level|Diretor|CEO|Owner/)){score+=15;razoes.push('🎯 decisor · acesso direto');}
       if(u.tagsRede.includes('superconector')){score+=8;razoes.push('🌐 superconector');}
       if(u.tagsRede.includes('indicador')){score+=5;}
@@ -4739,7 +4799,7 @@ async function gerarBPcomIA(){
   }
   const btn=document.getElementById('btn-gerar-ia');
   btn.disabled=true;btn.textContent='⏳ Gerando...';
-  const aiPrompt=`Você é um consultor especialista em startups e business plans para investidores. Com base nas informações abaixo, gere um Business Plan resumido para uma vitrine de investimentos.
+  const aiPrompt=`Você é um consultor especialista em startups e business plans para investidores. Com base nas informações abaixo, gere um Business Plan resumido para um módulo de Investimentos IA Hub.
 
 Projeto: ${nome}
 Setor: ${setor||'não informado'}
@@ -4821,7 +4881,7 @@ function renderPublicPage(p){
   const hubN=p.cotasHub??Math.round(cotas*(p.pctIAHub||50)/100);
   const comp=p.cotasComprometidas||0;
   const hubPct=Math.round(hubN/cotas*100);
-  const waMsg=encodeURIComponent('Olá Bruno! Tenho interesse no projeto '+p.nome+' da Vitrine IA Hub. Pode me dar mais detalhes?');
+  const waMsg=encodeURIComponent('Olá Bruno! Tenho interesse no projeto '+p.nome+' da Investimentos IA Hub. Pode me dar mais detalhes?');
   const waUrl='https://wa.me/5521?text='+waMsg;
   const rules=[
     'Manifeste interesse abaixo. Bruno entra em contato para explicar o deal completo.',
@@ -4833,7 +4893,7 @@ function renderPublicPage(p){
   <div style="max-width:480px;margin:0 auto;padding:20px 0 40px">
     <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 20px rgba(0,0,0,.08)">
       <div style="padding:14px 20px 0;display:flex;justify-content:space-between;align-items:center">
-        <span style="font-size:10px;font-weight:700;letter-spacing:.15em;color:#888;text-transform:uppercase">IA Hub · Vitrine</span>
+        <span style="font-size:10px;font-weight:700;letter-spacing:.15em;color:#888;text-transform:uppercase">IA Hub · Investimentos</span>
         ${p.status==='aberto'?'<span style="font-size:10px;font-weight:700;background:#d1fae5;color:#065f46;padding:3px 9px;border-radius:12px">Captação aberta</span>':''}
       </div>
       <div style="padding:20px">
@@ -4982,7 +5042,7 @@ function vitMudaStatus(id,s){
   showToast('Status: '+vitStatusLabel(s));
 }
 function deleteVitProj(id){
-  if(!confirm('Excluir este projeto da vitrine?'))return;
+  if(!confirm('Excluir este projeto de Investimentos?'))return;
   projetosVitrine=projetosVitrine.filter(p=>p.id!==id);
   saveData();syncToSupabase();renderVitrine();showToast('Projeto excluído');
 }
@@ -5184,7 +5244,7 @@ function exportVitPDF(id){
   </style></head><body>
 
   <div class="header">
-    <div class="hub-label">IA Hub — Vitrine de Investimentos</div>
+    <div class="hub-label">IA Hub — Investimentos IA Hub</div>
     <div class="proj-nome">${esc(p.nome||'Sem título')}</div>
     ${p.tagline?`<div class="proj-tagline">${esc(p.tagline)}</div>`:''}
     <div class="badges">
@@ -5249,7 +5309,7 @@ function exportVitPDF(id){
     <div style="font-size:11px;color:#aaa">Documento gerado pelo sistema IA Hub · ${new Date().toLocaleDateString('pt-BR')}</div>
     <div class="footer-sign">
       <div class="name">IA Hub</div>
-      <div class="role">Vitrine de Investimentos</div>
+      <div class="role">Investimentos IA Hub</div>
     </div>
   </div>
 
