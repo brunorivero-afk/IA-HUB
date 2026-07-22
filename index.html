@@ -4881,75 +4881,127 @@ function renderPublicPage(p){
   const hubN=p.cotasHub??Math.round(cotas*(p.pctIAHub||50)/100);
   const comp=p.cotasComprometidas||0;
   const hubPct=Math.round(hubN/cotas*100);
+  const extPct=Math.max(0,Math.round((comp-hubN)/cotas*100));
   const waMsg=encodeURIComponent('Olá Bruno! Tenho interesse no projeto '+p.nome+' da Investimentos IA Hub. Pode me dar mais detalhes?');
   const waUrl='https://wa.me/5521?text='+waMsg;
-  const rules=[
-    'Manifeste interesse abaixo. Bruno entra em contato para explicar o deal completo.',
-    'Relatório trimestral para todos os cotistas enquanto o projeto estiver ativo.',
-    p.prazoMeses?'Captação encerra em '+p.prazoMeses+' meses ou quando as cotas esgotarem.':'Captação encerra quando as cotas esgotarem.'
-  ];
-  document.body.style.cssText='margin:0;padding:0;background:#f5f4f0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh;';
+  const sec=(label,html)=>`<div style="padding:20px;border-top:1px solid #f0f0f0"><div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#9ca3af;margin-bottom:12px">${label}</div>${html}</div>`;
+  const para=(txt)=>txt?`<p style="font-size:13px;color:#374151;line-height:1.75;margin:0">${esc(txt)}</p>`:'';
+  const row=(label,val,note='')=>val?`<div style="display:flex;gap:6px;margin-bottom:8px"><span style="font-size:12px;color:#9ca3af;min-width:110px;padding-top:1px">${label}</span><span style="font-size:13px;color:#0a1628;font-weight:600">${esc(val)}${note?`<span style="font-size:10px;font-weight:400;color:#d97706;margin-left:6px">${note}</span>`:''}</span></div>`:'';
+  const kpi=(label,val)=>val?`<div style="background:#f9fafb;border:1px solid #f0f0f0;border-radius:10px;padding:12px;text-align:center"><div style="font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">${label}</div><div style="font-size:16px;font-weight:700;color:#0a1628">${esc(val)}</div></div>`:'';
+  const swotBlock=(icon,label,col,val)=>val?`<div style="background:${col};border-radius:8px;padding:10px 12px"><div style="font-size:10px;font-weight:700;color:#374151;margin-bottom:6px">${icon} ${label}</div>${val.split('\n').filter(l=>l.trim()).map(l=>`<div style="font-size:12px;color:#374151;display:flex;gap:6px;margin-bottom:3px"><span>·</span><span>${esc(l.trim())}</span></div>`).join('')}</div>`:'';
+  const hasBP=p.problema||p.solucao||p.modeloReceita||p.tracao;
+  const hasKPI=p.numArr||p.numCrescimento||p.numClientes||p.numMargem;
+  const hasMkt=p.numTAM||p.numSAM||p.numSOM;
+  const hasSWOT=p.swotF||p.swotW||p.swotO||p.swotT;
+  const hasTime=p.time&&p.time.length>0;
+  const hasUso=p.usoRecursos&&p.usoRecursos.length>0;
+  const hasFAQ=p.faq&&p.faq.length>0;
+  const hasDocs=p.docs&&p.docs.length>0;
+  document.body.style.cssText='margin:0;padding:0;background:#f0efe9;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh;';
   document.body.innerHTML=`
-  <div style="max-width:480px;margin:0 auto;padding:20px 0 40px">
-    <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 20px rgba(0,0,0,.08)">
-      <div style="padding:14px 20px 0;display:flex;justify-content:space-between;align-items:center">
-        <span style="font-size:10px;font-weight:700;letter-spacing:.15em;color:#888;text-transform:uppercase">IA Hub · Investimentos</span>
-        ${p.status==='aberto'?'<span style="font-size:10px;font-weight:700;background:#d1fae5;color:#065f46;padding:3px 9px;border-radius:12px">Captação aberta</span>':''}
+  <div style="max-width:600px;margin:0 auto;padding:24px 0 52px">
+    <!-- Header -->
+    <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.07)">
+      <div style="padding:16px 20px 0;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:10px;font-weight:700;letter-spacing:.2em;color:#9ca3af;text-transform:uppercase">IA Hub · Investimentos</span>
+        ${p.estagio?`<span style="font-size:10px;background:#f3f4f6;border:1px solid #e5e7eb;color:#6b7280;padding:3px 10px;border-radius:12px">${esc(p.estagio)}</span>`:''}
       </div>
       <div style="padding:20px">
-        <div style="width:44px;height:44px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#1d4ed8;margin-bottom:12px">BR</div>
-        <div style="font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Bruno Rivero indica</div>
-        <div style="font-size:18px;font-weight:700;color:#0a1628;line-height:1.3;margin-bottom:4px">${esc(p.nome||'')}</div>
-        ${p.setor?'<span style="display:inline-block;font-size:11px;background:#f3f4f6;border:1px solid #e5e7eb;color:#6b7280;padding:3px 10px;border-radius:20px;margin-bottom:14px">'+esc(p.setor)+'</span>':''}
-        ${p.teseCurador?`<div style="background:#f8faff;border-left:3px solid #3b82f6;border-radius:0 8px 8px 0;padding:14px 16px;margin:${p.setor?'0':'14px 0 0'}">
-          <p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.7;color:#1a1a1a;margin:0">"${esc(p.teseCurador)}"</p>
+        <div style="display:flex;align-items:flex-start;gap:14px">
+          <div style="width:48px;height:48px;border-radius:12px;background:#1d4ed8;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0">${(p.nome||'?')[0].toUpperCase()}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px">Curadoria Bruno Rivero</div>
+            <div style="font-size:20px;font-weight:700;color:#0a1628;line-height:1.25;margin-bottom:6px">${esc(p.nome||'')}</div>
+            ${p.tagline?`<div style="font-size:13px;color:#6b7280;line-height:1.5">${esc(p.tagline)}</div>`:''}
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+              ${p.setor?`<span style="font-size:11px;background:#f3f4f6;border:1px solid #e5e7eb;color:#6b7280;padding:3px 10px;border-radius:20px">${esc(p.setor)}</span>`:''}
+              ${p.status==='aberto'?'<span style="font-size:11px;font-weight:700;background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:20px">🟢 Captação aberta</span>':''}
+            </div>
+          </div>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
-          <div style="height:1px;flex:1;background:#e5e7eb"></div>
-          <span style="font-size:11px;color:#9ca3af;white-space:nowrap">Bruno Rivero · ${new Date().getFullYear()}</span>
-          <div style="height:1px;flex:1;background:#e5e7eb"></div>
+        ${p.teseCurador?`<div style="margin-top:18px;background:#f8faff;border-left:3px solid #3b82f6;border-radius:0 8px 8px 0;padding:14px 16px">
+          <p style="font-family:Georgia,'Times New Roman',serif;font-size:14px;line-height:1.75;color:#1a1a1a;margin:0">"${esc(p.teseCurador)}"</p>
+          <div style="font-size:11px;color:#9ca3af;margin-top:8px">— Bruno Rivero · ${new Date().getFullYear()}</div>
         </div>`:''}
       </div>
-      <div style="height:1px;background:#f0f0f0;margin:0 20px"></div>
-      <div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        ${p.captacaoTotal?`<div style="background:#f9fafb;border:1px solid #f0f0f0;border-radius:10px;padding:10px 12px"><div style="font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Captação total</div><div style="font-size:17px;font-weight:700;color:#0a1628">${esc(p.captacaoTotal)}</div><div style="font-size:10px;color:#6b7280;margin-top:2px">${cotas} cotas</div></div>`:''}
-        ${p.ticketMinimo?`<div style="background:#f9fafb;border:1px solid #f0f0f0;border-radius:10px;padding:10px 12px"><div style="font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Cota mínima</div><div style="font-size:17px;font-weight:700;color:#0a1628">${esc(p.ticketMinimo)}</div><div style="font-size:10px;color:#6b7280;margin-top:2px">por investidor</div></div>`:''}
-        ${p.prazoMeses?`<div style="background:#f9fafb;border:1px solid #f0f0f0;border-radius:10px;padding:10px 12px"><div style="font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Prazo</div><div style="font-size:17px;font-weight:700;color:#0a1628">${esc(p.prazoMeses)} meses</div></div>`:''}
-        ${p.retornoPrev?`<div style="background:#f9fafb;border:1px solid #f0f0f0;border-radius:10px;padding:10px 12px"><div style="font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Retorno projetado</div><div style="font-size:17px;font-weight:700;color:#0a1628">${esc(p.retornoPrev)}</div><div style="font-size:10px;color:#d97706;margin-top:2px">projeção não garantida</div></div>`:''}
-      </div>
-      <div style="margin:0 20px 16px;background:#f0fdf4;border:1px solid #a7f3d0;border-radius:10px;padding:12px 14px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          <span style="font-size:14px">🛡</span>
-          <span style="font-size:12px;font-weight:700;color:#065f46">IA Hub tem skin in the game</span>
+      <!-- Deal terms -->
+      <div style="padding:0 20px 4px;border-top:1px solid #f0f0f0">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#9ca3af;margin:14px 0 10px">Termos do deal</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+          ${kpi('Captação total',p.captacaoTotal)}${kpi('Cota mínima',p.ticketMinimo)}
+          ${p.prazoMeses?kpi('Prazo',p.prazoMeses+' meses'):''}${p.retornoPrev?`<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px;text-align:center"><div style="font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Retorno projetado</div><div style="font-size:16px;font-weight:700;color:#0a1628">${esc(p.retornoPrev)}</div><div style="font-size:9px;color:#d97706;margin-top:3px">projeção não garantida</div></div>`:''}
         </div>
-        <div style="font-size:12px;color:#065f46;line-height:1.5;opacity:.9">Reservamos ${p.pctIAHub||50}% das cotas para a rede IA Hub antes de abrir para terceiros. Se não compramos, não indicamos.</div>
-      </div>
-      ${(p.status==='aberto'||p.status==='aprovado')?`<div style="padding:0 20px 16px">
-        <div style="display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin-bottom:6px"><span>Cotas preenchidas</span><span style="font-weight:700;color:#0a1628">${comp}/${cotas}</span></div>
-        <div style="display:flex;height:6px;border-radius:3px;overflow:hidden;border:1px solid #e5e7eb">
-          <div style="width:${hubPct}%;background:#10b981"></div>
-          <div style="width:${Math.max(0,Math.round((comp-hubN)/cotas*100))}%;background:#3b82f6"></div>
-          <div style="flex:1;background:#f3f4f6"></div>
+        <div style="background:#f0fdf4;border:1px solid #a7f3d0;border-radius:10px;padding:12px 14px;margin-bottom:14px">
+          <div style="font-size:12px;font-weight:700;color:#065f46;margin-bottom:3px">🛡 IA Hub tem skin in the game</div>
+          <div style="font-size:12px;color:#065f46;line-height:1.5;opacity:.9">Reservamos ${p.pctIAHub||50}% das cotas para a rede antes de abrir para terceiros. Se não compramos, não indicamos.</div>
         </div>
-        <div style="display:flex;gap:12px;margin-top:6px">
-          <span style="font-size:10px;color:#6b7280;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#10b981;display:inline-block"></span>IA Hub (${hubN})</span>
-          <span style="font-size:10px;color:#6b7280;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#3b82f6;display:inline-block"></span>Rede (${Math.max(0,comp-hubN)})</span>
-          <span style="font-size:10px;color:#6b7280;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#e5e7eb;border:1px solid #d1d5db;display:inline-block"></span>Disponíveis (${cotas-comp})</span>
-        </div>
-      </div>`:''}
-      <div style="height:1px;background:#f0f0f0;margin:0 20px"></div>
-      <div style="padding:16px 20px">
-        <div style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Como funciona</div>
-        ${rules.map((r,i)=>`<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:12px;color:#6b7280;line-height:1.5"><span style="font-size:10px;font-weight:700;color:#3b82f6;min-width:16px;margin-top:2px">${i+1}</span><span>${r}</span></div>`).join('')}
+        ${(p.status==='aberto'||p.status==='aprovado')?`<div style="margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin-bottom:5px"><span>Cotas preenchidas</span><span style="font-weight:700;color:#0a1628">${comp}/${cotas}</span></div>
+          <div style="display:flex;height:7px;border-radius:4px;overflow:hidden;border:1px solid #e5e7eb">
+            <div style="width:${hubPct}%;background:#10b981"></div>
+            <div style="width:${extPct}%;background:#3b82f6"></div>
+            <div style="flex:1;background:#f3f4f6"></div>
+          </div>
+          <div style="display:flex;gap:14px;margin-top:6px">
+            <span style="font-size:10px;color:#6b7280;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#10b981;display:inline-block"></span>IA Hub (${hubN})</span>
+            <span style="font-size:10px;color:#6b7280;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#3b82f6;display:inline-block"></span>Rede (${Math.max(0,comp-hubN)})</span>
+            <span style="font-size:10px;color:#6b7280;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#e5e7eb;border:1px solid #d1d5db;display:inline-block"></span>Disponíveis (${cotas-comp})</span>
+          </div>
+        </div>`:''}
       </div>
+      <!-- CTA -->
       <div style="padding:0 20px 20px">
-        <a href="${waUrl}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;background:#10b981;border-radius:10px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;box-sizing:border-box">
-          <span>💬</span> Tenho interesse — falar com Bruno
+        <a href="${waUrl}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px;background:#10b981;border-radius:10px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;box-sizing:border-box">
+          💬 Tenho interesse — falar com Bruno
         </a>
-        <div style="text-align:center;font-size:11px;color:#9ca3af;margin-top:8px">Sem compromisso. Resposta em até 24h.</div>
+        <div style="text-align:center;font-size:11px;color:#9ca3af;margin-top:6px">Sem compromisso. Resposta em até 24h.</div>
       </div>
     </div>
-    <div style="text-align:center;font-size:11px;color:#bbb;margin-top:16px;padding:0 20px">Curadoria IA Hub · Projeções de retorno não constituem garantia de rentabilidade. Investimentos envolvem riscos.</div>
+    ${hasBP?`<!-- Business Plan -->
+    <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.07);margin-top:12px">
+      ${p.problema?sec('O problema',para(p.problema)):''}
+      ${p.solucao?sec('A solução',para(p.solucao)):''}
+      ${p.modeloReceita?sec('Modelo de receita',para(p.modeloReceita)):''}
+      ${p.tracao?sec('Tração atual',para(p.tracao)):''}
+    </div>`:''}
+    ${hasKPI?`<!-- KPIs -->
+    <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.07);margin-top:12px">
+      ${sec('Indicadores',`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${kpi('ARR / Receita',p.numArr)}${kpi('Crescimento',p.numCrescimento)}${kpi('Clientes ativos',p.numClientes)}${kpi('Margem bruta',p.numMargem)}</div>`)}
+    </div>`:''}
+    ${hasMkt?`<!-- Mercado -->
+    <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.07);margin-top:12px">
+      ${sec('Tamanho do mercado',`${row('TAM — total',p.numTAM)}${row('SAM — endereçável',p.numSAM)}${row('SOM — meta 3 anos',p.numSOM)}`)}
+    </div>`:''}
+    ${hasSWOT?`<!-- SWOT -->
+    <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.07);margin-top:12px">
+      ${sec('Análise SWOT',`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${swotBlock('✅','Forças','#f0fdf4',p.swotF)}${swotBlock('⚠','Fraquezas','#fffbeb',p.swotW)}${swotBlock('🚀','Oportunidades','#eff6ff',p.swotO)}${swotBlock('⚡','Ameaças','#fef2f2',p.swotT)}</div>`)}
+    </div>`:''}
+    ${hasTime?`<!-- Time -->
+    <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.07);margin-top:12px">
+      ${sec('Time',p.time.map(m=>`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="width:36px;height:36px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#1d4ed8;flex-shrink:0">${(m.nome||'?')[0].toUpperCase()}</div><div><div style="font-size:13px;font-weight:600;color:#0a1628">${esc(m.nome)}</div><div style="font-size:11px;color:#6b7280">${esc(m.papel||'')}</div></div></div>`).join(''))}
+    </div>`:''}
+    ${hasUso?`<!-- Uso dos Recursos -->
+    <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.07);margin-top:12px">
+      ${sec('Uso dos recursos',p.usoRecursos.map(u=>`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:#374151">${esc(u.desc)}</span><span style="font-weight:700;color:#0a1628">${u.pct||0}%</span></div><div style="height:6px;background:#f3f4f6;border-radius:3px;overflow:hidden"><div style="height:100%;width:${u.pct||0}%;background:#3b82f6;border-radius:3px"></div></div></div>`).join(''))}
+    </div>`:''}
+    ${hasFAQ?`<!-- FAQ -->
+    <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.07);margin-top:12px">
+      ${sec('Perguntas frequentes',p.faq.map((f,i)=>`<details style="border:1px solid #f0f0f0;border-radius:8px;margin-bottom:8px;overflow:hidden"${i===0?' open':''}><summary style="padding:12px 14px;font-size:13px;font-weight:600;color:#0a1628;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center">${esc(f.pergunta)}<span style="color:#9ca3af;font-size:14px">+</span></summary><div style="padding:0 14px 12px;font-size:13px;color:#6b7280;line-height:1.65">${esc(f.resposta||'')}</div></details>`).join(''))}
+    </div>`:''}
+    ${hasDocs?`<!-- Docs -->
+    <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.07);margin-top:12px">
+      ${sec('Documentos',p.docs.filter(d=>d.titulo&&d.url).map(d=>`<a href="${esc(d.url)}" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #f0f0f0;border-radius:8px;margin-bottom:8px;text-decoration:none;color:#0a1628"><span style="font-size:18px">📄</span><span style="font-size:13px;font-weight:500">${esc(d.titulo)}</span><span style="margin-left:auto;font-size:11px;color:#9ca3af">Abrir →</span></a>`).join(''))}
+    </div>`:''}
+    <!-- CTA final -->
+    <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.07);margin-top:12px;padding:24px 20px;text-align:center">
+      <div style="font-size:15px;font-weight:700;color:#0a1628;margin-bottom:6px">Interessado neste projeto?</div>
+      <div style="font-size:13px;color:#6b7280;margin-bottom:16px">Fale com Bruno diretamente. Ele explica o deal, responde dúvidas e coordena a entrada.</div>
+      <a href="${waUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:10px;padding:13px 24px;background:#10b981;border-radius:10px;color:#fff;font-size:14px;font-weight:700;text-decoration:none">
+        💬 Falar com Bruno via WhatsApp
+      </a>
+      <div style="font-size:11px;color:#9ca3af;margin-top:8px">Sem compromisso. Resposta em até 24h.</div>
+    </div>
+    <div style="text-align:center;font-size:11px;color:#bbb;margin-top:20px;padding:0 20px;line-height:1.7">Curadoria IA Hub · Projeções de retorno não constituem garantia de rentabilidade.<br>Investimentos de risco envolvem possibilidade de perda total do capital.</div>
   </div>`;
 }
 
