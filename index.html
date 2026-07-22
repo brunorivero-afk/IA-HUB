@@ -1992,13 +1992,17 @@ function renderMembros(){
     const comissaoTxt=u.comissao?`${u.comissao}% (${(u.comissaoModelo||'').replace('por_projeto','por projeto')||'—'})`:'—';
     const ts=(() => { try { return calcTrustScore(u.id); } catch(e){ return {score:0,detalhes:[]}; } })();
     const tl=trustLabel(ts.score);
+    const TAG_ICONS={investidor:'💰',superconector:'🌐',autoridade:'🏆',decisor:'🎯',influenciador:'📣',indicador:'🤝',serial:'🏗',nacional:'🌍',mentor:'🤲',captador:'💼'};
+    const TAG_LABELS={investidor:'Investidor',superconector:'Superconector',autoridade:'Autoridade',decisor:'Decisor',influenciador:'Influenciador',indicador:'Indicador ativo',serial:'Empreendedor serial',nacional:'Alcance nacional',mentor:'Mentor',captador:'Captador'};
+    const tagsHtml=socio&&u.tagsRede&&u.tagsRede.length?`<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:5px">${u.tagsRede.map(t=>`<span style="background:#ede9fe;color:#5b21b6;border-radius:20px;font-size:10px;padding:2px 7px;font-weight:600">${TAG_ICONS[t]||'•'} ${TAG_LABELS[t]||t}</span>`).join('')}</div>`:'';
+    const pesoHtml=socio&&u.pesoRede?`<div style="font-size:11px;margin-top:3px">${'⭐'.repeat(u.pesoRede)}<span style="color:#7c3aed;margin-left:5px;font-size:10px">${['','Básico','Razoável','Relevante','Muito valioso','Estratégico'][u.pesoRede]||''}</span></div>`:'';
     // Item 12: selo de membro verificado
     const aprovadorNome=u.aprovadoPor?(users.find(x=>x.id===u.aprovadoPor)||{}).nome||'IA Hub':'IA Hub';
     const dataEntradaFmt=u.dataEntrada?new Date(u.dataEntrada).toLocaleDateString('pt-BR'):'—';
     const seloVerificado=u.dataEntrada?`<span title="Aprovado por: ${aprovadorNome} | Membro desde: ${dataEntradaFmt}" style="display:inline-flex;align-items:center;gap:3px;background:#E1F5EE;color:#085041;border-radius:20px;padding:2px 7px;font-size:10px;font-weight:600;margin-left:4px;cursor:help">✓ Verificado</span>`:'';
     const membroDesdeHtml=u.dataEntrada?`<div style="font-size:10px;color:#888;margin-top:1px">desde ${dataEntradaFmt} · por ${aprovadorNome}</div>`:'';
     return`<tr>
-      <td><span class="avatar" style="background:${ps.bg};color:${ps.tx}">${initials(u.nome)}</span><strong>${u.nome}</strong>${seloVerificado} ${socio?trustBadgeHtml(u.id):''}${membroDesdeHtml}</td>
+      <td><span class="avatar" style="background:${ps.bg};color:${ps.tx}">${initials(u.nome)}</span><strong>${u.nome}</strong>${seloVerificado} ${socio?trustBadgeHtml(u.id):''}${membroDesdeHtml}${tagsHtml}${pesoHtml}</td>
       <td>${tipoTag}</td>
       <td style="color:#666">${u.emp||'—'}</td>
       <td style="display:${socio?'table-cell':'none'};color:#666;font-size:12px">${u.email||'—'}</td>
@@ -2709,24 +2713,32 @@ async function enriquecerSinergia(){
   // Monta contexto com membros dos segmentos envolvidos
   const membrosA=users.filter(u=>u.status==='Ativo'&&(u.seg||'').toLowerCase().split(',').map(s=>s.trim()).some(s=>s.includes(a.toLowerCase())));
   const membrosB=users.filter(u=>u.status==='Ativo'&&(u.seg||'').toLowerCase().split(',').map(s=>s.trim()).some(s=>s.includes(b.toLowerCase())));
-  const perfilMembro=u=>`${u.nome}${u.emp&&u.emp!=='?'?' ('+u.emp+')':''}${u.ativ?' — '+u.ativ.substring(0,120):''}`;
+  const perfilMembro=u=>[
+    u.emp&&u.emp!=='?'?`Empresa: ${u.emp}`:'',
+    u.ativ?`Atividade: ${u.ativ.substring(0,100)}`:'',
+    u.oferece?`Oferece: ${u.oferece}`:'',
+    u.busca?`Busca: ${u.busca}`:'',
+    u.resultado?`Resultado: ${u.resultado}`:'',
+    u.tagsRede&&u.tagsRede.length?`Perfil: ${u.tagsRede.join(', ')}`:'',
+  ].filter(Boolean).join(' | ')||'(perfil não preenchido)';
   const ctxA=membrosA.length?membrosA.map(perfilMembro).join('\n'):'(nenhum membro cadastrado neste segmento)';
   const ctxB=membrosB.length?membrosB.map(perfilMembro).join('\n'):'(nenhum membro cadastrado neste segmento)';
   const aiPrompt=`Você é curador de uma rede de negócios premium chamada IA Hub.
 
 Escreva um texto de sinergia estratégica entre os segmentos "${a}" e "${b}" da rede.
 
-Membros do segmento ${a}:
+Perfis dos membros do segmento ${a}:
 ${ctxA}
 
-Membros do segmento ${b}:
+Perfis dos membros do segmento ${b}:
 ${ctxB}
 
 Escreva 2 a 3 parágrafos que:
-1. Expliquem o complemento real e específico entre esses segmentos (sem clichês genéricos)
-2. Identifiquem que tipo de cliente ou situação dispara a apresentação entre eles
-3. Se houver membros cadastrados, mencione-os pelo nome e como cada um se encaixa na sinergia
+1. Expliquem o complemento REAL e específico entre esses segmentos com base nos perfis acima
+2. Identifiquem que tipo de cliente, momento ou situação dispara a apresentação entre eles
+3. Use os dados de "Oferece", "Busca" e "Resultado" para deixar o texto concreto e não genérico
 
+IMPORTANTE: Não mencione nomes de pessoas. Referencie pelos perfis ("um especialista em tributário", "um profissional com foco em PMEs"). O texto será exibido para todos os membros da rede.
 Seja direto, estratégico e específico. Responda apenas com os parágrafos, sem títulos.`;
   try{
     const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
@@ -3631,6 +3643,26 @@ function matchConexao(con){
       const cMatch=conSegs.some(cs=>synSegs.some(ss=>cs.includes(ss)||ss.includes(cs)));
       if(uMatch&&cMatch){score+=Math.round(25*nw);razoes.push('sinergia: '+syn.a+' ↔ '+syn.b);}
     });
+    // Match por campos oferece/busca (intenção explícita)
+    const conTexto=((con.desc||'')+' '+(con.fitSegs||'')).toLowerCase();
+    const uOferece=(u.oferece||'').toLowerCase();
+    const uBusca=(u.busca||'').toLowerCase();
+    if(uOferece&&conTexto){
+      const hits=uOferece.split(/[\s,]+/).filter(p=>p.length>3&&conTexto.includes(p)).length;
+      if(hits>0){score+=Math.round(20*nw*Math.min(hits,3));razoes.push('oferta alinhada à conexão');}
+    }
+    if(uBusca&&conTexto){
+      const hits=uBusca.split(/[\s,]+/).filter(p=>p.length>3&&((con.seg||'').toLowerCase().includes(p)||conTexto.includes(p))).length;
+      if(hits>0){score+=Math.round(15*nw*Math.min(hits,2));razoes.push('busca ativa no segmento');}
+    }
+    // Bônus por tags do curador
+    if(u.tagsRede&&u.tagsRede.length){
+      if(u.pesoRede)score+=u.pesoRede*3;
+      if(u.tagsRede.includes('investidor')&&conTexto.match(/capta|investimento|aporte|funding|seed|série/)){score+=20;razoes.push('💰 investidor · potencial aporte');}
+      if(u.tagsRede.includes('decisor')&&con.acesso&&con.acesso.match(/C-Level|Diretor|CEO|Owner/)){score+=15;razoes.push('🎯 decisor · acesso direto');}
+      if(u.tagsRede.includes('superconector')){score+=8;razoes.push('🌐 superconector');}
+      if(u.tagsRede.includes('indicador')){score+=5;}
+    }
     // Bônus por hierarquia alta (C-Level / Diretoria = maior valor)
     if(con.acesso&&(con.acesso.includes('C-Level')||con.acesso.includes('Diretoria'))){score+=15;razoes.push('acesso C-Level/Diretoria');}
     if(score>0){
