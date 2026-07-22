@@ -1098,7 +1098,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <!-- Aba 1 -->
     <div id="vit-fsec-ident">
       <div class="fg">
-        <div class="full"><label>Nome do Projeto *</label><input id="vit-f-nome" placeholder="Nome do projeto"></div>
+        <div class="full"><label>Nome do Projeto *</label><input id="vit-f-nome" placeholder="Nome do projeto" oninput="vitAutoSlug(this.value)"></div>
         <div><label>Setor / Vertical</label><input id="vit-f-setor" placeholder="ex: SaaS B2B, Fintech, Saúde"></div>
         <div><label>Estágio</label>
           <select id="vit-f-estagio">
@@ -1164,6 +1164,14 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
         <div><label>Total de cotas</label><input id="vit-f-cotas" type="number" placeholder="50" value="50"></div>
         <div><label>Retorno previsto</label><input id="vit-f-retorno" placeholder="ex: 12% a.a. ou 30% em 24 meses"></div>
         <div><label>Prazo (meses)</label><input id="vit-f-prazo" placeholder="ex: 24"></div>
+        <div class="full" style="margin-top:4px">
+          <label>ID do link público <span style="font-size:10px;color:#9ca3af;font-weight:400">(define a URL compartilhável)</span></label>
+          <div style="display:flex;align-items:center;gap:0;border:1px solid #ddd;border-radius:6px;overflow:hidden;background:#fff">
+            <span style="padding:7px 10px;font-size:11px;color:#9ca3af;background:#f9fafb;border-right:1px solid #eee;white-space:nowrap">?invest=</span>
+            <input id="vit-f-linkid" placeholder="ex: agro-digital" style="flex:1;border:none;padding:7px 10px;font-size:13px;outline:none;font-family:monospace" oninput="this.dataset.manual='1';this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'-').replace(/-+/g,'-')">
+          </div>
+          <div style="font-size:11px;color:#9ca3af;margin-top:3px">Apenas letras, números e hífens. Deixe em branco para gerar automaticamente.</div>
+        </div>
         <div class="full fg-sec">Uso dos Recursos <button class="btn-s btn-sm" onclick="addVitUso()" style="margin-left:8px">+ Linha</button></div>
         <div class="full" id="vit-uso-list"></div>
       </div>
@@ -4868,12 +4876,26 @@ Escreva em português brasileiro. Seja específico para o setor informado.`;
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 function vitUID(){return 'vp'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+function vitSlugify(s){return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40);}
+function vitAutoSlug(nome){
+  const el=document.getElementById('vit-f-linkid');
+  if(!el||el.dataset.manual==='1')return;
+  el.value=vitSlugify(nome);
+}
+function vitSlugUnique(slug){
+  const existing=projetosVitrine.filter(p=>p.publicToken===slug&&p.id!==_vitEditId);
+  if(!existing.length)return slug;
+  return slug+'-'+Math.random().toString(36).slice(2,5);
+}
 
 function vitPublicLink(id){
   const p=projetosVitrine.find(p=>p.id===id);if(!p)return;
-  if(!p.publicToken){p.publicToken='vi'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);saveData();syncToSupabase();}
+  if(!p.publicToken){p.publicToken=vitSlugUnique(vitSlugify(p.nome||vitUID()));saveData();syncToSupabase();}
   const url=location.origin+location.pathname+'?invest='+p.publicToken;
-  navigator.clipboard.writeText(url).then(()=>showToast('🔗 Link copiado!'),()=>prompt('Copie o link:',url));
+  navigator.clipboard.writeText(url).then(
+    ()=>showToast('🔗 Link copiado — ?invest='+p.publicToken),
+    ()=>prompt('Copie o link:',url)
+  );
 }
 
 function renderPublicPage(p){
@@ -5141,6 +5163,8 @@ function openVitProj(id){
   document.getElementById('vit-f-pcthub').value=vn('pctIAHub')||50;
   document.getElementById('vit-f-cotas').value=vn('cotas')||50;
   const teseEl=document.getElementById('vit-f-tese');if(teseEl)teseEl.value=p?(p.teseCurador||''):'';
+  const linkEl=document.getElementById('vit-f-linkid');
+  if(linkEl){linkEl.value=p?(p.publicToken||vitSlugify(p.nome||'')):'';linkEl.dataset.manual=p&&p.publicToken?'1':'';}
   _vitTimeSet(p?p.time||[]:[]);
   _vitUsoSet(p?p.usoRecursos||[]:[{desc:'Tecnologia & Produto',pct:60},{desc:'Comercial & Marketing',pct:25},{desc:'Operações',pct:15}]);
   _vitFAQSet(p?p.faq||[]:[]);
@@ -5184,6 +5208,8 @@ function saveVitProj(){
     time:_vitTime.filter(m=>m.nome),usoRecursos:_vitUso.filter(u=>u.desc),
     faq:_vitFAQ.filter(f=>f.pergunta),docs:_vitDocs.filter(d=>d.titulo),
   };
+  const rawSlug=g('vit-f-linkid')||vitSlugify(nome);
+  data.publicToken=vitSlugUnique(rawSlug||vitUID());
   if(_vitEditId){
     const i=projetosVitrine.findIndex(p=>p.id===_vitEditId);
     if(i>=0)projetosVitrine[i]={...projetosVitrine[i],...data};
