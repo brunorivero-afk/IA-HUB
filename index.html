@@ -54,6 +54,11 @@ body{font-family:system-ui,sans-serif;background:#f5f5f3;color:#1a1a1a;font-size
 .user-menu button{display:block;width:100%;text-align:left;padding:10px 14px;background:none;border:none;cursor:pointer;font-size:13px;color:#0a1628;}
 .user-menu button:hover{background:#f5f5f3;}
 .user-menu-sep{border:none;border-top:1px solid #eee;margin:3px 0;}
+.tag-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid #e2e8f0;background:#f8fafc;color:#475569;user-select:none;transition:all .15s;}
+.tag-chip:has(input:checked){background:#ede9fe;border-color:#7c3aed;color:#5b21b6;font-weight:600;}
+.tag-chip input{display:none;}
+.peso-star{font-size:20px;background:none;border:none;cursor:pointer;padding:1px;line-height:1;transition:transform .1s;}
+.peso-star:hover{transform:scale(1.2);}
 .notif-btn{position:relative;background:#f5f5f3;border:1px solid #eee;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;}
 .notif-count{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;display:flex;align-items:center;justify-content:center;font-weight:700;}
 
@@ -603,8 +608,22 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
           <input id="u-spec-adv-val" placeholder="Ex: Direito Empresarial, Tributário, Trabalhista..."></div>
         <div id="u-spec-cont" style="display:none"><label>Especialização contábil</label>
           <input id="u-spec-cont-val" placeholder="Ex: Tributário, Auditoria, Contabilidade Rural..."></div>
+        <div id="u-spec-eng" style="display:none"><label>Área de engenharia</label>
+          <input id="u-spec-eng-val" placeholder="Ex: Civil, Software, Elétrica, Mecânica, Ambiental..."></div>
+        <div id="u-spec-corr" style="display:none"><label>Tipo de corretagem</label>
+          <input id="u-spec-corr-val" placeholder="Ex: Imóveis, Seguros, Investimentos, Câmbio..."></div>
+        <div id="u-spec-consul" style="display:none"><label>Área de consultoria</label>
+          <input id="u-spec-consul-val" placeholder="Ex: Estratégia, Marketing, RH, TI, Fiscal, Processos..."></div>
+        <div id="u-spec-dent" style="display:none"><label>Especialidade odontológica</label>
+          <input id="u-spec-dent-val" placeholder="Ex: Ortodontia, Implantodontia, Estética, Endodontia..."></div>
+        <div id="u-spec-psico" style="display:none"><label>Área de psicologia</label>
+          <input id="u-spec-psico-val" placeholder="Ex: Clínica, Organizacional, Coaching, Neuropsicologia..."></div>
       </div>
       <div class="full"><label>Descrição das atividades</label><textarea id="u-ativ" placeholder="Serviços, público-alvo, proposta de valor..."></textarea></div>
+      <div class="fg-sec">Presença na rede</div>
+      <div><label>O que você oferece</label><input id="u-oferece" placeholder="Ex: Contratos, planejamento tributário, introductions..."></div>
+      <div><label>O que você busca</label><input id="u-busca" placeholder="Ex: Clientes PME, parceiro técnico, investidor..."></div>
+      <div class="full"><label>Maior resultado recente <span style="font-size:10px;font-weight:400;color:#aaa">(1 frase)</span></label><input id="u-resultado" placeholder="Ex: Reduzi 40% da carga tributária de 12 clientes em 2024"></div>
       <div class="fg-sec" id="u-sec-acesso">Perfil e acesso</div>
       <div id="u-perfil-wrap"><label>Perfil</label>
         <select id="u-perfil"><option>Sócio</option><option selected>Associado</option><option>Parceiro</option></select></div>
@@ -640,6 +659,33 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
           <input id="u-comissao-obs" placeholder="Ex: 20% sobre projetos trazidos por ele..." style="padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;width:100%;margin-top:4px"></div>
       </div>
       <div class="full"><label>Observações internas</label><textarea id="u-obs" placeholder="Visível apenas para sócios..."></textarea></div>
+      <!-- SEÇÃO CURADOR — só aparece quando sócio edita outro membro -->
+      <div id="u-curator-wrap" class="full" style="display:none;background:#faf5ff;border:1px solid #e9d5ff;border-radius:12px;padding:14px;margin-top:4px">
+        <div style="font-size:11px;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">🎖 Qualificação do Curador <span style="font-weight:400;opacity:.6;text-transform:none;letter-spacing:0">(privado)</span></div>
+        <div style="margin-bottom:12px">
+          <label style="font-size:12px;color:#555;display:block;margin-bottom:6px">Perfil de valor na rede</label>
+          <div id="u-tags-wrap" style="display:flex;flex-wrap:wrap;gap:6px">
+            <label class="tag-chip"><input type="checkbox" value="investidor"> 💰 Investidor</label>
+            <label class="tag-chip"><input type="checkbox" value="superconector"> 🌐 Superconector</label>
+            <label class="tag-chip"><input type="checkbox" value="autoridade"> 🏆 Autoridade</label>
+            <label class="tag-chip"><input type="checkbox" value="decisor"> 🎯 Decisor</label>
+            <label class="tag-chip"><input type="checkbox" value="influenciador"> 📣 Influenciador</label>
+            <label class="tag-chip"><input type="checkbox" value="indicador"> 🤝 Indicador ativo</label>
+            <label class="tag-chip"><input type="checkbox" value="serial"> 🏗 Empreendedor serial</label>
+            <label class="tag-chip"><input type="checkbox" value="nacional"> 🌍 Alcance nacional</label>
+            <label class="tag-chip"><input type="checkbox" value="mentor"> 🤲 Mentor</label>
+            <label class="tag-chip"><input type="checkbox" value="captador"> 💼 Captador de recursos</label>
+          </div>
+        </div>
+        <div style="margin-bottom:12px">
+          <label style="font-size:12px;color:#555;display:block;margin-bottom:4px">Peso na rede</label>
+          <div id="u-peso-stars" style="display:flex;gap:2px"></div>
+        </div>
+        <div>
+          <label style="font-size:12px;color:#555;display:block;margin-bottom:4px">Nota privada <span style="opacity:.6">(só você vê)</span></label>
+          <textarea id="u-nota-curador" placeholder="Ex: Ex-sócio da XP. Busca tese em healthtech. Conhece o Gustavo da Vivo." style="height:60px;width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px;resize:vertical"></textarea>
+        </div>
+      </div>
     </div>
     <div class="modal-btns">
       <button class="btn-s" onclick="closeOv('ov-usr')">Cancelar</button>
@@ -1349,6 +1395,14 @@ function doLogout(){currentUser=null;showScreen('login');}
 function toggleUserMenu(e){e.stopPropagation();document.getElementById('user-menu').classList.toggle('open');}
 function closeUserMenu(){document.getElementById('user-menu').classList.remove('open');}
 document.addEventListener('click',function(){closeUserMenu();});
+let _pesoRede=0;
+function renderPesoStars(val){
+  const wrap=document.getElementById('u-peso-stars');if(!wrap)return;
+  const labels=['','Perfil básico','Potencial razoável','Valor relevante','Muito valioso','Ativo estratégico'];
+  wrap.innerHTML=[1,2,3,4,5].map(i=>`<button type="button" class="peso-star" onclick="setPesoRede(${i})" title="${i} — ${labels[i]}">${i<=val?'⭐':'☆'}</button>`).join('')
+    +(val?`<span style="font-size:12px;color:#7c3aed;margin-left:8px;align-self:center">${labels[val]}</span>`:'');
+}
+function setPesoRede(v){_pesoRede=(_pesoRede===v)?0:v;renderPesoStars(_pesoRede);}
 function isSocio(){return currentUser&&currentUser.perfil==='Sócio';}
 function initials(n){const p=(n||'?').trim().split(' ');return(p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();}
 
@@ -1996,17 +2050,26 @@ function updateSpecFields(){
   const isMed=seg.includes('médic')||seg.includes('medic');
   const isAdv=seg.includes('advog');
   const isCont=seg.includes('contabil')||seg.includes('contador');
-  const anySpec=isMed||isAdv||isCont;
+  const isEng=seg.includes('engenh');
+  const isCorr=seg.includes('correto');
+  const isConsul=seg.includes('consul');
+  const isDent=seg.includes('denti')||seg.includes('odont');
+  const isPsico=seg.includes('psicol')||seg.includes('psico');
+  const anySpec=isMed||isAdv||isCont||isEng||isCorr||isConsul||isDent||isPsico;
   const wrap=document.getElementById('u-spec-wrap');if(wrap)wrap.style.display=anySpec?'block':'none';
-  const elMed=document.getElementById('u-spec-medico');if(elMed)elMed.style.display=isMed?'block':'none';
-  const elAdv=document.getElementById('u-spec-adv');if(elAdv)elAdv.style.display=isAdv?'block':'none';
-  const elCont=document.getElementById('u-spec-cont');if(elCont)elCont.style.display=isCont?'block':'none';
+  const show=(id,v)=>{const el=document.getElementById(id);if(el)el.style.display=v?'block':'none';};
+  show('u-spec-medico',isMed);show('u-spec-adv',isAdv);show('u-spec-cont',isCont);
+  show('u-spec-eng',isEng);show('u-spec-corr',isCorr);show('u-spec-consul',isConsul);
+  show('u-spec-dent',isDent);show('u-spec-psico',isPsico);
 }
 function openAddUsr(){
   editUsrId=null;
   document.getElementById('usr-modal-ttl').textContent='Novo membro';
-  ['u-nome','u-emp','u-email','u-tel','u-seg','u-ativ','u-obs','u-senha','u-comissao','u-comissao-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  ['u-spec-medico-val','u-spec-adv-val','u-spec-cont-val'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['u-nome','u-emp','u-email','u-tel','u-seg','u-ativ','u-obs','u-senha','u-comissao','u-comissao-obs','u-oferece','u-busca','u-resultado','u-nota-curador'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['u-spec-medico-val','u-spec-adv-val','u-spec-cont-val','u-spec-eng-val','u-spec-corr-val','u-spec-consul-val','u-spec-dent-val','u-spec-psico-val'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.querySelectorAll('#u-tags-wrap input[type=checkbox]').forEach(cb=>cb.checked=false);
+  _pesoRede=0;renderPesoStars(0);
+  document.getElementById('u-curator-wrap').style.display='none';
   updateSpecFields();
   document.getElementById('u-perfil').value='Associado';
   document.getElementById('u-tipo').value='PJ';
@@ -2042,6 +2105,21 @@ function openEditUsr(id){
   const sm=document.getElementById('u-spec-medico-val');if(sm)sm.value=u.especMedico||'';
   const sa=document.getElementById('u-spec-adv-val');if(sa)sa.value=u.especAdv||'';
   const sc2=document.getElementById('u-spec-cont-val');if(sc2)sc2.value=u.especCont||'';
+  const specMap={eng:'especEng',corr:'especCorr',consul:'especConsul',dent:'especDent',psico:'especPsico'};
+  Object.entries(specMap).forEach(([k,f])=>{const el=document.getElementById('u-spec-'+k+'-val');if(el)el.value=u[f]||'';});
+  // campos self-reported
+  const so=document.getElementById('u-oferece');if(so)so.value=u.oferece||'';
+  const sb=document.getElementById('u-busca');if(sb)sb.value=u.busca||'';
+  const sr=document.getElementById('u-resultado');if(sr)sr.value=u.resultado||'';
+  // seção do curador — só para sócios editando outro membro
+  const isCuradorEdit=isSocio()&&id!==currentUser?.id;
+  const cw=document.getElementById('u-curator-wrap');if(cw)cw.style.display=isCuradorEdit?'block':'none';
+  if(isCuradorEdit){
+    const tags=u.tagsRede||[];
+    document.querySelectorAll('#u-tags-wrap input[type=checkbox]').forEach(cb=>cb.checked=tags.includes(cb.value));
+    _pesoRede=u.pesoRede||0;renderPesoStars(_pesoRede);
+    const nc=document.getElementById('u-nota-curador');if(nc)nc.value=u.notaCurador||'';
+  }
   updateSpecFields();
   document.getElementById('ov-usr').classList.add('open');
 }
@@ -2074,6 +2152,19 @@ function saveUsr(){
     especMedico:(document.getElementById('u-spec-medico-val')||{value:''}).value.trim()||undefined,
     especAdv:(document.getElementById('u-spec-adv-val')||{value:''}).value.trim()||undefined,
     especCont:(document.getElementById('u-spec-cont-val')||{value:''}).value.trim()||undefined,
+    especEng:(document.getElementById('u-spec-eng-val')||{value:''}).value.trim()||undefined,
+    especCorr:(document.getElementById('u-spec-corr-val')||{value:''}).value.trim()||undefined,
+    especConsul:(document.getElementById('u-spec-consul-val')||{value:''}).value.trim()||undefined,
+    especDent:(document.getElementById('u-spec-dent-val')||{value:''}).value.trim()||undefined,
+    especPsico:(document.getElementById('u-spec-psico-val')||{value:''}).value.trim()||undefined,
+    oferece:(document.getElementById('u-oferece')||{value:''}).value.trim()||undefined,
+    busca:(document.getElementById('u-busca')||{value:''}).value.trim()||undefined,
+    resultado:(document.getElementById('u-resultado')||{value:''}).value.trim()||undefined,
+    ...(isSocio()&&editUsrId&&editUsrId!==currentUser?.id?{
+      tagsRede:[...document.querySelectorAll('#u-tags-wrap input[type=checkbox]:checked')].map(cb=>cb.value),
+      pesoRede:_pesoRede||undefined,
+      notaCurador:(document.getElementById('u-nota-curador')||{value:''}).value.trim()||undefined,
+    }:{}),
     desde:today};
   // strip undefined
   Object.keys(obj).forEach(k=>obj[k]===undefined&&delete obj[k]);
