@@ -183,6 +183,8 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 .syn-card{background:#fff;border:1px solid #eee;border-radius:12px;padding:14px;}
 .syn-hdr{display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap;}
 .syn-why{font-size:13px;color:#555;line-height:1.6;}
+.syn-why-clip{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;}
+.btn-leia-mais{background:none;border:none;color:#7c3aed;font-size:11px;font-weight:700;cursor:pointer;padding:3px 0 0;letter-spacing:.02em;}
 .syn-ppl{font-size:12px;color:#888;margin-bottom:6px;}
 
 /* ===== RELATÓRIO ===== */
@@ -2766,8 +2768,9 @@ async function enriquecerTodasSinergias(){
   for(let idx=0;idx<alvo.length;idx++){
     const s=alvo[idx];
     btn.textContent=`⏳ ${idx+1}/${alvo.length}...`;
-    const membrosA=users.filter(u=>u.status==='Ativo'&&(u.seg||'').split(',').map(x=>x.trim()).includes(s.a));
-    const membrosB=users.filter(u=>u.status==='Ativo'&&(u.seg||'').split(',').map(x=>x.trim()).includes(s.b));
+    const saL=s.a.toLowerCase(),sbL=s.b.toLowerCase();
+    const membrosA=users.filter(u=>u.status==='Ativo'&&(u.seg||'').toLowerCase().split(',').map(x=>x.trim()).some(x=>x.includes(saL)||saL.includes(x)));
+    const membrosB=users.filter(u=>u.status==='Ativo'&&(u.seg||'').toLowerCase().split(',').map(x=>x.trim()).some(x=>x.includes(sbL)||sbL.includes(x)));
     const ctxA=membrosA.length?membrosA.map(perfilMembro).join('\n'):'(segmento sem membros detalhados)';
     const ctxB=membrosB.length?membrosB.map(perfilMembro).join('\n'):'(segmento sem membros detalhados)';
     const angulo=angulos[(s.id||idx)%angulos.length];
@@ -2833,7 +2836,8 @@ function renderSin(){
         <span class="badge" style="margin-left:auto;background:${syn.p==='alta'?'#E1F5EE':'#EEEDFE'};color:${syn.p==='alta'?'#085041':'#3C3489'}">${syn.p==='alta'?'Alta':'Média'}</span>
       </div>
       ${ppl.length?`<div class="syn-ppl">${ppl.map(n=>`<span class="chip">${n}</span>`).join('')}</div>`:''}
-      <div class="syn-why">${syn.why}</div>
+      <div class="syn-why syn-why-clip" id="sw-${syn.id}">${syn.why}</div>
+      <button class="btn-leia-mais" onclick="toggleSynWhy(${syn.id})">↓ leia mais</button>
       ${syn.note&&isSocio()?`<div style="background:#0a1628;color:#e2e8f0;border-radius:8px;padding:9px 12px;margin-top:8px;font-size:12px;line-height:1.6"><span style="font-size:10px;font-weight:700;letter-spacing:.08em;opacity:.7;text-transform:uppercase">IA Hub</span><br>${syn.note}</div>`:''}
       ${editBtn}
     </div>`;
@@ -2925,6 +2929,12 @@ function saveSin(){
   closeOv('ov-sin');renderSin();saveData();
 }
 function removeSin(id){if(!confirm('Remover sinergia?'))return;sinergias=sinergias.filter(s=>s.id!==id);renderSin();saveData();}
+function toggleSynWhy(id){
+  const el=document.getElementById('sw-'+id);
+  const btn=el.nextElementSibling;
+  const clipped=el.classList.toggle('syn-why-clip');
+  btn.textContent=clipped?'↓ leia mais':'↑ fechar';
+}
 
 // ===================== PIPELINE =====================
 let _pipDragId=null;
