@@ -552,6 +552,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
         <select id="syn-seg" onchange="renderSin()"><option value="">Todos os segmentos</option></select>
         <button class="btn-p" id="btn-nova-sin" style="display:none" onclick="openAddSin()">+ Nova sinergia</button>
         <button class="btn-p" id="btn-regen-sin" style="display:none;background:#e8f0ff;color:#2554C7;border:1.5px solid #2554C7" onclick="regenerarSinBtn()">⚡ Regenerar</button>
+        <button class="btn-p" id="btn-enrich-sin" style="display:none;background:#f5f0ff;color:#6d28d9;border:1.5px solid #7c3aed" onclick="enriquecerTodasSinergias()">✨ Enriquecer todas com IA</button>
       </div>
       <div class="syn-grid" id="syn-grid"></div>
     </div>
@@ -2734,10 +2735,89 @@ function regenerarSinBtn(){
   showToast(`✅ ${n} sinergias geradas automaticamente.`);
 }
 
+async function enriquecerTodasSinergias(){
+  let key=localStorage.getItem('groq_key');
+  if(!key){
+    const k=window.prompt('Cole sua Groq API key (console.groq.com):','');
+    if(!k||!k.trim())return;
+    localStorage.setItem('groq_key',k.trim());key=k.trim();
+  }
+  const alvo=sinergias.filter(s=>s.auto);
+  if(!alvo.length){showToast('Nenhuma sinergia automática para enriquecer.');return;}
+  if(!confirm(`Enriquecer ${alvo.length} sinergias com IA?\nLeva ~${alvo.length*3} segundos. As notas pessoais serão mantidas.`))return;
+  const btn=document.getElementById('btn-enrich-sin');
+  btn.disabled=true;
+  const angulos=[
+    'Foque no gatilho: qual situação concreta do cliente de um segmento gera necessidade imediata do outro? Seja específico e direto.',
+    'Foque no cliente em comum: que tipo de empresa ou pessoa se beneficia dos dois segmentos ao mesmo tempo? Explore o cenário real.',
+    'Foque na complementaridade técnica: que conhecimento ou serviço de cada lado preenche uma lacuna do outro? Mostre o valor cruzado.',
+    'Foque na indicação estratégica: quem indica quem, em qual momento e por quê? Dê exemplos de situação.',
+    'Foque em um projeto conjunto: o que os dois segmentos poderiam construir ou ofertar juntos para um cliente? Seja concreto.'
+  ];
+  const perfilMembro=u=>[
+    u.emp&&u.emp!=='?'?`Empresa: ${u.emp}`:'',
+    u.ativ?`Atividade: ${u.ativ.substring(0,80)}`:'',
+    u.oferece?`Oferece: ${u.oferece}`:'',
+    u.busca?`Busca: ${u.busca}`:'',
+    u.resultado?`Resultado recente: ${u.resultado}`:'',
+    u.tagsRede&&u.tagsRede.length?`Perfil: ${u.tagsRede.join(', ')}`:'',
+  ].filter(Boolean).join(' | ')||'(sem perfil detalhado)';
+  let ok=0,erros=0;
+  for(let idx=0;idx<alvo.length;idx++){
+    const s=alvo[idx];
+    btn.textContent=`⏳ ${idx+1}/${alvo.length}...`;
+    const membrosA=users.filter(u=>u.status==='Ativo'&&(u.seg||'').split(',').map(x=>x.trim()).includes(s.a));
+    const membrosB=users.filter(u=>u.status==='Ativo'&&(u.seg||'').split(',').map(x=>x.trim()).includes(s.b));
+    const ctxA=membrosA.length?membrosA.map(perfilMembro).join('\n'):'(segmento sem membros detalhados)';
+    const ctxB=membrosB.length?membrosB.map(perfilMembro).join('\n'):'(segmento sem membros detalhados)';
+    const angulo=angulos[(s.id||idx)%angulos.length];
+    const prompt=`Você é curador de uma rede de negócios premium chamada IA Hub Connect.
+
+Escreva um texto de sinergia entre "${s.a}" e "${s.b}". ${angulo}
+
+Perfis de ${s.a}:
+${ctxA}
+
+Perfis de ${s.b}:
+${ctxB}
+
+Regras:
+- 2 parágrafos curtos e densos, sem títulos
+- Não mencione nomes de pessoas — referencie por perfil ("um especialista em...", "quem atua com...")
+- Evite frases genéricas como "indicações cruzadas" ou "ampliação de carteira"
+- Seja específico ao contexto desses segmentos e desses perfis
+- Tom direto, estratégico, como se estivesse explicando a um sócio por que essa conexão vale a pena`;
+    try{
+      const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+        body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:prompt}],temperature:0.85,max_tokens:400})
+      });
+      const data=await res.json();
+      if(data.error)throw new Error(data.error.message);
+      const txt=(data.choices?.[0]?.message?.content||'').trim();
+      if(txt){
+        const i=sinergias.findIndex(x=>x.id===s.id);
+        if(i>=0)sinergias[i].why=txt;
+        ok++;
+      }
+    }catch(e){
+      erros++;
+      if(e.message?.includes('401')){localStorage.removeItem('groq_key');showToast('⚠ Key inválida — processo interrompido.');break;}
+    }
+    // Pausa entre chamadas para não estourar rate limit
+    if(idx<alvo.length-1)await new Promise(r=>setTimeout(r,1200));
+  }
+  saveData();syncToSupabase();renderSin();
+  btn.disabled=false;btn.textContent='✨ Enriquecer todas com IA';
+  showToast(`✅ ${ok} sinergias enriquecidas${erros?` · ${erros} com erro`:''}. Revise e adicione sua nota pessoal em cada uma.`);
+}
+
 function renderSin(){
   autoUpdateSinergiaPpl();
   document.getElementById('btn-nova-sin').style.display=isSocio()?'inline-block':'none';
   document.getElementById('btn-regen-sin').style.display=isSocio()?'inline-block':'none';
+  document.getElementById('btn-enrich-sin').style.display=isSocio()?'inline-block':'none';
   const f=document.getElementById('syn-f').value;
   const seg=document.getElementById('syn-seg').value;
   const list=sinergias.filter(s=>(!f||f==='all'||s.p===f)&&(!seg||(s.a===seg||s.b===seg)));
