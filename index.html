@@ -5056,6 +5056,7 @@ function renderVitrine(){
       <option value="encerrado"${sf==='encerrado'?' selected':''}>Encerrado</option>
     </select>
     <button class="btn-s" onclick="document.getElementById('ov-vit-manifesto').classList.add('open')">📜 Manifesto</button>
+    ${isSocio()?`<button class="btn-s" onclick="configGroqKey()" title="Configurar chave da IA">⚙ IA</button>`:''}
     ${isSocio()?'<button class="btn-p" onclick="openVitProj(null)">+ Novo Projeto</button>':''}
   </div>
   <div id="vit-list">${list.length?list.map(vitCardHTML).join(''):'<div class="empty-msg">Nenhum projeto cadastrado. Clique em "+ Novo Projeto" para começar.</div>'}</div>`;
@@ -5554,11 +5555,13 @@ injectLogos();
 (async()=>{
   const investToken=new URLSearchParams(location.search).get('invest');
   if(investToken){
-    // Public page: load data without auth and render
-    const loaded=await loadFromSupabase();
-    const proj=(loaded?projetosVitrine:JSON.parse(localStorage.getItem('iahub_data')||'{}').projetosVitrine||[])
-      .find(p=>p.publicToken===investToken);
+    await loadFromSupabase();
+    const proj=projetosVitrine.find(p=>p.publicToken===investToken);
     if(proj){renderPublicPage(proj);return;}
+    // Token not found — show friendly error
+    document.body.style.cssText='margin:0;padding:0;background:#f0efe9;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;';
+    document.body.innerHTML=`<div style="text-align:center;padding:40px 20px"><div style="font-size:32px;margin-bottom:16px">🔍</div><div style="font-size:18px;font-weight:700;color:#0a1628;margin-bottom:8px">Projeto não encontrado</div><div style="font-size:14px;color:#6b7280;max-width:320px">Este link pode ter expirado ou o projeto não está mais disponível.<br><br>Entre em contato com o curador para solicitar acesso.</div></div>`;
+    return;
   }
   const loaded=await loadFromSupabase();
   if(loaded){
