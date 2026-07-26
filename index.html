@@ -2780,12 +2780,17 @@ async function enriquecerTodasSinergias(){
   if(!confirm(`Enriquecer ${alvo.length} sinergias com IA?\nLeva ~${alvo.length*3} segundos. As notas pessoais serão mantidas.`))return;
   const btn=document.getElementById('btn-enrich-sin');
   btn.disabled=true;
-  const angulos=[
-    'Foque no gatilho: qual situação concreta do cliente de um segmento gera necessidade imediata do outro? Seja específico e direto.',
-    'Foque no cliente em comum: que tipo de empresa ou pessoa se beneficia dos dois segmentos ao mesmo tempo? Explore o cenário real.',
-    'Foque na complementaridade técnica: que conhecimento ou serviço de cada lado preenche uma lacuna do outro? Mostre o valor cruzado.',
-    'Foque na indicação estratégica: quem indica quem, em qual momento e por quê? Dê exemplos de situação.',
-    'Foque em um projeto conjunto: o que os dois segmentos poderiam construir ou ofertar juntos para um cliente? Seja concreto.'
+  const formatos=[
+    {instrucao:'Abra com uma situação real do cliente — algo que aconteceu ou está acontecendo — que força a necessidade dos dois profissionais ao mesmo tempo. Primeira frase: o cenário. Segunda: por que os dois.',
+     proibido:'Não comece com o nome dos segmentos nem com "X e Y são complementares".'},
+    {instrucao:'Abra identificando a fronteira: o ponto exato onde o trabalho de um termina e o do outro começa. Mostre que saber essa fronteira é o que transforma um colega em parceiro estratégico.',
+     proibido:'Não comece com introdução genérica. Vá direto à fronteira.'},
+    {instrucao:'Abra pelo resultado — o que o cliente ganha quando os dois trabalham juntos que nenhum entregaria sozinho. Construa de trás pra frente: resultado → por que cada um contribui.',
+     proibido:'Não descreva os segmentos antes do resultado. O resultado vem primeiro.'},
+    {instrucao:'Abra com o momento certo da apresentação: a situação específica em que um ligaria para o outro. Não o que eles fazem — quando e por que um chama o outro.',
+     proibido:'Não explique o que cada segmento faz. Foque no gatilho da apresentação.'},
+    {instrucao:'Abra com um ângulo inesperado ou contra-intuitivo sobre esse par. Algo que surpreende quem está lendo — uma conexão que não parece óbvia mas faz total sentido quando explicada.',
+     proibido:'Evite o óbvio. Se a conexão parece trivial, procure o ângulo que não seria.'},
   ];
   const perfilMembro=u=>[
     u.emp&&u.emp!=='?'?`Empresa: ${u.emp}`:'',
@@ -2804,23 +2809,20 @@ async function enriquecerTodasSinergias(){
     const membrosB=users.filter(u=>u.status==='Ativo'&&(u.seg||'').toLowerCase().split(',').map(x=>x.trim()).some(x=>x.includes(sbL)||sbL.includes(x)));
     const ctxA=membrosA.length?membrosA.map(perfilMembro).join('\n'):'(segmento sem membros detalhados)';
     const ctxB=membrosB.length?membrosB.map(perfilMembro).join('\n'):'(segmento sem membros detalhados)';
-    const angulo=angulos[(s.id||idx)%angulos.length];
-    const prompt=`Você é curador de uma rede de negócios premium chamada IA Hub Connect.
+    const fmt=formatos[(s.id||idx)%formatos.length];
+    const prompt=`Você é curador sênior de uma rede de negócios chamada IA Hub Connect. Escreva o texto de sinergia entre "${s.a}" e "${s.b}".
 
-Escreva um texto de sinergia entre "${s.a}" e "${s.b}". ${angulo}
+INSTRUÇÃO DE ESTRUTURA: ${fmt.instrucao}
+PROIBIDO: ${fmt.proibido}
+TAMBÉM PROIBIDO: Começar com "${s.a}" ou "${s.b}" como sujeito da primeira frase. Proibido usar as expressões "indicações cruzadas", "ampliação de carteira", "sinergias naturais", "se complementam" na abertura.
 
-Perfis de ${s.a}:
+Perfis reais de ${s.a}:
 ${ctxA}
 
-Perfis de ${s.b}:
+Perfis reais de ${s.b}:
 ${ctxB}
 
-Regras:
-- 2 parágrafos curtos e densos, sem títulos
-- Não mencione nomes de pessoas — referencie por perfil ("um especialista em...", "quem atua com...")
-- Evite frases genéricas como "indicações cruzadas" ou "ampliação de carteira"
-- Seja específico ao contexto desses segmentos e desses perfis
-- Tom direto, estratégico, como se estivesse explicando a um sócio por que essa conexão vale a pena`;
+FORMATO: 2 parágrafos curtos e densos. Sem títulos. Sem bullet points. Não mencione nomes de pessoas — use o perfil ("quem atua com tributário", "o profissional de construção"). Use os dados acima para ser concreto — se não há dados, invente um cenário plausível para esse par específico.`;
     try{
       const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
         method:'POST',
@@ -2866,7 +2868,7 @@ function renderSin(){
         <span class="badge" style="background:${cb.bg};color:${cb.tx}">${syn.b}</span>
         <span class="badge" style="margin-left:auto;background:${syn.p==='alta'?'#E1F5EE':'#EEEDFE'};color:${syn.p==='alta'?'#085041':'#3C3489'}">${syn.p==='alta'?'Alta':'Média'}</span>
       </div>
-      ${ppl.length?`<div class="syn-ppl">${ppl.map(n=>`<span class="chip">${n}</span>`).join('')}</div>`:''}
+      ${ppl.length&&currentUser?.perfil!=='Parceiro'?`<div class="syn-ppl">${ppl.map(n=>`<span class="chip">${n}</span>`).join('')}</div>`:''}
       <div class="syn-why syn-why-clip" id="sw-${syn.id}">${syn.why}</div>
       <button class="btn-leia-mais" onclick="toggleSynWhy(${syn.id})">↓ leia mais</button>
       ${syn.note&&isSocio()?`<div style="background:#0a1628;color:#e2e8f0;border-radius:8px;padding:9px 12px;margin-top:8px;font-size:12px;line-height:1.6"><span style="font-size:10px;font-weight:700;letter-spacing:.08em;opacity:.7;text-transform:uppercase">IA Hub</span><br>${syn.note}</div>`:''}
@@ -2901,23 +2903,25 @@ async function enriquecerSinergia(){
   ].filter(Boolean).join(' | ')||'(perfil não preenchido)';
   const ctxA=membrosA.length?membrosA.map(perfilMembro).join('\n'):'(nenhum membro cadastrado neste segmento)';
   const ctxB=membrosB.length?membrosB.map(perfilMembro).join('\n'):'(nenhum membro cadastrado neste segmento)';
-  const aiPrompt=`Você é curador de uma rede de negócios premium chamada IA Hub.
+  const fmtsSingle=[
+    {instrucao:`Abra com uma situação real do cliente que força a necessidade dos dois ao mesmo tempo. Primeira frase: o cenário. Segunda: por que os dois profissionais precisam estar juntos.`,proibido:`Não comece com o nome dos segmentos nem com "${a} e ${b} são complementares".`},
+    {instrucao:`Abra pelo resultado: o que o cliente ganha quando os dois trabalham juntos que nenhum entregaria sozinho. Construa de trás pra frente.`,proibido:`Não descreva os segmentos antes do resultado.`},
+    {instrucao:`Abra com o momento exato da apresentação — quando e por que um profissional chama o outro. Não o que fazem, mas o gatilho.`,proibido:`Não explique o que cada segmento faz na abertura.`},
+  ];
+  const fmtS=fmtsSingle[Math.floor(Math.random()*fmtsSingle.length)];
+  const aiPrompt=`Você é curador sênior de uma rede de negócios chamada IA Hub Connect. Escreva o texto de sinergia entre "${a}" e "${b}".
 
-Escreva um texto de sinergia estratégica entre os segmentos "${a}" e "${b}" da rede.
+INSTRUÇÃO DE ESTRUTURA: ${fmtS.instrucao}
+PROIBIDO: ${fmtS.proibido}
+TAMBÉM PROIBIDO: Começar com "${a}" ou "${b}" como sujeito. Proibido: "indicações cruzadas", "se complementam", "sinergias naturais".
 
-Perfis dos membros do segmento ${a}:
+Perfis reais de ${a}:
 ${ctxA}
 
-Perfis dos membros do segmento ${b}:
+Perfis reais de ${b}:
 ${ctxB}
 
-Escreva 2 a 3 parágrafos que:
-1. Expliquem o complemento REAL e específico entre esses segmentos com base nos perfis acima
-2. Identifiquem que tipo de cliente, momento ou situação dispara a apresentação entre eles
-3. Use os dados de "Oferece", "Busca" e "Resultado" para deixar o texto concreto e não genérico
-
-IMPORTANTE: Não mencione nomes de pessoas. Referencie pelos perfis ("um especialista em tributário", "um profissional com foco em PMEs"). O texto será exibido para todos os membros da rede.
-Seja direto, estratégico e específico. Responda apenas com os parágrafos, sem títulos.`;
+FORMATO: 2 parágrafos curtos e densos. Sem títulos. Sem listas. Não mencione nomes de pessoas — use o perfil. Use os dados acima para ser concreto.`;
   try{
     const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',
