@@ -11,8 +11,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:system-ui,sans-serif;background:#f5f5f3;color:#1a1a1a;font-size:14px;transition:background .2s,color .2s;}
-:root{--azul:#0891b2;--azul2:#06b6d4;--azul-esc:#0a1628;--verde:#0F6E56;--amber:#854F0B;}
+body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size:14px;transition:background .2s,color .2s;}
+:root{--azul:#0a1628;--azul2:#d4a017;--azul-esc:#0a1628;--verde:#0F6E56;--amber:#d4a017;--amber-dk:#a07810;}
 
 /* ===== DARK MODE ===== */
 [data-theme="dark"]{color-scheme:dark;}
@@ -22,7 +22,7 @@ body{font-family:system-ui,sans-serif;background:#f5f5f3;color:#1a1a1a;font-size
 [data-theme="dark"] .tabs-wrap{background:#13182b;border-color:#1e2a42;}
 [data-theme="dark"] .tab{color:#6b7280;}
 [data-theme="dark"] .tab:hover{color:#e2e8f0;}
-[data-theme="dark"] .tab.active{color:#22d3ee;border-bottom-color:#22d3ee;}
+[data-theme="dark"] .tab.active{color:#d4a017;border-bottom-color:#d4a017;}
 [data-theme="dark"] .app{background:transparent;}
 [data-theme="dark"] .stat,.stat-sub{background:#1a2035;border-color:#1e2a42;}
 [data-theme="dark"] .stat-value{color:#e2e8f0;}
@@ -46,11 +46,11 @@ body{font-family:system-ui,sans-serif;background:#f5f5f3;color:#1a1a1a;font-size
 [data-theme="dark"] .user-menu button{color:#e2e8f0;}
 [data-theme="dark"] .user-menu button:hover{background:#1e2a42;}
 [data-theme="dark"] .notif-btn{background:#1a2035;border-color:#1e2a42;color:#94a3b8;}
-[data-theme="dark"] .btn-s{background:#1a2035;border-color:#3b4e6e;color:#93c5fd;}
+[data-theme="dark"] .btn-s{background:#1a2035;border-color:#3b4e6e;color:#e8c668;}
 [data-theme="dark"] .btn-s:hover{background:#1e2a42;}
 [data-theme="dark"] .btn-leia-mais{color:#818cf8;}
 [data-theme="dark"] .empty-msg{color:#4b5563;}
-[data-theme="dark"] .add-fu-btn{background:#1a2035;border-color:#2554C7;color:#60a5fa;}
+[data-theme="dark"] .add-fu-btn{background:#1a2035;border-color:#d4a017;color:#d4a017;}
 [data-theme="dark"] .vit-card-tese{background:#1e2a42;border-left-color:#d4a017;}
 [data-theme="dark"] .vit-card-meta{background:#131d33;border-color:#1e2a42;}
 [data-theme="dark"] .vit-meta-label{color:#6b7280;}
@@ -68,6 +68,14 @@ body{font-family:system-ui,sans-serif;background:#f5f5f3;color:#1a1a1a;font-size
 [data-theme="dark"] .fin-total-row{background:#131d33;border-color:#2d3748;}
 [data-theme="dark"] #net-box{background:#1a2035;border-color:#1e2a42;}
 [data-theme="dark"] #btn-dark-toggle{background:#1a2035;border-color:#1e2a42;color:#fbbf24;}
+[data-theme="dark"] .btn-p{background:#d4a017;color:#fff;}
+[data-theme="dark"] .btn-p:hover{background:#a07810;}
+[data-theme="dark"] .btn-auth{background:#d4a017;}
+[data-theme="dark"] .btn-auth:hover{background:#a07810;}
+[data-theme="dark"] .badge{background:#1e2a42!important;color:#94a3b8!important;}
+[data-theme="dark"] .fin-grupo-hdr{background:#172032;}
+[data-theme="dark"] .cal-evt{background:#d4a017;color:#fff;}
+[data-theme="dark"] .cal-week-evt{background:#d4a017;}
 
 
 /* ===== TELAS ===== */
@@ -81,7 +89,7 @@ body{font-family:system-ui,sans-serif;background:#f5f5f3;color:#1a1a1a;font-size
 .auth-left{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;background:linear-gradient(135deg,#0a1628 0%,#0d2240 60%,#0a3355 100%);position:relative;overflow:hidden;}
 .auth-left::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 60% 40%,rgba(0,200,220,.08) 0%,transparent 70%);}
 .auth-left-inner{position:relative;z-index:1;text-align:center;}
-.auth-tagline{font-size:15px;color:#22d3ee;margin-top:10px;}
+.auth-tagline{font-size:15px;color:#d4a017;margin-top:10px;}
 .auth-tagline strong{color:#fff;}
 .auth-right{width:440px;display:flex;align-items:center;justify-content:center;padding:40px;background:#fff;overflow-y:auto;}
 .auth-box{width:100%;max-width:360px;}
@@ -89,12 +97,12 @@ body{font-family:system-ui,sans-serif;background:#f5f5f3;color:#1a1a1a;font-size
 .auth-box .sub{font-size:13px;color:#888;margin-bottom:24px;}
 .auth-box label{display:block;font-size:12px;color:#555;margin-bottom:4px;margin-top:14px;font-weight:500;}
 .auth-box input,.auth-box select,.auth-box textarea{width:100%;padding:10px 14px;border:1.5px solid #e0e0e0;border-radius:10px;font-size:13px;color:#1a1a1a;outline:none;transition:border .15s;}
-.auth-box input:focus,.auth-box select:focus,.auth-box textarea:focus{border-color:#0891b2;}
+.auth-box input:focus,.auth-box select:focus,.auth-box textarea:focus{border-color:#d4a017;}
 .auth-box textarea{height:80px;resize:vertical;}
-.btn-auth{width:100%;margin-top:20px;padding:12px;background:#2554C7;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;}
-.btn-auth:hover{background:#1a3fa3;}
+.btn-auth{width:100%;margin-top:20px;padding:12px;background:#0a1628;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;}
+.btn-auth:hover{background:#172032;}
 .auth-err{color:#c0392b;font-size:12px;margin-top:8px;display:none;}
-.auth-link{font-size:12px;color:#0891b2;cursor:pointer;text-decoration:underline;margin-top:12px;display:block;text-align:center;}
+.auth-link{font-size:12px;color:#0a1628;cursor:pointer;text-decoration:underline;margin-top:12px;display:block;text-align:center;}
 .auth-demo{margin-top:18px;padding-top:14px;border-top:1px solid #f0f0f0;font-size:11px;color:#aaa;line-height:1.8;}
 @media(max-width:680px){.auth-wrap{flex-direction:column;}.auth-left{padding:30px 20px;min-height:auto;}.auth-right{width:100%;padding:24px 16px;}}
 
@@ -123,7 +131,7 @@ body{font-family:system-ui,sans-serif;background:#f5f5f3;color:#1a1a1a;font-size
 .tabs{display:flex;gap:0;}
 .tab{padding:12px 16px;font-size:13px;cursor:pointer;color:#888;border-bottom:2px solid transparent;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;}
 .tab:hover{color:#0a1628;}
-.tab.active{color:#0891b2;border-bottom-color:#0891b2;font-weight:500;}
+.tab.active{color:#d4a017;border-bottom-color:#d4a017;font-weight:500;}
 .tab.locked{opacity:.35;cursor:not-allowed;}
 .app{padding:20px 24px;max-width:1200px;margin:0 auto;}
 .panel{display:none;}
@@ -146,21 +154,21 @@ tr:hover td{background:#fafaf8;}
 .badge{font-size:11px;padding:2px 8px;border-radius:20px;display:inline-block;white-space:nowrap;margin:1px;}
 .p-socio{background:#FAEEDA;color:#633806;}
 .p-assoc{background:#E1F5EE;color:#085041;}
-.p-parc{background:#E6F1FB;color:#0C447C;}
+.p-parc{background:#f0ede8;color:#5a4a3a;}
 .s-ativo{background:#E1F5EE;color:#085041;}
 .s-inativo{background:#F1EFE8;color:#444441;}
 .s-pendente{background:#FAEEDA;color:#633806;}
 .f-prospect{background:#F1EFE8;color:#888;}
-.f-contato{background:#E6F1FB;color:#0C447C;}
+.f-contato{background:#f0ede8;color:#5a4a3a;}
 .f-proposta{background:#FAEEDA;color:#633806;}
 .f-fechado{background:#E1F5EE;color:#085041;}
-.proj-and{background:#E6F1FB;color:#0C447C;}
+.proj-and{background:#f0ede8;color:#5a4a3a;}
 .proj-conc{background:#E1F5EE;color:#085041;}
 .proj-paus{background:#F1EFE8;color:#888;}
-button.btn-p{background:#2554C7;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:13px;cursor:pointer;white-space:nowrap;}
-button.btn-p:hover{background:#1a3fa3;}
-button.btn-s{background:#fff;border:1px solid #2554C7;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;color:#2554C7;}
-button.btn-s:hover{background:#eef2ff;}
+button.btn-p{background:#0a1628;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:13px;cursor:pointer;white-space:nowrap;}
+button.btn-p:hover{background:#172032;}
+button.btn-s{background:#fff;border:1px solid #0a1628;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;color:#0a1628;}
+button.btn-s:hover{background:#f5f0e8;}
 button.btn-d{background:#fff;border:1px solid #fecaca;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;color:#c0392b;}
 button.btn-sm{padding:4px 10px;font-size:11px;}
 .avatar{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;vertical-align:middle;margin-right:8px;}
@@ -187,21 +195,21 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 .pj-title{font-size:15px;font-weight:600;color:#0a1628;}
 .pj-body{font-size:13px;color:#555;line-height:1.6;margin:8px 0;}
 .pj-meta{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:#888;margin-bottom:8px;}
-.fu-line{border-left:2px solid #bae6fd;margin-left:6px;padding-left:14px;margin-top:10px;}
+.fu-line{border-left:2px solid #e8d9b0;margin-left:6px;padding-left:14px;margin-top:10px;}
 .fu-item{position:relative;margin-bottom:10px;}
-.fu-item::before{content:'';position:absolute;left:-19px;top:5px;width:8px;height:8px;border-radius:50%;background:#06b6d4;border:2px solid #fff;box-shadow:0 0 0 2px #06b6d4;}
+.fu-item::before{content:'';position:absolute;left:-19px;top:5px;width:8px;height:8px;border-radius:50%;background:#d4a017;border:2px solid #fff;box-shadow:0 0 0 2px #d4a017;}
 .fu-txt{font-size:13px;color:#1a1a1a;}
 .fu-meta{font-size:11px;color:#aaa;margin-top:2px;}
 .fu-new-badge{background:#dcfce7;color:#166534;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:6px;font-weight:600;}
-.add-fu-btn{background:#f0f9ff;border:1px dashed #7dd3fc;color:#0891b2;border-radius:8px;padding:7px 14px;font-size:12px;cursor:pointer;margin-top:8px;}
+.add-fu-btn{background:#fdf8ee;border:1px dashed #d4bf80;color:#0a1628;border-radius:8px;padding:7px 14px;font-size:12px;cursor:pointer;margin-top:8px;}
 
 /* ===== FINANCEIRO ===== */
 .fin-planilha{background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden;margin-bottom:16px;}
 .fin-planilha-hdr{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;background:#0a1628;color:#fff;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
 .fin-planilha-hdr-col,.fin-planilha-cell{padding:9px 12px;border-right:1px solid rgba(255,255,255,.08);}
 .fin-planilha-hdr-col:last-child,.fin-planilha-cell:last-child{border-right:none;}
-.fin-grupo-hdr{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;background:#2554C7;color:#fff;font-size:12px;font-weight:600;}
-.fin-subcat-hdr{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;background:#f0f4ff;font-size:12px;font-weight:500;color:#2554C7;border-bottom:1px solid #e0e8ff;}
+.fin-grupo-hdr{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;background:#0a1628;color:#fff;font-size:12px;font-weight:600;}
+.fin-subcat-hdr{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;background:#f5f0e8;font-size:12px;font-weight:500;color:#0a1628;border-bottom:1px solid #e0e8ff;}
 .fin-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;font-size:13px;border-bottom:1px solid #f5f5f3;align-items:center;}
 .fin-row:hover{background:#fafaf8;}
 .fin-row:last-child{border-bottom:none;}
@@ -209,7 +217,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 .fin-cell:last-child{border-right:none;}
 .fin-cell-edit{padding:4px 8px;}
 .fin-cell input[type=number]{width:100%;padding:5px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px;text-align:right;}
-.fin-cell input[type=number]:focus{border-color:#2554C7;outline:none;}
+.fin-cell input[type=number]:focus{border-color:#0a1628;outline:none;}
 .fin-total-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;background:#f8f9fa;font-size:12px;font-weight:600;color:#0a1628;border-top:2px solid #eee;}
 .fin-total-row .fin-cell{padding:9px 12px;}
 .fin-saldo-bar{display:flex;align-items:center;justify-content:space-between;background:#0a1628;color:#fff;padding:14px 16px;border-radius:12px;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
@@ -258,7 +266,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 .trust-b{background:#fef9c3;color:#854d0e;}
 .trust-c{background:#fee2e2;color:#991b1b;}
 .trust-bar-wrap{background:#f0f0ee;border-radius:20px;height:6px;flex:1;min-width:60px;}
-.trust-bar{height:6px;border-radius:20px;background:linear-gradient(90deg,#2554C7,#06b6d4);}
+.trust-bar{height:6px;border-radius:20px;background:linear-gradient(90deg,#0a1628,#d4a017);}
 
 /* ===== CONEXÕES ===== */
 .con-card{background:#fff;border:1px solid #eee;border-radius:12px;padding:16px;margin-bottom:12px;}
@@ -266,13 +274,13 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 .con-title{font-size:14px;font-weight:600;color:#0a1628;}
 .con-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
 .con-desc{font-size:13px;color:#555;line-height:1.6;margin-bottom:10px;}
-.con-match{background:#f0f4ff;border:1px solid #c7d6ff;border-radius:10px;padding:10px 12px;margin-top:8px;}
-.con-match-title{font-size:11px;font-weight:700;color:#2554C7;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;}
+.con-match{background:#f5f0e8;border:1px solid #c7d6ff;border-radius:10px;padding:10px 12px;margin-top:8px;}
+.con-match-title{font-size:11px;font-weight:700;color:#0a1628;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;}
 .con-match-item{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid #e0e8ff;font-size:12px;}
 .con-match-item:last-child{border-bottom:none;}
-.con-match-score{font-weight:700;color:#2554C7;min-width:28px;}
+.con-match-score{font-weight:700;color:#0a1628;min-width:28px;}
 .con-owner{font-size:11px;color:#aaa;}
-.porte-startup{background:#e0f2fe;color:#0369a1;}
+.porte-startup{background:#f0ede8;color:#5a4a3a;}
 .porte-pequena{background:#dcfce7;color:#166534;}
 .porte-media{background:#fef9c3;color:#854d0e;}
 .porte-grande{background:#fee2e2;color:#991b1b;}
@@ -285,16 +293,16 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 .agenda-cfg code{background:#f5f5f3;padding:2px 6px;border-radius:4px;font-size:12px;}
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
 .cal-nav{display:flex;align-items:center;gap:8px;}
-.cal-nav button{background:#fff;border:1px solid #2554C7;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;color:#2554C7;}
+.cal-nav button{background:#fff;border:1px solid #0a1628;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;color:#0a1628;}
 .cal-title{font-size:16px;font-weight:600;color:#0a1628;}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden;}
 .cal-dow{background:#fafafa;text-align:center;font-size:11px;font-weight:600;color:#888;padding:8px 0;text-transform:uppercase;border-bottom:1px solid #eee;}
 .cal-day{min-height:88px;border:0.5px solid #f0f0f0;padding:6px;position:relative;font-size:12px;color:#555;cursor:pointer;}
 .cal-day:hover{background:#fafaf8;}
 .cal-day.other-month{color:#ccc;background:#fafafa;}
-.cal-day.today{background:#f0f9ff;}
+.cal-day.today{background:#fdf8ee;}
 .cal-day .daynum{font-weight:600;margin-bottom:4px;}
-.cal-evt{background:#0891b2;color:#fff;border-radius:4px;padding:1px 5px;font-size:10px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cal-evt{background:#0a1628;color:#fff;border-radius:4px;padding:1px 5px;font-size:10px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .cal-evt.local{background:#854F0B;}
 .agenda-list{margin-top:16px;}
 .agenda-evt-item{background:#fff;border:1px solid #eee;border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;}
@@ -304,14 +312,14 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 .gcal-status{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:5px 12px;border-radius:20px;}
 .gcal-on{background:#E1F5EE;color:#085041;}
 .gcal-off{background:#F1EFE8;color:#888;}
-.cal-view-btn{background:#fff;border:1px solid #2554C7;color:#2554C7;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;}
-.cal-view-btn.active{background:#2554C7;color:#fff;}
+.cal-view-btn{background:#fff;border:1px solid #0a1628;color:#0a1628;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;}
+.cal-view-btn.active{background:#0a1628;color:#fff;}
 .cal-week-grid{display:grid;grid-template-columns:60px repeat(7,1fr);border:1px solid #eee;border-radius:12px;overflow:hidden;background:#fff;}
 .cal-week-hdr{background:#fafafa;font-size:11px;font-weight:600;color:#888;padding:8px 6px;text-align:center;border-bottom:1px solid #eee;}
 .cal-week-time{font-size:10px;color:#aaa;padding:2px 4px;border-right:1px solid #f0f0f0;border-bottom:1px solid #f8f8f8;text-align:right;}
 .cal-week-cell{border-left:0.5px solid #f0f0f0;border-bottom:0.5px solid #f8f8f8;min-height:28px;position:relative;cursor:pointer;}
 .cal-week-cell:hover{background:#fafaf8;}
-.cal-week-evt{position:absolute;left:1px;right:1px;background:#2554C7;color:#fff;border-radius:3px;font-size:9px;padding:1px 3px;overflow:hidden;z-index:1;}
+.cal-week-evt{position:absolute;left:1px;right:1px;background:#0a1628;color:#fff;border-radius:3px;font-size:9px;padding:1px 3px;overflow:hidden;z-index:1;}
 .cal-day-view{background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden;}
 .cal-day-hour{display:flex;border-bottom:0.5px solid #f0f0f0;min-height:44px;}
 .cal-day-hour-lbl{width:60px;font-size:11px;color:#aaa;padding:4px 8px;border-right:1px solid #f0f0f0;flex-shrink:0;}
@@ -322,8 +330,8 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 .sala2{background:#ede9fe;color:#5b21b6;}
 .ranking-row{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:0.5px solid #f0f0f0;font-size:13px;}
 .ranking-row:last-child{border-bottom:none;}
-.ranking-pos{font-size:16px;font-weight:700;color:#2554C7;width:28px;}
-.ranking-bar{height:6px;border-radius:3px;background:#2554C7;margin-top:3px;}
+.ranking-pos{font-size:16px;font-weight:700;color:#0a1628;width:28px;}
+.ranking-bar{height:6px;border-radius:3px;background:#0a1628;margin-top:3px;}
 
 /* ===== NOTIF BAR ===== */
 .notif-bar{background:#0d2240;color:#fff;border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;}
@@ -348,16 +356,16 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 .btn-vit-int:hover{background:#0a5a45;}
 .btn-vit-int-done{background:#f0fdf4;color:#0F6E56;border:1px solid #bbf7d0;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:default;}
 .vit-prog-track{height:7px;background:#f0f0f0;border-radius:10px;overflow:hidden;margin-bottom:2px;}
-.vit-prog-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,#2554C7,#06b6d4);transition:width .4s;}
+.vit-prog-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,#0a1628,#d4a017);transition:width .4s;}
 .vit-s-ras{background:#f5f5f3;color:#888;}
 .vit-s-rev{background:#FAEEDA;color:#633806;}
-.vit-s-apr{background:#f0f4ff;color:#2554C7;}
+.vit-s-apr{background:#f5f0e8;color:#0a1628;}
 .vit-s-abe{background:#E1F5EE;color:#085041;}
 .vit-s-enc{background:#fee2e2;color:#991b1b;}
 .vit-form-tabs{display:flex;gap:0;border-bottom:1px solid #eee;margin-bottom:18px;overflow-x:auto;}
 .vit-ftab{padding:8px 14px;font-size:12px;cursor:pointer;color:#888;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;white-space:nowrap;}
 .vit-ftab:hover{color:#0a1628;}
-.vit-ftab.active{color:#0891b2;border-bottom-color:#0891b2;font-weight:500;}
+.vit-ftab.active{color:#d4a017;border-bottom-color:#d4a017;font-weight:500;}
 </style>
 </head>
 <body>
@@ -365,39 +373,39 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 <!-- ============ LOGO SVG (reutilizável) ============ -->
 <template id="tpl-logo-lg">
 <svg width="110" height="110" viewBox="0 0 200 200" fill="none">
-  <polygon points="100,62 132,81 132,119 100,138 68,119 68,81" fill="#06b6d4" opacity=".9"/>
-  <line x1="100" y1="62" x2="100" y2="28" stroke="#22d3ee" stroke-width="2.5"/>
-  <circle cx="100" cy="18" r="9" fill="none" stroke="#22d3ee" stroke-width="2.5"/>
-  <line x1="100" y1="138" x2="100" y2="172" stroke="#22d3ee" stroke-width="2.5"/>
-  <circle cx="100" cy="182" r="9" fill="none" stroke="#22d3ee" stroke-width="2.5"/>
-  <line x1="132" y1="81" x2="158" y2="55" stroke="#22d3ee" stroke-width="2.5"/>
-  <circle cx="166" cy="47" r="9" fill="none" stroke="#22d3ee" stroke-width="2.5"/>
-  <line x1="132" y1="119" x2="158" y2="145" stroke="#22d3ee" stroke-width="2.5"/>
-  <circle cx="166" cy="153" r="9" fill="none" stroke="#22d3ee" stroke-width="2.5"/>
-  <line x1="68" y1="81" x2="42" y2="55" stroke="#22d3ee" stroke-width="2.5"/>
-  <circle cx="34" cy="47" r="9" fill="none" stroke="#22d3ee" stroke-width="2.5"/>
-  <line x1="68" y1="119" x2="42" y2="145" stroke="#22d3ee" stroke-width="2.5"/>
-  <circle cx="34" cy="153" r="9" fill="none" stroke="#22d3ee" stroke-width="2.5"/>
-  <line x1="132" y1="100" x2="160" y2="100" stroke="#22d3ee" stroke-width="2"/>
-  <line x1="68" y1="100" x2="40" y2="100" stroke="#22d3ee" stroke-width="2"/>
+  <polygon points="100,62 132,81 132,119 100,138 68,119 68,81" fill="#d4a017" opacity=".9"/>
+  <line x1="100" y1="62" x2="100" y2="28" stroke="#d4a017" stroke-width="2.5"/>
+  <circle cx="100" cy="18" r="9" fill="none" stroke="#d4a017" stroke-width="2.5"/>
+  <line x1="100" y1="138" x2="100" y2="172" stroke="#d4a017" stroke-width="2.5"/>
+  <circle cx="100" cy="182" r="9" fill="none" stroke="#d4a017" stroke-width="2.5"/>
+  <line x1="132" y1="81" x2="158" y2="55" stroke="#d4a017" stroke-width="2.5"/>
+  <circle cx="166" cy="47" r="9" fill="none" stroke="#d4a017" stroke-width="2.5"/>
+  <line x1="132" y1="119" x2="158" y2="145" stroke="#d4a017" stroke-width="2.5"/>
+  <circle cx="166" cy="153" r="9" fill="none" stroke="#d4a017" stroke-width="2.5"/>
+  <line x1="68" y1="81" x2="42" y2="55" stroke="#d4a017" stroke-width="2.5"/>
+  <circle cx="34" cy="47" r="9" fill="none" stroke="#d4a017" stroke-width="2.5"/>
+  <line x1="68" y1="119" x2="42" y2="145" stroke="#d4a017" stroke-width="2.5"/>
+  <circle cx="34" cy="153" r="9" fill="none" stroke="#d4a017" stroke-width="2.5"/>
+  <line x1="132" y1="100" x2="160" y2="100" stroke="#d4a017" stroke-width="2"/>
+  <line x1="68" y1="100" x2="40" y2="100" stroke="#d4a017" stroke-width="2"/>
   <circle cx="100" cy="100" r="9" fill="#0e7490"/>
 </svg>
 </template>
 <template id="tpl-logo-sm">
 <svg width="32" height="32" viewBox="0 0 200 200" fill="none">
-  <polygon points="100,62 132,81 132,119 100,138 68,119 68,81" fill="#06b6d4"/>
-  <line x1="100" y1="62" x2="100" y2="28" stroke="#22d3ee" stroke-width="3"/>
-  <circle cx="100" cy="18" r="9" fill="none" stroke="#22d3ee" stroke-width="3"/>
-  <line x1="132" y1="81" x2="158" y2="55" stroke="#22d3ee" stroke-width="3"/>
-  <circle cx="166" cy="47" r="9" fill="none" stroke="#22d3ee" stroke-width="3"/>
-  <line x1="132" y1="119" x2="158" y2="145" stroke="#22d3ee" stroke-width="3"/>
-  <circle cx="166" cy="153" r="9" fill="none" stroke="#22d3ee" stroke-width="3"/>
-  <line x1="68" y1="81" x2="42" y2="55" stroke="#22d3ee" stroke-width="3"/>
-  <circle cx="34" cy="47" r="9" fill="none" stroke="#22d3ee" stroke-width="3"/>
-  <line x1="68" y1="119" x2="42" y2="145" stroke="#22d3ee" stroke-width="3"/>
-  <circle cx="34" cy="153" r="9" fill="none" stroke="#22d3ee" stroke-width="3"/>
-  <line x1="100" y1="138" x2="100" y2="172" stroke="#22d3ee" stroke-width="3"/>
-  <circle cx="100" cy="182" r="9" fill="none" stroke="#22d3ee" stroke-width="3"/>
+  <polygon points="100,62 132,81 132,119 100,138 68,119 68,81" fill="#d4a017"/>
+  <line x1="100" y1="62" x2="100" y2="28" stroke="#d4a017" stroke-width="3"/>
+  <circle cx="100" cy="18" r="9" fill="none" stroke="#d4a017" stroke-width="3"/>
+  <line x1="132" y1="81" x2="158" y2="55" stroke="#d4a017" stroke-width="3"/>
+  <circle cx="166" cy="47" r="9" fill="none" stroke="#d4a017" stroke-width="3"/>
+  <line x1="132" y1="119" x2="158" y2="145" stroke="#d4a017" stroke-width="3"/>
+  <circle cx="166" cy="153" r="9" fill="none" stroke="#d4a017" stroke-width="3"/>
+  <line x1="68" y1="81" x2="42" y2="55" stroke="#d4a017" stroke-width="3"/>
+  <circle cx="34" cy="47" r="9" fill="none" stroke="#d4a017" stroke-width="3"/>
+  <line x1="68" y1="119" x2="42" y2="145" stroke="#d4a017" stroke-width="3"/>
+  <circle cx="34" cy="153" r="9" fill="none" stroke="#d4a017" stroke-width="3"/>
+  <line x1="100" y1="138" x2="100" y2="172" stroke="#d4a017" stroke-width="3"/>
+  <circle cx="100" cy="182" r="9" fill="none" stroke="#d4a017" stroke-width="3"/>
 </svg>
 </template>
 
@@ -407,7 +415,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <div class="auth-left-inner">
       <div id="logo-login-wrap"></div>
       <div style="margin-top:16px">
-        <div style="font-size:40px;font-weight:800;color:#fff;letter-spacing:-.02em">IA <span style="color:#22d3ee">Hub</span></div>
+        <div style="font-size:40px;font-weight:800;color:#fff;letter-spacing:-.02em">IA <span style="color:#d4a017">Hub</span></div>
         <div class="auth-tagline">Conectando negócios com <strong>inteligência</strong></div>
       </div>
       <div style="margin-top:40px;max-width:280px">
@@ -437,7 +445,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <div class="auth-left-inner">
       <div id="logo-cad-wrap"></div>
       <div style="margin-top:16px">
-        <div style="font-size:40px;font-weight:800;color:#fff;letter-spacing:-.02em">IA <span style="color:#22d3ee">Hub</span></div>
+        <div style="font-size:40px;font-weight:800;color:#fff;letter-spacing:-.02em">IA <span style="color:#d4a017">Hub</span></div>
         <div class="auth-tagline">Conectando negócios com <strong>inteligência</strong></div>
       </div>
     </div>
@@ -506,7 +514,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:4px">
         <div class="section-hdr" style="margin-top:0;border-bottom:none;margin-bottom:0">Mapa de Sinergias da Rede</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn-p" style="background:#fff;color:#2554C7;border:1.5px solid #2554C7" onclick="abrirNovaConexao()">🔗 Nova Conexão</button>
+          <button class="btn-p" style="background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="abrirNovaConexao()">🔗 Nova Conexão</button>
         </div>
       </div>
       <div id="dashboard-moderacao"></div>
@@ -537,7 +545,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <!-- Sub-abas internas (Membros só para sócios) -->
       <div id="sub-tabs-bar" style="display:flex;gap:8px;margin-bottom:20px">
         <button id="sub-btn-membros" class="btn-p" style="flex:1" onclick="switchMbrTab('membros')">👥 Membros</button>
-        <button id="sub-btn-conexoes" class="btn-p" style="flex:1;background:#fff;color:#2554C7;border:1.5px solid #2554C7" onclick="switchMbrTab('conexoes')">🔗 Conexões</button>
+        <button id="sub-btn-conexoes" class="btn-p" style="flex:1;background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="switchMbrTab('conexoes')">🔗 Conexões</button>
       </div>
       <div id="sub-tab-membros">
       <!-- Cards perfil (só sócios) -->
@@ -545,7 +553,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:16px">
           <div class="stat"><div class="stat-label">Sócios</div><div class="stat-value" id="cnt-socio" style="color:#854F0B">0</div></div>
           <div class="stat"><div class="stat-label">Associados</div><div class="stat-value" id="cnt-assoc" style="color:#0F6E56">0</div></div>
-          <div class="stat"><div class="stat-label">Parceiros</div><div class="stat-value" id="cnt-parc" style="color:#185FA5">0</div></div>
+          <div class="stat"><div class="stat-label">Parceiros</div><div class="stat-value" id="cnt-parc" style="color:#0a1628">0</div></div>
           <div class="stat"><div class="stat-label">Pendentes</div><div class="stat-value" id="cnt-pend" style="color:#633806">0</div></div>
         </div>
       </div>
@@ -626,7 +634,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
         <select id="syn-f" onchange="renderSin()"><option value="all">Todas</option><option value="alta">Alta prioridade</option></select>
         <select id="syn-seg" onchange="renderSin()"><option value="">Todos os segmentos</option></select>
         <button class="btn-p" id="btn-nova-sin" style="display:none" onclick="openAddSin()">+ Nova sinergia</button>
-        <button class="btn-p" id="btn-regen-sin" style="display:none;background:#e8f0ff;color:#2554C7;border:1.5px solid #2554C7" onclick="regenerarSinBtn()">⚡ Regenerar</button>
+        <button class="btn-p" id="btn-regen-sin" style="display:none;background:#e8f0ff;color:#0a1628;border:1.5px solid #0a1628" onclick="regenerarSinBtn()">⚡ Regenerar</button>
         <button class="btn-p" id="btn-enrich-sin" style="display:none;background:#f5f0ff;color:#6d28d9;border:1.5px solid #7c3aed" onclick="enriquecerTodasSinergias()">✨ Enriquecer todas com IA</button>
       </div>
       <div class="syn-grid" id="syn-grid"></div>
@@ -677,7 +685,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <div><label>Telefone</label><input id="u-tel" placeholder="(00) 00000-0000"></div>
       <div class="full"><label>Segmento(s)</label><input id="u-seg" placeholder="Ex: Advocacia, Contabilidade (vírgula)" oninput="updateSpecFields()"></div>
       <div id="u-spec-wrap" class="full" style="display:none;background:#f8faff;border:1px solid #dbeafe;border-radius:10px;padding:12px;margin-top:-4px">
-        <div style="font-size:11px;font-weight:700;color:#2554C7;margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">Especialidade</div>
+        <div style="font-size:11px;font-weight:700;color:#0a1628;margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">Especialidade</div>
         <div id="u-spec-medico" style="display:none"><label>Especialidade médica</label>
           <input id="u-spec-medico-val" placeholder="Ex: Cardiologista, Ortopedista, Neurologista..."></div>
         <div id="u-spec-adv" style="display:none"><label>Área do direito</label>
@@ -845,7 +853,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <label>Descrição *</label>
     <textarea id="fu-txt" placeholder="Descreva o avanço, decisão ou próximo passo..." style="height:110px"></textarea>
     <label>Data</label><input id="fu-data" type="date">
-    <div style="margin-top:12px;padding:10px;background:#f0f9ff;border-radius:8px;font-size:12px;color:#0891b2">
+    <div style="margin-top:12px;padding:10px;background:#fdf8ee;border-radius:8px;font-size:12px;color:#0a1628">
       📧 "Salvar e notificar" avisa todos os participantes. "Salvar" registra sem notificar.
     </div>
     <div class="modal-btns">
@@ -896,7 +904,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <h2 id="con-modal-ttl">Nova conexão</h2>
     <p style="font-size:13px;color:#888;margin-bottom:16px">Cadastre um contato sem revelar dados pessoais. O sistema fará o match automático com membros da rede.</p>
     <div class="fg">
-      <div style="background:#eff6ff;border-radius:8px;padding:10px 12px;margin-bottom:4px;font-size:12px;color:#2554C7;grid-column:1/-1">
+      <div style="background:#eff6ff;border-radius:8px;padding:10px 12px;margin-bottom:4px;font-size:12px;color:#0a1628;grid-column:1/-1">
         💡 Não informe nome da empresa nem dados pessoais. Use atributos que descrevam o perfil sem identificar.
       </div>
       <div class="full"><label>Segmento / Indústria *</label>
@@ -950,7 +958,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <!-- Abas do modal -->
     <div style="display:flex;gap:8px;margin-bottom:16px">
       <button id="ev-tab-btn-reuniao" class="btn-p" style="flex:1" onclick="switchEvTab('reuniao')">Reunião</button>
-      <button id="ev-tab-btn-convidado" class="btn-p" style="flex:1;background:#fff;color:#2554C7;border:1.5px solid #2554C7" onclick="switchEvTab('convidado')">+ Convidado externo</button>
+      <button id="ev-tab-btn-convidado" class="btn-p" style="flex:1;background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="switchEvTab('convidado')">+ Convidado externo</button>
     </div>
     <!-- Aba Reunião -->
     <div id="ev-tab-reuniao">
@@ -983,7 +991,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <p style="font-size:13px;color:#888;margin-bottom:14px">Cadastre quem vem de fora da rede. Os dados ficam vinculados a esta reunião.</p>
       <div id="ev-convidados-list" style="margin-bottom:12px"></div>
       <div style="background:#f8f9ff;border:1px solid #e0e8ff;border-radius:10px;padding:14px">
-        <div style="font-size:12px;font-weight:600;color:#2554C7;margin-bottom:10px">Adicionar convidado</div>
+        <div style="font-size:12px;font-weight:600;color:#0a1628;margin-bottom:10px">Adicionar convidado</div>
         <div class="fg">
           <div><label>Nome *</label><input id="conv-nome" placeholder="Nome completo"></div>
           <div><label>Empresa</label><input id="conv-emp" placeholder="Empresa ou organização"></div>
@@ -996,8 +1004,8 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
         <button class="btn-p" style="margin-top:10px;width:100%" onclick="addConvidado()">+ Adicionar à reunião</button>
       </div>
     </div>
-    <div id="ev-gcal-link" style="display:none;margin-top:10px;padding:10px;background:#eff6ff;border-radius:8px;font-size:12px;color:#2554C7"></div>
-    <div style="margin-top:10px;padding:10px;background:#eff6ff;border-radius:8px;font-size:12px;color:#2554C7">
+    <div id="ev-gcal-link" style="display:none;margin-top:10px;padding:10px;background:#eff6ff;border-radius:8px;font-size:12px;color:#0a1628"></div>
+    <div style="margin-top:10px;padding:10px;background:#eff6ff;border-radius:8px;font-size:12px;color:#0a1628">
       📧 Participantes receberão notificação interna + link para adicionar ao Google Calendar.
     </div>
     <div class="modal-btns">
@@ -1053,7 +1061,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
         <select id="lc-conexao">
           <option value="">— Nenhuma —</option>
         </select>
-        <div style="font-size:11px;color:#2554C7;margin-top:3px" id="lc-conexao-dono"></div>
+        <div style="font-size:11px;color:#0a1628;margin-top:3px" id="lc-conexao-dono"></div>
       </div>
       <div class="full"><label>Comprovante / Nota fiscal</label>
         <input id="lc-anexo" type="file" accept="image/*,.pdf" onchange="handleAnexoUpload(event)">
@@ -1126,7 +1134,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     </div>
     <div id="onboarding-body"></div>
     <div style="margin-top:18px;display:flex;gap:8px">
-      <button class="btn-p" style="flex:1;background:linear-gradient(90deg,#2554C7,#06b6d4)" onclick="fecharOnboarding()">Entendido — vamos lá! 🚀</button>
+      <button class="btn-p" style="flex:1;background:linear-gradient(90deg,#0a1628,#d4a017)" onclick="fecharOnboarding()">Entendido — vamos lá! 🚀</button>
     </div>
     <div style="margin-top:10px;text-align:center">
       <span style="font-size:11px;opacity:.5;cursor:pointer" onclick="fecharOnboarding()">Fechar e não mostrar novamente</span>
@@ -1185,14 +1193,14 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
           </select>
         </div>
         <div class="full"><label>Tagline (uma frase)</label><input id="vit-f-tagline" placeholder="O que é o projeto em uma linha..."></div>
-        <div class="full" style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:14px;margin:4px 0 8px">
-          <div style="font-size:12px;font-weight:600;color:#0891b2;margin-bottom:8px">✨ Gerar Business Plan com IA</div>
+        <div class="full" style="background:#fdf8ee;border:1px solid #e8d9b0;border-radius:10px;padding:14px;margin:4px 0 8px">
+          <div style="font-size:12px;font-weight:600;color:#0a1628;margin-bottom:8px">✨ Gerar Business Plan com IA</div>
           <label style="color:#555">Descreva o negócio em 2–3 frases</label>
           <textarea id="vit-f-desc-ia" placeholder="Ex: Sistema que automatiza obrigações fiscais para PMEs. Reduz em 80% o tempo do contador. Já tem 12 clientes pagantes em beta." style="height:64px;margin-top:4px"></textarea>
           <button id="btn-gerar-ia" class="btn-p" onclick="gerarBPcomIA()" style="margin-top:8px;width:100%">✨ Gerar com IA</button>
           <div style="font-size:10px;color:#94a3b8;margin-top:5px;display:flex;justify-content:space-between;align-items:center">
             <span>Preencha Nome e Setor antes de gerar · Cria: Tagline · SWOT · FAQ e mais</span>
-            <button onclick="configGroqKey()" style="font-size:10px;color:#0891b2;background:none;border:none;cursor:pointer;padding:0;text-decoration:underline">⚙ key Groq</button>
+            <button onclick="configGroqKey()" style="font-size:10px;color:#0a1628;background:none;border:none;cursor:pointer;padding:0;text-decoration:underline">⚙ key Groq</button>
           </div>
         </div>
         <div class="full fg-sec">Business Plan</div>
@@ -1274,9 +1282,9 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <button onclick="closeOv('ov-vit-manifesto')" style="position:absolute;top:18px;right:20px;background:none;border:none;font-size:20px;color:#aaa;cursor:pointer;line-height:1">✕</button>
 
     <div style="text-align:center;margin-bottom:36px">
-      <div style="font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#0891b2;margin-bottom:10px">Investimentos IA Hub</div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#0a1628;margin-bottom:10px">Investimentos IA Hub</div>
       <div style="font-size:22px;font-weight:700;color:#0a1628;margin-bottom:12px">Princípios de Investimento</div>
-      <div style="width:48px;height:3px;background:#0891b2;margin:0 auto"></div>
+      <div style="width:48px;height:3px;background:#0a1628;margin:0 auto"></div>
     </div>
 
     <p style="font-size:13.5px;color:#444;line-height:1.8;margin-bottom:32px;text-align:center;max-width:540px;margin-left:auto;margin-right:auto">
@@ -1286,7 +1294,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <div style="display:flex;flex-direction:column;gap:0">
 
       <div style="display:flex;gap:20px;padding:20px 0;border-top:1px solid #f0f0f0">
-        <div style="font-size:13px;font-weight:800;color:#0891b2;width:28px;flex-shrink:0;padding-top:1px">I</div>
+        <div style="font-size:13px;font-weight:800;color:#0a1628;width:28px;flex-shrink:0;padding-top:1px">I</div>
         <div>
           <div style="font-size:13px;font-weight:700;color:#0a1628;margin-bottom:5px">Skin in the game</div>
           <div style="font-size:13px;color:#555;line-height:1.7">O IA Hub reserva no mínimo 50% das cotas de todo projeto publicado nesta curadoria. Nunca colocamos no mercado algo que não estamos dispostos a comprar. Essa regra não tem exceção.</div>
@@ -1294,7 +1302,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       </div>
 
       <div style="display:flex;gap:20px;padding:20px 0;border-top:1px solid #f0f0f0">
-        <div style="font-size:13px;font-weight:800;color:#0891b2;width:28px;flex-shrink:0;padding-top:1px">II</div>
+        <div style="font-size:13px;font-weight:800;color:#0a1628;width:28px;flex-shrink:0;padding-top:1px">II</div>
         <div>
           <div style="font-size:13px;font-weight:700;color:#0a1628;margin-bottom:5px">Curadoria antes de captação</div>
           <div style="font-size:13px;color:#555;line-height:1.7">Nenhum projeto chega ao mercado sem aprovação dos sócios. O filtro é o nosso produto. Preferimos publicar menos e publicar bem.</div>
@@ -1302,7 +1310,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       </div>
 
       <div style="display:flex;gap:20px;padding:20px 0;border-top:1px solid #f0f0f0">
-        <div style="font-size:13px;font-weight:800;color:#0891b2;width:28px;flex-shrink:0;padding-top:1px">III</div>
+        <div style="font-size:13px;font-weight:800;color:#0a1628;width:28px;flex-shrink:0;padding-top:1px">III</div>
         <div>
           <div style="font-size:13px;font-weight:700;color:#0a1628;margin-bottom:5px">Tese visível</div>
           <div style="font-size:13px;color:#555;line-height:1.7">Todo projeto publicado carrega a análise do curador — o que vimos, por que acreditamos, onde está o risco. Transparência sobre o julgamento é a base da confiança.</div>
@@ -1310,7 +1318,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       </div>
 
       <div style="display:flex;gap:20px;padding:20px 0;border-top:1px solid #f0f0f0">
-        <div style="font-size:13px;font-weight:800;color:#0891b2;width:28px;flex-shrink:0;padding-top:1px">IV</div>
+        <div style="font-size:13px;font-weight:800;color:#0a1628;width:28px;flex-shrink:0;padding-top:1px">IV</div>
         <div>
           <div style="font-size:13px;font-weight:700;color:#0a1628;margin-bottom:5px">Overflow valoriza</div>
           <div style="font-size:13px;color:#555;line-height:1.7">Quando a demanda supera as cotas disponíveis, o valor unitário sobe. Quem entra cedo, entra nas melhores condições. O excesso de interesse é um sinal — e é tratado como tal.</div>
@@ -1318,7 +1326,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       </div>
 
       <div style="display:flex;gap:20px;padding:20px 0;border-top:1px solid #f0f0f0">
-        <div style="font-size:13px;font-weight:800;color:#0891b2;width:28px;flex-shrink:0;padding-top:1px">V</div>
+        <div style="font-size:13px;font-weight:800;color:#0a1628;width:28px;flex-shrink:0;padding-top:1px">V</div>
         <div>
           <div style="font-size:13px;font-weight:700;color:#0a1628;margin-bottom:5px">Prazo honesto</div>
           <div style="font-size:13px;color:#555;line-height:1.7">Todo deal tem prazo de captação e retorno projetado declarados. Não trabalhamos com promessas abertas nem expectativas vagas. O combinado não sai caro.</div>
@@ -1326,7 +1334,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       </div>
 
       <div style="display:flex;gap:20px;padding:20px 0;border-top:1px solid #f0f0f0">
-        <div style="font-size:13px;font-weight:800;color:#0891b2;width:28px;flex-shrink:0;padding-top:1px">VI</div>
+        <div style="font-size:13px;font-weight:800;color:#0a1628;width:28px;flex-shrink:0;padding-top:1px">VI</div>
         <div>
           <div style="font-size:13px;font-weight:700;color:#0a1628;margin-bottom:5px">Relatório trimestral</div>
           <div style="font-size:13px;color:#555;line-height:1.7">Investidores com cotas ativas recebem atualização a cada 3 meses — avanços, desvios e próximos passos. Sem silêncio quando as coisas ficam difíceis.</div>
@@ -1334,7 +1342,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       </div>
 
       <div style="display:flex;gap:20px;padding:20px 0;border-top:1px solid #f0f0f0">
-        <div style="font-size:13px;font-weight:800;color:#0891b2;width:28px;flex-shrink:0;padding-top:1px">VII</div>
+        <div style="font-size:13px;font-weight:800;color:#0a1628;width:28px;flex-shrink:0;padding-top:1px">VII</div>
         <div>
           <div style="font-size:13px;font-weight:700;color:#0a1628;margin-bottom:5px">Resultado público</div>
           <div style="font-size:13px;color:#555;line-height:1.7">Quando um projeto encerra, o retorno entregue versus o prometido fica registrado no histórico da aba. Construímos reputação com transparência, não com silêncio.</div>
@@ -1401,10 +1409,10 @@ const SEG_C={
   'Mercado Financeiro':{bg:'#E1F5EE',tx:'#085041',dot:'#0F6E56'},
   'Eventos Corporativos':{bg:'#FAEEDA',tx:'#633806',dot:'#854F0B'},
   'Mercado Esportivo':{bg:'#FAEEDA',tx:'#633806',dot:'#854F0B'},
-  'Corretagem de Imóveis':{bg:'#E6F1FB',tx:'#0C447C',dot:'#185FA5'},
-  'Imobiliária':{bg:'#E6F1FB',tx:'#0C447C',dot:'#185FA5'},
-  'Corretora de Seguros':{bg:'#E6F1FB',tx:'#0C447C',dot:'#185FA5'},
-  'Construção':{bg:'#E6F1FB',tx:'#0C447C',dot:'#185FA5'},
+  'Corretagem de Imóveis':{bg:'#f0ede8',tx:'#5a4a3a',dot:'#0a1628'},
+  'Imobiliária':{bg:'#f0ede8',tx:'#5a4a3a',dot:'#0a1628'},
+  'Corretora de Seguros':{bg:'#f0ede8',tx:'#5a4a3a',dot:'#0a1628'},
+  'Construção':{bg:'#f0ede8',tx:'#5a4a3a',dot:'#0a1628'},
   'Venda de Veículos':{bg:'#FAECE7',tx:'#712B13',dot:'#993C1D'},
   'Blindagem de Veículos':{bg:'#FAECE7',tx:'#712B13',dot:'#993C1D'},
   'Locação de Veículos':{bg:'#FAECE7',tx:'#712B13',dot:'#993C1D'},
@@ -1414,7 +1422,7 @@ const SEG_C={
   'Pessoa Física':{bg:'#fef3c7',tx:'#92400e',dot:'#d97706'},
 };
 function sc(s){return SEG_C[s]||{bg:'#F1EFE8',tx:'#444441',dot:'#888780'};}
-const PS={Sócio:{bg:'#FAEEDA',tx:'#633806'},Associado:{bg:'#E1F5EE',tx:'#085041'},Parceiro:{bg:'#E6F1FB',tx:'#0C447C'},Operador:{bg:'#1e3a5f',tx:'#fff'}};
+const PS={Sócio:{bg:'#FAEEDA',tx:'#633806'},Associado:{bg:'#E1F5EE',tx:'#085041'},Parceiro:{bg:'#f0ede8',tx:'#5a4a3a'},Operador:{bg:'#1e3a5f',tx:'#fff'}};
 const FUNIL_CLS={Prospect:'f-prospect','Contato feito':'f-contato','Proposta enviada':'f-proposta',Fechado:'f-fechado'};
 const PROJ_CLS={'Em andamento':'proj-and',Concluído:'proj-conc',Pausado:'proj-paus'};
 
@@ -1734,7 +1742,7 @@ function renderRede(){
     const pa=pos[syn.a],pb=pos[syn.b];if(!pa||!pb)return;
     const l=document.createElementNS('http://www.w3.org/2000/svg','line');
     l.setAttribute('x1',pa.x);l.setAttribute('y1',pa.y);l.setAttribute('x2',pb.x);l.setAttribute('y2',pb.y);
-    l.setAttribute('stroke',syn.p==='alta'?'#0891b2':'#bbb');
+    l.setAttribute('stroke',syn.p==='alta'?'#0a1628':'#bbb');
     l.setAttribute('stroke-width',syn.p==='alta'?2:1);l.setAttribute('opacity',syn.p==='alta'?.4:.18);
     l.dataset.a=syn.a;l.dataset.b=syn.b;svg.appendChild(l);
   });
@@ -1828,7 +1836,7 @@ function renderDashboardConexoes(){
     if(destaque){
       const dono=users.find(u=>u.id===destaque.c.criadorId);
       const topMatch=destaque.matches[0];
-      destaqueEl.innerHTML=`<div style="background:linear-gradient(135deg,#2554C7,#06b6d4);border-radius:12px;padding:16px 18px;margin-bottom:16px;color:#fff;cursor:pointer" onclick="showTab('rede-membros');setTimeout(()=>switchMbrTab('conexoes'),100)">
+      destaqueEl.innerHTML=`<div style="background:linear-gradient(135deg,#0a1628,#d4a017);border-radius:12px;padding:16px 18px;margin-bottom:16px;color:#fff;cursor:pointer" onclick="showTab('rede-membros');setTimeout(()=>switchMbrTab('conexoes'),100)">
         <div style="font-size:11px;opacity:.85;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">⭐ Conexão em destaque da semana</div>
         <div style="font-size:15px;font-weight:600;margin-bottom:4px">${destaque.c.seg}</div>
         <div style="font-size:12px;opacity:.9;margin-bottom:8px">${isSocio()?'por '+(dono?dono.nome:'?')+' · ':''}${topMatch.score}% de match com ${isSocio()?topMatch.user.nome:topMatch.user.perfil||'Membro'}</div>
@@ -1861,7 +1869,7 @@ function renderDashboardConexoes(){
         ${c.acesso?`<span class="badge" style="background:#f0f0ee;color:#555">${c.acesso}</span>`:''}
       </div>
       <div style="font-size:12px;color:#555;line-height:1.5;margin-bottom:8px">${c.desc.length>100?c.desc.substring(0,100)+'…':c.desc}</div>
-      ${matches.length?`<div style="font-size:11px;color:#2554C7;font-weight:500">🎯 ${matches.length} match${matches.length>1?'es':''} na rede</div>`:''}
+      ${matches.length?`<div style="font-size:11px;color:#0a1628;font-weight:500">🎯 ${matches.length} match${matches.length>1?'es':''} na rede</div>`:''}
     </div>`;
   }).join('');
   }
@@ -1902,7 +1910,7 @@ function renderLembreteConexao(){
   };
   let msg=null;
   if(!minhasCon.length){
-    msg={icon:'💡',texto:'Você ainda não cadastrou nenhuma conexão. Comece agora e aumente sua relevância na rede.',cor:'#2554C7',bg:'#eff6ff'};
+    msg={icon:'💡',texto:'Você ainda não cadastrou nenhuma conexão. Comece agora e aumente sua relevância na rede.',cor:'#0a1628',bg:'#eff6ff'};
   } else {
     const datas=minhasCon.map(c=>parseDataBR(c.desde)).filter(Boolean);
     if(datas.length){
@@ -1928,26 +1936,26 @@ function renderCharts(){
   users.forEach(u=>(u.seg||'').split(',').map(s=>s.trim()).filter(Boolean).forEach(s=>segCount[s]=(segCount[s]||0)+1));
   const segsTop=Object.entries(segCount).sort((a,b)=>b[1]-a[1]).slice(0,8);
   const ctx1=document.getElementById('chart-segs').getContext('2d');
-  chartInstances['chart-segs']=new Chart(ctx1,{type:'bar',data:{labels:segsTop.map(x=>x[0]),datasets:[{data:segsTop.map(x=>x[1]),backgroundColor:'#0891b2',borderRadius:6}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}});
+  chartInstances['chart-segs']=new Chart(ctx1,{type:'bar',data:{labels:segsTop.map(x=>x[0]),datasets:[{data:segsTop.map(x=>x[1]),backgroundColor:'#0a1628',borderRadius:6}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}});
 
   // Status projetos
   destroyChart('chart-proj-status');
   const pstatus={'Em andamento':0,'Concluído':0,'Pausado':0};
   projetos.forEach(p=>pstatus[p.status]=(pstatus[p.status]||0)+1);
   const ctx2=document.getElementById('chart-proj-status').getContext('2d');
-  chartInstances['chart-proj-status']=new Chart(ctx2,{type:'doughnut',data:{labels:Object.keys(pstatus),datasets:[{data:Object.values(pstatus),backgroundColor:['#0891b2','#0F6E56','#888']}]},options:{plugins:{legend:{position:'bottom'}}}});
+  chartInstances['chart-proj-status']=new Chart(ctx2,{type:'doughnut',data:{labels:Object.keys(pstatus),datasets:[{data:Object.values(pstatus),backgroundColor:['#0a1628','#0F6E56','#888']}]},options:{plugins:{legend:{position:'bottom'}}}});
 
   // Perfis
   destroyChart('chart-perfis');
   const perfis={Sócio:0,Associado:0,Parceiro:0};
   users.forEach(u=>perfis[u.perfil]=(perfis[u.perfil]||0)+1);
   const ctx3=document.getElementById('chart-perfis').getContext('2d');
-  chartInstances['chart-perfis']=new Chart(ctx3,{type:'doughnut',data:{labels:Object.keys(perfis),datasets:[{data:Object.values(perfis),backgroundColor:['#854F0B','#0F6E56','#185FA5']}]},options:{plugins:{legend:{position:'bottom'}}}});
+  chartInstances['chart-perfis']=new Chart(ctx3,{type:'doughnut',data:{labels:Object.keys(perfis),datasets:[{data:Object.values(perfis),backgroundColor:['#854F0B','#0F6E56','#0a1628']}]},options:{plugins:{legend:{position:'bottom'}}}});
 
   // Faturamento (por projeto)
   destroyChart('chart-fat');
   const ctx4=document.getElementById('chart-fat').getContext('2d');
-  chartInstances['chart-fat']=new Chart(ctx4,{type:'bar',data:{labels:projetos.map(p=>p.nome.length>18?p.nome.substring(0,17)+'…':p.nome),datasets:[{data:projetos.map(p=>p.valor||0),backgroundColor:'#06b6d4',borderRadius:6}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'R$'+v.toLocaleString('pt-BR')}}}}});
+  chartInstances['chart-fat']=new Chart(ctx4,{type:'bar',data:{labels:projetos.map(p=>p.nome.length>18?p.nome.substring(0,17)+'…':p.nome),datasets:[{data:projetos.map(p=>p.valor||0),backgroundColor:'#d4a017',borderRadius:6}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'R$'+v.toLocaleString('pt-BR')}}}}});
 }
 
 // ===================== HELPERS =====================
@@ -2190,7 +2198,7 @@ function renderMembros(){
   const showExternos=!fsecao||fsecao==='externos';
   let rowsHtml='';
   if(showMembros){
-    if(!fsecao||fsecao==='membros')rowsHtml+=`<tr><td colspan="11" style="background:#f0f4ff;font-size:11px;font-weight:700;color:#2554C7;padding:6px 14px;text-transform:uppercase;letter-spacing:.06em">Membros da rede</td></tr>`;
+    if(!fsecao||fsecao==='membros')rowsHtml+=`<tr><td colspan="11" style="background:#f5f0e8;font-size:11px;font-weight:700;color:#0a1628;padding:6px 14px;text-transform:uppercase;letter-spacing:.06em">Membros da rede</td></tr>`;
     if(fsecao==='parceiros'){
       const parceiros=data.filter(u=>u.perfil==='Parceiro');
       if(!parceiros.length)rowsHtml+=`<tr><td colspan="11" class="empty-msg" style="padding:20px">Nenhum parceiro encontrado.</td></tr>`;
@@ -2454,7 +2462,7 @@ function renderPlanilha(){
     // Lançamentos avulsos (não são subcats fixas)
     const avulsos=lancsG.filter(l=>!grupo.cats.includes(l.cat));
     avulsos.forEach(l=>{
-      const anx=l.anexo?`<a href="${l.anexo.dataUrl}" download="${l.anexo.name}" title="${l.anexo.name}" style="margin-left:4px;color:#2554C7;font-size:11px">📎</a>`:'';
+      const anx=l.anexo?`<a href="${l.anexo.dataUrl}" download="${l.anexo.name}" title="${l.anexo.name}" style="margin-left:4px;color:#0a1628;font-size:11px">📎</a>`:'';
       html+=`<div class="fin-row">
         <div class="fin-cell"><strong>${l.desc}</strong>${anx}<div style="font-size:11px;color:#888">${l.cat||''}</div></div>
         <div class="fin-cell" style="text-align:right;font-weight:600;color:${l.tipo==='in'?'#0F6E56':'#c0392b'}">${l.tipo==='in'?'+':'-'} R$ ${(l.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
@@ -2495,7 +2503,7 @@ function renderFinCharts(){
   const sorted=[...lancamentos].sort((a,b)=>(a.data||'').localeCompare(b.data||''));
   let acc=0;
   const ctx2=document.getElementById('chart-fin-saldo');
-  if(ctx2)chartInstances['chart-fin-saldo']=new Chart(ctx2.getContext('2d'),{type:'line',data:{labels:sorted.map(l=>l.data),datasets:[{label:'Saldo',data:sorted.map(l=>{acc+=l.tipo==='in'?l.valor:-l.valor;return acc;}),borderColor:'#2554C7',backgroundColor:'rgba(37,84,199,.08)',fill:true,tension:.3,pointRadius:3}]},options:{plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'R$'+v.toLocaleString('pt-BR')}}}}});
+  if(ctx2)chartInstances['chart-fin-saldo']=new Chart(ctx2.getContext('2d'),{type:'line',data:{labels:sorted.map(l=>l.data),datasets:[{label:'Saldo',data:sorted.map(l=>{acc+=l.tipo==='in'?l.valor:-l.valor;return acc;}),borderColor:'#0a1628',backgroundColor:'rgba(37,84,199,.08)',fill:true,tension:.3,pointRadius:3}]},options:{plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'R$'+v.toLocaleString('pt-BR')}}}}});
 }
 
 function openAddLanc(){
@@ -2551,7 +2559,7 @@ function openEditLanc(id){
   if(document.getElementById('lc-comissao-pct'))document.getElementById('lc-comissao-pct').value=l.comissaoPct||'';
   document.getElementById('lc-anexo').value='';
   window._lcAnexoData=l.anexo||null;
-  document.getElementById('lc-anexo-preview').innerHTML=l.anexo?`📎 ${l.anexo.name} <span style="color:#0F6E56">(anexado)</span> <a href="${l.anexo.dataUrl}" download="${l.anexo.name}" style="margin-left:6px;color:#0891b2">baixar</a>`:'';
+  document.getElementById('lc-anexo-preview').innerHTML=l.anexo?`📎 ${l.anexo.name} <span style="color:#0F6E56">(anexado)</span> <a href="${l.anexo.dataUrl}" download="${l.anexo.name}" style="margin-left:6px;color:#0a1628">baixar</a>`:'';
   document.getElementById('ov-lanc').classList.add('open');
 }
 function saveLanc(){
@@ -3073,7 +3081,7 @@ function pipDrop(e,col){
 function renderPipeline(){
   if(!isSocio()){document.getElementById('tab-pipeline').innerHTML='<div class="blocked"><h2>Acesso restrito</h2></div>';return;}
   const COLS=['Prospect','Contato feito','Proposta enviada','Fechado'];
-  const COL_COLORS={Prospect:'#888','Contato feito':'#0891b2','Proposta enviada':'#854F0B',Fechado:'#0F6E56'};
+  const COL_COLORS={Prospect:'#888','Contato feito':'#0a1628','Proposta enviada':'#854F0B',Fechado:'#0F6E56'};
   const ativos=users.filter(u=>u.status==='Ativo');
   const semFunil=ativos.filter(u=>!COLS.includes(u.funil));
   const el=document.getElementById('tab-pipeline');
@@ -3373,7 +3381,7 @@ function buildMonthView(el){
     const isT=ds===ts;
     const evts=agendaLocalEvents.filter(e=>e.data===ds);
     let eh=evts.slice(0,3).map(e=>{
-      const sc=e.sala==='Sala de Reuniões'?'#2554C7':e.sala==='Lounge'?'#7c3aed':'#854F0B';
+      const sc=e.sala==='Sala de Reuniões'?'#0a1628':e.sala==='Lounge'?'#7c3aed':'#854F0B';
       return`<div class="cal-evt" style="background:${sc};cursor:pointer" onclick="event.stopPropagation();openEditEvento(${e.id})" title="${e.titulo}">${e.hora||''} ${e.titulo}</div>`;
     }).join('');
     if(evts.length>3)eh+=`<div style="font-size:10px;color:#aaa">+${evts.length-3} mais</div>`;
@@ -3394,7 +3402,7 @@ function buildWeekView(el){
   let h='<div class="cal-week-grid"><div class="cal-week-hdr"></div>';
   days.forEach((d,i)=>{
     const ds=d.toISOString().split('T')[0];const isT=ds===ts;
-    h+=`<div class="cal-week-hdr" style="${isT?'background:#eff6ff;color:#2554C7':''}"><div>${dn[i]}</div><div style="font-size:16px;font-weight:700">${d.getDate()}</div></div>`;
+    h+=`<div class="cal-week-hdr" style="${isT?'background:#eff6ff;color:#0a1628':''}"><div>${dn[i]}</div><div style="font-size:16px;font-weight:700">${d.getDate()}</div></div>`;
   });
   for(let hh=7;hh<21;hh++){
     h+=`<div class="cal-week-time">${String(hh).padStart(2,'0')}:00</div>`;
@@ -3402,7 +3410,7 @@ function buildWeekView(el){
       const ds=d.toISOString().split('T')[0];
       const evts=agendaLocalEvents.filter(e=>e.data===ds&&parseInt((e.hora||'0').split(':')[0])===hh);
       h+=`<div class="cal-week-cell" onclick="openAddEvento('${ds}')">`;
-      evts.forEach(e=>{const sc=e.sala==='Lounge'?'#7c3aed':'#2554C7';h+=`<div class="cal-week-evt" style="background:${sc}" onclick="event.stopPropagation();openEditEvento(${e.id})">${e.titulo}</div>`;});
+      evts.forEach(e=>{const sc=e.sala==='Lounge'?'#7c3aed':'#0a1628';h+=`<div class="cal-week-evt" style="background:${sc}" onclick="event.stopPropagation();openEditEvento(${e.id})">${e.titulo}</div>`;});
       h+='</div>';
     });
   }
@@ -3440,7 +3448,7 @@ function renderUpcoming(){
         <div class="agenda-evt-title">${e.sala?`<span class="cal-sala-badge ${sc}">${e.sala}</span>`:''} ${e.titulo} <span class="badge" style="background:#f0f0ee;color:#555">${e.tipo||'Reunião'}</span></div>
         ${parts.length?`<div class="agenda-evt-desc">👥 ${parts.join(', ')}</div>`:''}
         ${e.desc?`<div class="agenda-evt-desc">${e.desc}</div>`:''}
-        <a href="${gcalLink}" target="_blank" onclick="event.stopPropagation()" style="font-size:11px;color:#2554C7;display:inline-block;margin-top:4px">📅 Adicionar ao Google Calendar</a>
+        <a href="${gcalLink}" target="_blank" onclick="event.stopPropagation()" style="font-size:11px;color:#0a1628;display:inline-block;margin-top:4px">📅 Adicionar ao Google Calendar</a>
       </div>
       <div class="agenda-evt-time">${new Date(e.data+'T00:00:00').toLocaleDateString('pt-BR')} · ${e.hora||''}${e.horafim?' – '+e.horafim:''}</div>
     </div>`;
@@ -3489,8 +3497,8 @@ function switchMbrTab(tab){
     if(panel)panel.style.display=t===tab?'block':'none';
     const btn=document.getElementById('sub-btn-'+t);
     if(!btn)return;
-    if(t===tab){btn.style.background='#2554C7';btn.style.color='#fff';btn.style.border='1.5px solid #2554C7';}
-    else{btn.style.background='#fff';btn.style.color='#2554C7';btn.style.border='1.5px solid #2554C7';}
+    if(t===tab){btn.style.background='#0a1628';btn.style.color='#fff';btn.style.border='1.5px solid #0a1628';}
+    else{btn.style.background='#fff';btn.style.color='#0a1628';btn.style.border='1.5px solid #0a1628';}
   });
   if(tab==='conexoes'){
     const el=document.getElementById('con-inner-mbr');
@@ -3503,8 +3511,8 @@ function switchEvTab(tab){
     document.getElementById('ev-tab-'+t).style.display=t===tab?'block':'none';
     const btn=document.getElementById('ev-tab-btn-'+t);
     if(!btn)return;
-    if(t===tab){btn.style.background='#2554C7';btn.style.color='#fff';btn.style.border='1.5px solid #2554C7';}
-    else{btn.style.background='#fff';btn.style.color='#2554C7';btn.style.border='1.5px solid #2554C7';}
+    if(t===tab){btn.style.background='#0a1628';btn.style.color='#fff';btn.style.border='1.5px solid #0a1628';}
+    else{btn.style.background='#fff';btn.style.color='#0a1628';btn.style.border='1.5px solid #0a1628';}
   });
 }
 
@@ -3594,7 +3602,7 @@ function openEditEvento(id){
   renderConvidadosList();
   const lnk=gerarGcalLink(ev);
   document.getElementById('ev-gcal-link').style.display='block';
-  document.getElementById('ev-gcal-link').innerHTML=`<a href="${lnk}" target="_blank" style="color:#2554C7;font-weight:500">📅 Abrir no Google Calendar para adicionar à sua agenda pessoal</a>`;
+  document.getElementById('ev-gcal-link').innerHTML=`<a href="${lnk}" target="_blank" style="color:#0a1628;font-weight:500">📅 Abrir no Google Calendar para adicionar à sua agenda pessoal</a>`;
   switchEvTab('reuniao');
   document.getElementById('ov-evento').classList.add('open');
 }
@@ -3724,7 +3732,7 @@ function renderConList(){
             <div class="con-title">${u.nome}${u.empresa?` <span style="font-weight:400;color:#888;font-size:12px">· ${u.empresa}</span>`:''}</div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
               <span class="badge" style="background:${pb};color:${pt}">${u.perfil}</span>
-              ${segs.map(s=>`<span class="badge" style="background:#f0f4ff;color:#2554C7">${s}</span>`).join('')}
+              ${segs.map(s=>`<span class="badge" style="background:#f5f0e8;color:#0a1628">${s}</span>`).join('')}
             </div>
           </div>
           <button class="btn-s btn-sm" onclick="openEditUsr(${u.id})">Editar</button>
@@ -3771,7 +3779,7 @@ function renderConList(){
       <button class="btn-d btn-sm" onclick="deleteCon(${c.id})">✕</button>
     </div>`:'';
     // Item 17: badge CorpLink
-    const corpLinkBadge=isCorpLink?`<span class="badge" style="background:#1e3a5f;color:#7dd3fc;border:1px solid #2554C7;font-weight:700">🏦 CorpLink</span>`:'';
+    const corpLinkBadge=isCorpLink?`<span class="badge" style="background:#1e3a5f;color:#d4bf80;border:1px solid #0a1628;font-weight:700">🏦 CorpLink</span>`:'';
     // Item 18: badge pendente para sócios
     const pendenteBadge=isPendente&&isSocio()?`<span class="badge" style="background:#fef9c3;color:#854d0e">⏳ Aguardando aprovação</span>`:'';
     return`<div class="con-card" style="${isPendente?'border:1px solid #fbbf24;':'border-left:3px solid '+nivelBorderColor+';'}" >
@@ -4082,10 +4090,10 @@ function openModeracaoPanel(){
     corpLinkHtml=`<div class="section-hdr">🏦 Conexões CorpLink aguardando aprovação (${conCorpLinkPend.length})</div>`+
     conCorpLinkPend.map(c=>{
       const dono=users.find(u=>u.id===c.criadorId);
-      return`<div class="con-card" style="margin-bottom:10px;border-color:#2554C7">
+      return`<div class="con-card" style="margin-bottom:10px;border-color:#0a1628">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:8px">
           <div>
-            <div style="font-size:14px;font-weight:600">${c.seg} <span class="badge" style="background:#1e3a5f;color:#7dd3fc;font-weight:700">🏦 CorpLink</span></div>
+            <div style="font-size:14px;font-weight:600">${c.seg} <span class="badge" style="background:#1e3a5f;color:#d4bf80;font-weight:700">🏦 CorpLink</span></div>
             <div style="font-size:11px;color:#888">enviada por ${dono?dono.nome:'?'} · ${c.desde||''}</div>
           </div>
           <span class="badge" style="background:#fef9c3;color:#854d0e">⏳ Pendente</span>
@@ -4957,7 +4965,7 @@ function renderOperadorView(){
     <div style="background:#fff;border:1px solid #eee;border-radius:12px;padding:20px">
       <div style="font-size:14px;font-weight:600;color:#0a1628;margin-bottom:16px">📋 Nova conexão CorpLink</div>
       <div class="fg">
-        <div style="background:#eff6ff;border-radius:8px;padding:10px 12px;margin-bottom:4px;font-size:12px;color:#2554C7;grid-column:1/-1">
+        <div style="background:#eff6ff;border-radius:8px;padding:10px 12px;margin-bottom:4px;font-size:12px;color:#0a1628;grid-column:1/-1">
           🏦 Esta conexão será enviada com origem <strong>CorpLink</strong> e ficará pendente até aprovação de um sócio.
         </div>
         <div class="full"><label style="font-size:12px;color:#555;font-weight:500">Segmento / Indústria *</label>
@@ -5266,7 +5274,7 @@ function renderVitrine(){
   el.innerHTML=`
   <div class="stats">
     <div class="stat"><div class="stat-label">Projetos</div><div class="stat-value">${projetosVitrine.length}</div></div>
-    <div class="stat"><div class="stat-label">Em captação</div><div class="stat-value" style="color:#0891b2">${emCap}</div></div>
+    <div class="stat"><div class="stat-label">Em captação</div><div class="stat-value" style="color:#0a1628">${emCap}</div></div>
     <div class="stat"><div class="stat-label">Interesses registrados</div><div class="stat-value" style="color:#0F6E56">${totInt}</div></div>
   </div>
   <div class="controls">
@@ -5299,7 +5307,7 @@ function vitCardHTML(p){
   return`<div class="vit-card-v2">
     <div class="vit-card-badges">
       <span class="badge ${vitStatusCls(p.status)}">${vitStatusLabel(p.status)}</span>
-      ${p.setor?`<span class="badge" style="background:#f0f4ff;color:#2554C7">${esc(p.setor)}</span>`:''}
+      ${p.setor?`<span class="badge" style="background:#f5f0e8;color:#0a1628">${esc(p.setor)}</span>`:''}
       ${p.estagio?`<span class="badge" style="background:#f0fdf4;color:#166534">${esc(p.estagio)}</span>`:''}
     </div>
     <div class="vit-card-nome">${esc(p.nome||'Sem título')}</div>
@@ -5308,7 +5316,7 @@ function vitCardHTML(p){
     ${showBar?`<div class="vit-card-prog">
       <div style="display:flex;justify-content:space-between;font-size:11px;color:#888;margin-bottom:5px">
         <span>${comp} de ${cotas} cotas comprometidas</span>
-        <span style="font-weight:700;color:${pct>=80?'#0F6E56':'#0891b2'}">${pct}%</span>
+        <span style="font-weight:700;color:${pct>=80?'#0F6E56':'#0a1628'}">${pct}%</span>
       </div>
       <div class="vit-prog-track"><div class="vit-prog-fill" style="width:${pct}%"></div></div>
       ${isSoc?`<div style="font-size:10px;color:#aaa;margin-top:3px">${hubN} reservadas IA Hub · ${cotas-hubN} mercado externo</div>`:''}
@@ -5330,9 +5338,9 @@ function vitCardHTML(p){
       ${isSoc?`<button class="btn-s btn-sm" onclick="openVitInteresses('${p.id}')">Interesses (${ints})</button>`:''}
       ${isSoc&&p.status==='rascunho'?`<button class="btn-s btn-sm" style="border-color:#854F0B;color:#854F0B" onclick="vitMudaStatus('${p.id}','revisao')">→ Revisão</button>`:''}
       ${isSoc&&p.status==='revisao'?`<button class="btn-s btn-sm" style="border-color:#0F6E56;color:#0F6E56" onclick="vitMudaStatus('${p.id}','aprovado')">✓ Aprovar</button>`:''}
-      ${isSoc&&p.status==='aprovado'?`<button class="btn-s btn-sm" style="border-color:#0891b2;color:#0891b2" onclick="vitMudaStatus('${p.id}','aberto')">🚀 Abrir captação</button>`:''}
+      ${isSoc&&p.status==='aprovado'?`<button class="btn-s btn-sm" style="border-color:#0a1628;color:#0a1628" onclick="vitMudaStatus('${p.id}','aberto')">🚀 Abrir captação</button>`:''}
       ${isSoc&&p.status==='aberto'?`<button class="btn-s btn-sm" style="border-color:#888;color:#888" onclick="vitMudaStatus('${p.id}','encerrado')">Encerrar</button>`:''}
-      ${isSoc&&(p.status==='aberto'||p.status==='aprovado')?`<button class="btn-s btn-sm" onclick="vitPublicLink('${p.id}')" style="border-color:#0891b2;color:#0891b2">🔗 Link</button>`:''}
+      ${isSoc&&(p.status==='aberto'||p.status==='aprovado')?`<button class="btn-s btn-sm" onclick="vitPublicLink('${p.id}')" style="border-color:#0a1628;color:#0a1628">🔗 Link</button>`:''}
       ${isSoc?`<button class="btn-d btn-sm" onclick="deleteVitProj('${p.id}')">✕</button>`:''}
     </div>
   </div>`;
@@ -5514,8 +5522,8 @@ function exportVitPDF(id){
   w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${p.nome||'Projeto'} — IA Hub</title><style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#1a1a1a;background:#fff;padding:40px 48px;max-width:800px;margin:0 auto}
-    .header{border-bottom:3px solid #0891b2;padding-bottom:20px;margin-bottom:28px}
-    .hub-label{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#0891b2;margin-bottom:8px}
+    .header{border-bottom:3px solid #0a1628;padding-bottom:20px;margin-bottom:28px}
+    .hub-label{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#0a1628;margin-bottom:8px}
     .proj-nome{font-size:26px;font-weight:700;color:#0a1628;margin-bottom:6px}
     .proj-tagline{font-size:13px;color:#555;line-height:1.6;margin-bottom:12px}
     .badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px}
@@ -5526,19 +5534,19 @@ function exportVitPDF(id){
     .kpi-label{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
     .kpi-val{font-size:17px;font-weight:700;color:#0a1628}
     .sec{margin-bottom:24px;page-break-inside:avoid}
-    h2{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#0891b2;margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid #e2e8f0}
+    h2{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#0a1628;margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid #e2e8f0}
     p{line-height:1.7;color:#333;margin-bottom:8px}
     .swot-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
     .swot-q{border-radius:8px;padding:12px 14px}
     .swot-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;opacity:.7;margin-bottom:6px}
     .swot-item{font-size:12px;line-height:1.5;margin-bottom:2px}
     .team-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f0f0f0}
-    .avatar{width:30px;height:30px;border-radius:50%;background:#e0f2fe;color:#0891b2;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+    .avatar{width:30px;height:30px;border-radius:50%;background:#e0f2fe;color:#0a1628;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
     .uso-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
     .uso-bar-bg{flex:1;height:5px;background:#e2e8f0;border-radius:10px}
-    .uso-bar-fill{height:100%;border-radius:10px;background:#0891b2}
+    .uso-bar-fill{height:100%;border-radius:10px;background:#0a1628}
     .prog-bg{height:8px;background:#f0f0f0;border-radius:10px;margin:8px 0}
-    .prog-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,#2554C7,#06b6d4)}
+    .prog-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,#0a1628,#d4a017)}
     .faq-item{margin-bottom:12px}
     .faq-q{font-weight:600;margin-bottom:3px}
     .faq-a{color:#555;line-height:1.6}
@@ -5563,7 +5571,7 @@ function exportVitPDF(id){
   ${(p.numArr||p.numCrescimento||p.numClientes||p.numMargem)?`
   <div class="kpi-row">
     ${kpi('ARR',p.numArr,'#0F6E56')}
-    ${kpi('Crescimento',p.numCrescimento,'#0891b2')}
+    ${kpi('Crescimento',p.numCrescimento,'#0a1628')}
     ${kpi('Clientes',p.numClientes,'')}
     ${kpi('Margem bruta',p.numMargem,'')}
   </div>`:''}
@@ -5577,7 +5585,7 @@ function exportVitPDF(id){
 
   ${(p.numTAM||p.numSAM||p.numSOM)?sec('Tamanho de Mercado',`
   <div class="kpi-row" style="grid-template-columns:repeat(3,1fr)">
-    ${kpi('TAM',p.numTAM,'')}${kpi('SAM',p.numSAM,'#0891b2')}${kpi('SOM',p.numSOM,'#0F6E56')}
+    ${kpi('TAM',p.numTAM,'')}${kpi('SAM',p.numSAM,'#0a1628')}${kpi('SOM',p.numSOM,'#0F6E56')}
   </div>`):''}
 
   ${(p.swotF||p.swotW||p.swotO||p.swotT)?sec('Análise SWOT',`
@@ -5596,7 +5604,7 @@ function exportVitPDF(id){
 
   ${(p.captacaoTotal||p.ticketMinimo||p.retornoPrev||p.usoRecursos?.length)?sec('Oportunidade de Investimento',`
   <div class="kpi-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:12px">
-    ${kpi('Captação total',p.captacaoTotal,'#2554C7')}
+    ${kpi('Captação total',p.captacaoTotal,'#0a1628')}
     ${kpi('Ticket mínimo',p.ticketMinimo,'')}
     ${kpi('Retorno previsto',p.retornoPrev,'#0F6E56')}
   </div>
@@ -5638,7 +5646,7 @@ function openVitDetalhe(id){
       <div style="flex:1">
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
           <span class="badge ${vitStatusCls(p.status)}">${vitStatusLabel(p.status)}</span>
-          ${p.setor?`<span class="badge" style="background:#f0f4ff;color:#2554C7">${esc(p.setor)}</span>`:''}
+          ${p.setor?`<span class="badge" style="background:#f5f0e8;color:#0a1628">${esc(p.setor)}</span>`:''}
           ${p.estagio?`<span class="badge" style="background:#f0fdf4;color:#166534">${esc(p.estagio)}</span>`:''}
         </div>
         <div style="font-size:20px;font-weight:700;color:#0a1628;margin-bottom:4px">${esc(p.nome||'Sem título')}</div>
@@ -5648,13 +5656,13 @@ function openVitDetalhe(id){
     </div>
     ${(p.numArr||p.numCrescimento||p.numClientes||p.numMargem)?`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
       ${p.numArr?`<div class="stat"><div class="stat-label">ARR</div><div class="stat-value" style="font-size:18px;color:#0F6E56">${esc(p.numArr)}</div></div>`:''}
-      ${p.numCrescimento?`<div class="stat"><div class="stat-label">Crescimento</div><div class="stat-value" style="font-size:18px;color:#0891b2">${esc(p.numCrescimento)}</div></div>`:''}
+      ${p.numCrescimento?`<div class="stat"><div class="stat-label">Crescimento</div><div class="stat-value" style="font-size:18px;color:#0a1628">${esc(p.numCrescimento)}</div></div>`:''}
       ${p.numClientes?`<div class="stat"><div class="stat-label">Clientes</div><div class="stat-value" style="font-size:18px">${esc(p.numClientes)}</div></div>`:''}
       ${p.numMargem?`<div class="stat"><div class="stat-label">Margem bruta</div><div class="stat-value" style="font-size:18px">${esc(p.numMargem)}</div></div>`:''}
     </div>`:''}
     ${(p.status==='aberto'||p.status==='aprovado')?`<div class="rel-box" style="margin-bottom:16px">
       <h3>Captação</h3>
-      <div style="display:flex;justify-content:space-between;font-size:12px;color:#888;margin:8px 0 4px"><span>${comp}/${cotas} cotas comprometidas</span><span style="font-weight:600;color:#0891b2">${pct}%</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:#888;margin:8px 0 4px"><span>${comp}/${cotas} cotas comprometidas</span><span style="font-weight:600;color:#0a1628">${pct}%</span></div>
       <div class="vit-prog-track"><div class="vit-prog-fill" style="width:${pct}%"></div></div>
       <div style="font-size:11px;color:#aaa;margin-top:4px">${hubN} reservadas IA Hub · ${cotas-hubN} mercado externo</div>
     </div>`:''}
@@ -5667,7 +5675,7 @@ function openVitDetalhe(id){
     ${(p.numTAM||p.numSAM||p.numSOM)?`<div class="rel-box" style="margin-bottom:16px"><h3>Tamanho de Mercado</h3>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px">
         ${p.numTAM?`<div class="stat"><div class="stat-label">TAM</div><div class="stat-value" style="font-size:16px">${esc(p.numTAM)}</div></div>`:''}
-        ${p.numSAM?`<div class="stat"><div class="stat-label">SAM</div><div class="stat-value" style="font-size:16px;color:#0891b2">${esc(p.numSAM)}</div></div>`:''}
+        ${p.numSAM?`<div class="stat"><div class="stat-label">SAM</div><div class="stat-value" style="font-size:16px;color:#0a1628">${esc(p.numSAM)}</div></div>`:''}
         ${p.numSOM?`<div class="stat"><div class="stat-label">SOM (meta)</div><div class="stat-value" style="font-size:16px;color:#0F6E56">${esc(p.numSOM)}</div></div>`:''}
       </div>
     </div>`:''}
@@ -5679,20 +5687,20 @@ function openVitDetalhe(id){
     </div>`:''}
     ${p.time&&p.time.length?`<div class="rel-box" style="margin-bottom:16px"><h3>Time</h3>
       ${p.time.map(m=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f3">
-        <div class="avatar" style="background:#e0f2fe;color:#0891b2">${(m.nome||'?')[0].toUpperCase()}</div>
+        <div class="avatar" style="background:#e0f2fe;color:#0a1628">${(m.nome||'?')[0].toUpperCase()}</div>
         <div><div style="font-size:13px;font-weight:600">${esc(m.nome)}</div><div style="font-size:12px;color:#888">${esc(m.papel)}</div></div>
       </div>`).join('')}
     </div>`:''}
     ${(p.captacaoTotal||p.ticketMinimo||p.retornoPrev||(p.usoRecursos&&p.usoRecursos.length))?`<div class="rel-box" style="margin-bottom:16px"><h3>Deal</h3>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0">
-        ${p.captacaoTotal?`<div class="stat"><div class="stat-label">Captação</div><div class="stat-value" style="font-size:16px;color:#2554C7">${esc(p.captacaoTotal)}</div></div>`:''}
+        ${p.captacaoTotal?`<div class="stat"><div class="stat-label">Captação</div><div class="stat-value" style="font-size:16px;color:#0a1628">${esc(p.captacaoTotal)}</div></div>`:''}
         ${p.ticketMinimo?`<div class="stat"><div class="stat-label">Ticket mín.</div><div class="stat-value" style="font-size:16px">${esc(p.ticketMinimo)}</div></div>`:''}
         ${p.retornoPrev?`<div class="stat"><div class="stat-label">Retorno prev.</div><div class="stat-value" style="font-size:16px;color:#0F6E56">${esc(p.retornoPrev)}</div></div>`:''}
       </div>
       ${p.pctIAHub?`<div style="font-size:12px;color:#888;margin-bottom:10px">🏛 ${p.pctIAHub}% reservado para rede IA Hub · ${100-(p.pctIAHub||0)}% mercado externo${p.prazoMeses?' · Prazo: '+p.prazoMeses+' meses':''}</div>`:''}
       ${p.usoRecursos&&p.usoRecursos.length?p.usoRecursos.map(u=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
         <div style="color:#555;width:140px;flex-shrink:0">${esc(u.desc)}</div>
-        <div style="flex:1;height:5px;background:#f0f0f0;border-radius:10px;overflow:hidden"><div style="height:100%;border-radius:10px;background:#2554C7;width:${u.pct}%"></div></div>
+        <div style="flex:1;height:5px;background:#f0f0f0;border-radius:10px;overflow:hidden"><div style="height:100%;border-radius:10px;background:#0a1628;width:${u.pct}%"></div></div>
         <div style="font-weight:600;width:30px;text-align:right">${u.pct}%</div>
       </div>`).join(''):''}
     </div>`:''}
@@ -5705,7 +5713,7 @@ function openVitDetalhe(id){
     ${p.docs&&p.docs.length?`<div class="rel-box"><h3>Documentos</h3>
       ${p.docs.map(d=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f5f5f3">
         <span>📄</span>
-        ${d.url?`<a href="${esc(d.url)}" target="_blank" style="color:#0891b2;font-size:13px;text-decoration:none">${esc(d.titulo||d.url)}</a>`:`<span style="font-size:13px">${esc(d.titulo)}</span>`}
+        ${d.url?`<a href="${esc(d.url)}" target="_blank" style="color:#0a1628;font-size:13px;text-decoration:none">${esc(d.titulo||d.url)}</a>`:`<span style="font-size:13px">${esc(d.titulo)}</span>`}
       </div>`).join('')}
     </div>`:''}`;
   document.getElementById('ov-vit-detalhe').classList.add('open');
@@ -5741,7 +5749,7 @@ function openVitInteresses(id){
     ${(p.interesses||[]).length
       ?(p.interesses||[]).map((int,i)=>`<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f5f5f3">
           <div>
-            <div style="font-size:13px;font-weight:600">${esc(int.nome)} <span class="badge" style="${int.perfil==='IA Hub'?'background:#FAEEDA;color:#633806':'background:#f0f4ff;color:#2554C7'}">${esc(int.perfil||'Externo')}</span></div>
+            <div style="font-size:13px;font-weight:600">${esc(int.nome)} <span class="badge" style="${int.perfil==='IA Hub'?'background:#FAEEDA;color:#633806':'background:#f5f0e8;color:#0a1628'}">${esc(int.perfil||'Externo')}</span></div>
             ${int.contato?`<div style="font-size:11px;color:#888">${esc(int.contato)}</div>`:''}
             ${int.valor?`<div style="font-size:12px;color:#0F6E56;font-weight:600">${esc(int.valor)}</div>`:''}
             ${int.nota?`<div style="font-size:12px;color:#555;font-style:italic">${esc(int.nota)}</div>`:''}
