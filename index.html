@@ -1402,19 +1402,19 @@ let lancamentos=[
 ];
 
 let sinergias=[
-  {id:1,a:'Advocacia',b:'Contabilidade',p:'alta',why:'Escritórios de advocacia e contabilidade se indicam clientes com frequência. Estruturação societária, abertura de holdings e planejamento tributário são demandas que exigem os dois profissionais ao mesmo tempo. Um cliente que abre empresa com advogado vai precisar de contador; um cliente em reestruturação contábil vai precisar de advogado.',ppl_a:['Alex Salles','Marcus Soares','Gustavo Kalife'],ppl_b:['Eduardo Santos','André Reis']},
-  {id:2,a:'Advocacia',b:'Tributarista',p:'alta',why:'Contencioso fiscal e planejamento tributário preventivo são faces complementares do mesmo problema. Advogados litigam quando o problema já está instaurado; tributaristas planejam para que o problema não ocorra. Nonato e os advogados do HUB têm atuação sinérgica direta em clientes corporativos.',ppl_a:['Alex Salles','Marcus Soares'],ppl_b:['Nonato']},
-  {id:3,a:'Advocacia',b:'Lobista',p:'alta',why:'Advocacia regulatória e atuação política/legislativa se sobrepõem em clientes corporativos que precisam de influência em ambas as esferas. André Barbosa, Toledo e David operam nas esferas onde advogados precisam de influência para resolver questões regulatórias e de licenciamento.',ppl_a:['Alex Salles','Marcus Soares'],ppl_b:['André Barbosa']},
-  {id:4,a:'Advocacia',b:'Imobiliária',p:'alta',why:'Toda transação imobiliária corporativa exige assessoria jurídica especializada: due diligence de imóveis, contratos de compra e venda, constituição de SPEs (Sociedades de Propósito Específico) e análise de passivos ocultos. Paulo BH e Rafael Matias precisam de advogados parceiros.',ppl_a:['Alex Salles','Marcus Soares'],ppl_b:['Rafael Matias','Paulo BH']},
-  {id:5,a:'Contabilidade',b:'Mercado Financeiro',p:'alta',why:'Contadores estruturam o patrimônio empresarial e pessoal; gestores financeiros alocam os ativos resultantes. A indicação entre Eduardo Santos, André Reis e Lipe/Pedro de Biase é bidirecional e natural: quem organiza o patrimônio precisa investi-lo, e quem investe precisa de contabilidade.',ppl_a:['Eduardo Santos','André Reis'],ppl_b:['Lipe de Biase','Pedro de Biase']},
-  {id:6,a:'Contabilidade',b:'Tributarista',p:'alta',why:'Contabilidade tributária operacional (escrituração, apuração de impostos) e o tributarista que litiga e planeja são papéis complementares para o mesmo cliente corporativo. Nonato e os contadores do HUB atendem o mesmo público e podem montar propostas conjuntas.',ppl_a:['Eduardo Santos','André Reis'],ppl_b:['Nonato']},
-  {id:7,a:'Mercado Financeiro',b:'Corretora de Seguros',p:'alta',why:'Clientes de alta renda gerenciados por gestores de investimento precisam de seguro de vida, previdência privada e proteção de patrimônio. Alexandre Almeida é parceiro natural de Lipe e Pedro de Biase: cada cliente de investimento é um potencial cliente de seguro.',ppl_a:['Lipe de Biase','Pedro de Biase'],ppl_b:['Alexandre Almeida']},
-  {id:8,a:'Eventos Corporativos',b:'Mercado Esportivo',p:'alta',why:'Pedro Dau (V3A) e Marcelo Montenegro (213 Sports) atuam em mundos que se sobrepõem: patrocínios, ativações de marca, experiências VIP e eventos esportivos corporativos são oportunidades conjuntas onde a soma das redes cria projetos maiores e mais lucrativos.',ppl_a:['Pedro Dau'],ppl_b:['Marcelo Montenegro']},
-  {id:9,a:'Venda de Veículos',b:'Blindagem de Veículos',p:'alta',why:'A cada veículo vendido pela LM Veículos, Juninho pode oferecer a blindagem com Ricardo Savino como upgrade imediato. É o cross-sell mais direto e de maior ticket do HUB — quem compra veículo de alto padrão frequentemente considera blindagem.',ppl_a:['Juninho'],ppl_b:['Ricardo Savino']},
-  {id:10,a:'Venda de Veículos',b:'Corretora de Seguros',p:'alta',why:'Todo veículo vendido precisa de seguro obrigatório e opcional. Parceria formal entre Juninho (LM Veículos) e Alexandre Almeida gera receita recorrente para os dois: o seguro é vendido no ato da compra do veículo com comissão para a concessionária.',ppl_a:['Juninho'],ppl_b:['Alexandre Almeida']},
-  {id:11,a:'Construção',b:'Imobiliária',p:'alta',why:'O ciclo é direto e recorrente: Anselmo (Lasant) constrói as unidades que Paulo BH e Rafael Matias vendem ou alugam. Parceria estratégica que pode gerar projetos de longo prazo com desenvolvimento imobiliário completo.',ppl_a:['Anselmo'],ppl_b:['Paulo BH','Rafael Matias']},
-  {id:12,a:'Construção',b:'Loja de Tintas',p:'alta',why:'Obras em escala são o maior canal de venda de tintas em volume. Fabio Sampaio (Mundo das Cores) pode ser fornecedor exclusivo de Anselmo (Lasant), com contrato de fornecimento que garante previsibilidade de receita para ambos.',ppl_a:['Anselmo'],ppl_b:['Fabio Sampaio']},
-  {id:13,a:'Restaurante',b:'Produtos de Limpeza',p:'media',why:'Restaurantes são grandes consumidores de produtos de limpeza em volume contínuo. Diego Braga (Aliança) pode ter contrato de fornecimento mensal com Bernardo Montenegro (Grupo Malta) — múltiplas unidades, demanda previsível e recorrente.',ppl_a:['Bernardo Montenegro'],ppl_b:['Diego Braga']},
+  {id:1,a:'Advocacia',b:'Contabilidade',p:'alta',auto:true,why:'Estruturação societária, abertura de holdings e planejamento tributário são demandas que exigem os dois profissionais ao mesmo tempo. Um cliente que abre empresa precisará de contador; um cliente em reestruturação contábil precisará de advogado.',ppl_a:['Alex Salles','Marcus Soares','Gustavo Kalife'],ppl_b:['Eduardo Santos','André Reis']},
+  {id:2,a:'Advocacia',b:'Tributarista',p:'alta',auto:true,why:'Contencioso fiscal e planejamento tributário preventivo são faces complementares do mesmo problema. Advogados litigam quando o problema já está instaurado; tributaristas planejam para que ele não ocorra.',ppl_a:['Alex Salles','Marcus Soares'],ppl_b:['Nonato']},
+  {id:3,a:'Advocacia',b:'Lobista',p:'alta',auto:true,why:'Advocacia regulatória e atuação política se sobrepõem em clientes corporativos que precisam de influência em ambas as esferas — questões regulatórias e de licenciamento exigem os dois frentes simultaneamente.',ppl_a:['Alex Salles','Marcus Soares'],ppl_b:['André Barbosa']},
+  {id:4,a:'Advocacia',b:'Imobiliária',p:'alta',auto:true,why:'Toda transação imobiliária corporativa exige assessoria jurídica: due diligence, contratos de compra e venda, constituição de SPEs e análise de passivos ocultos. O corretor fecha o negócio; o advogado garante que ele se sustente.',ppl_a:['Alex Salles','Marcus Soares'],ppl_b:['Rafael Matias','Paulo BH']},
+  {id:5,a:'Contabilidade',b:'Mercado Financeiro',p:'alta',auto:true,why:'Contadores estruturam o patrimônio empresarial e pessoal; gestores financeiros alocam os ativos resultantes. A indicação é bidirecional: quem organiza o patrimônio precisa investi-lo, e quem investe precisa de contabilidade.',ppl_a:['Eduardo Santos','André Reis'],ppl_b:['Lipe de Biase','Pedro de Biase']},
+  {id:6,a:'Contabilidade',b:'Tributarista',p:'alta',auto:true,why:'Contabilidade tributária operacional e o especialista que litiga e planeja são papéis complementares para o mesmo cliente corporativo — cada um atua em uma camada distinta do mesmo problema fiscal.',ppl_a:['Eduardo Santos','André Reis'],ppl_b:['Nonato']},
+  {id:7,a:'Mercado Financeiro',b:'Corretora de Seguros',p:'alta',auto:true,why:'Clientes de alta renda que investem também precisam de seguro de vida, previdência privada e proteção de patrimônio. Cada cliente de investimento é um potencial cliente de seguro — e vice-versa.',ppl_a:['Lipe de Biase','Pedro de Biase'],ppl_b:['Alexandre Almeida']},
+  {id:8,a:'Eventos Corporativos',b:'Mercado Esportivo',p:'alta',auto:true,why:'Patrocínios, ativações de marca, experiências VIP e eventos esportivos corporativos se sobrepõem. A soma das redes dos dois segmentos cria projetos maiores e propostas que nenhum dos dois conseguiria fechar sozinho.',ppl_a:['Pedro Dau'],ppl_b:['Marcelo Montenegro']},
+  {id:9,a:'Venda de Veículos',b:'Blindagem de Veículos',p:'alta',auto:true,why:'A cada veículo vendido, a blindagem pode ser oferecida como upgrade imediato. É o cross-sell mais direto e de maior ticket da rede — quem compra veículo de alto padrão frequentemente considera blindagem.',ppl_a:['Juninho'],ppl_b:['Ricardo Savino']},
+  {id:10,a:'Venda de Veículos',b:'Corretora de Seguros',p:'alta',auto:true,why:'Todo veículo vendido precisa de seguro. Uma parceria formal entre os dois segmentos gera receita recorrente: o seguro é oferecido no ato da compra, com comissão para a concessionária.',ppl_a:['Juninho'],ppl_b:['Alexandre Almeida']},
+  {id:11,a:'Construção',b:'Imobiliária',p:'alta',auto:true,why:'O ciclo é direto: quem constrói as unidades e quem as vende ou aluga são parceiros naturais. Uma parceria estratégica pode gerar projetos de longo prazo com desenvolvimento imobiliário completo.',ppl_a:['Anselmo'],ppl_b:['Paulo BH','Rafael Matias']},
+  {id:12,a:'Construção',b:'Loja de Tintas',p:'alta',auto:true,why:'Obras em escala são o maior canal de venda de tintas em volume. Um contrato de fornecimento exclusivo entre os dois segmentos garante previsibilidade de receita para ambos.',ppl_a:['Anselmo'],ppl_b:['Fabio Sampaio']},
+  {id:13,a:'Restaurante',b:'Produtos de Limpeza',p:'media',auto:true,why:'Restaurantes são grandes consumidores de produtos de limpeza em volume contínuo. Demanda previsível, recorrente e de múltiplas unidades — perfil ideal para um contrato de fornecimento mensal.',ppl_a:['Bernardo Montenegro'],ppl_b:['Diego Braga']},
 ];
 sinergias = []; // substituído por geração automática
 
@@ -1488,6 +1488,20 @@ function toggleInvProfile(){
   if(wrap)wrap.style.display=isInv?'block':'none';
 }
 function isSocio(){return currentUser&&currentUser.perfil==='Sócio';}
+function sanitizeForParceiro(txt){
+  if(!txt||currentUser?.perfil!=='Parceiro')return txt;
+  let r=txt;
+  const tokens=users.flatMap(u=>{
+    const t=[];
+    if(u.nome){t.push(u.nome);const fn=u.nome.split(' ')[0];if(fn&&fn.length>2)t.push(fn);}
+    if(u.emp&&u.emp!=='?')t.push(u.emp);
+    return t;
+  }).filter(Boolean).sort((a,b)=>b.length-a.length);
+  tokens.forEach(n=>{
+    r=r.replace(new RegExp(n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),'[membro da rede]');
+  });
+  return r;
+}
 function initials(n){const p=(n||'?').trim().split(' ');return(p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();}
 
 // ===================== CADASTRO PÚBLICO =====================
@@ -2869,7 +2883,7 @@ function renderSin(){
         <span class="badge" style="margin-left:auto;background:${syn.p==='alta'?'#E1F5EE':'#EEEDFE'};color:${syn.p==='alta'?'#085041':'#3C3489'}">${syn.p==='alta'?'Alta':'Média'}</span>
       </div>
       ${ppl.length&&currentUser?.perfil!=='Parceiro'?`<div class="syn-ppl">${ppl.map(n=>`<span class="chip">${n}</span>`).join('')}</div>`:''}
-      <div class="syn-why syn-why-clip" id="sw-${syn.id}">${syn.why}</div>
+      <div class="syn-why syn-why-clip" id="sw-${syn.id}">${sanitizeForParceiro(syn.why)}</div>
       <button class="btn-leia-mais" onclick="toggleSynWhy(${syn.id})">↓ leia mais</button>
       ${syn.note&&isSocio()?`<div style="background:#0a1628;color:#e2e8f0;border-radius:8px;padding:9px 12px;margin-top:8px;font-size:12px;line-height:1.6"><span style="font-size:10px;font-weight:700;letter-spacing:.08em;opacity:.7;text-transform:uppercase">IA Hub</span><br>${syn.note}</div>`:''}
       ${editBtn}
