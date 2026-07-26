@@ -35,6 +35,7 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 [data-theme="dark"] .modal{background:#1a2035;border:1px solid #1e2a42;}
 [data-theme="dark"] .modal h2,.modal label{color:#e2e8f0;}
 [data-theme="dark"] .modal input,.modal select,.modal textarea,.controls input,.controls select{background:#0f1117;border-color:#2d3748;color:#e2e8f0;}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:#0f1117!important;border-color:#2d3748!important;color:#e2e8f0!important;}
 [data-theme="dark"] .overlay{background:rgba(0,0,0,.7);}
 [data-theme="dark"] .pj-card,.con-card,.rel-box,.chart-box,.info-box,.agenda-cfg,.fin-planilha,.fin-saldo-bar,.vit-card,.vit-card-v2{background:#1a2035;border-color:#1e2a42;}
 [data-theme="dark"] .pj-title,.con-title,.vit-card-nome{color:#e2e8f0;}
@@ -76,6 +77,10 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 [data-theme="dark"] .fin-grupo-hdr{background:#172032;}
 [data-theme="dark"] .cal-evt{background:#d4a017;color:#fff;}
 [data-theme="dark"] .cal-week-evt{background:#d4a017;}
+[data-theme="dark"] .con-match{background:#131d33;border-color:#1e2a42;}
+[data-theme="dark"] .con-match-title{color:#d4a017;}
+[data-theme="dark"] .con-match-score{color:#e2e8f0;}
+[data-theme="dark"] .con-match-item{border-color:#1e2a42;color:#d1d5db;}
 
 
 /* ===== TELAS ===== */
@@ -274,9 +279,9 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 .con-title{font-family:Georgia,serif;font-size:15px;font-weight:normal;color:#0a1628;letter-spacing:-.1px;}
 .con-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
 .con-desc{font-size:13px;color:#555;line-height:1.6;margin-bottom:10px;}
-.con-match{background:#f5f0e8;border:1px solid #c7d6ff;border-radius:10px;padding:10px 12px;margin-top:8px;}
+.con-match{background:#f5f0e8;border:1px solid #e8e4dc;border-radius:10px;padding:10px 12px;margin-top:8px;}
 .con-match-title{font-size:11px;font-weight:700;color:#0a1628;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;}
-.con-match-item{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid #e0e8ff;font-size:12px;}
+.con-match-item{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid #e0dbd0;font-size:12px;}
 .con-match-item:last-child{border-bottom:none;}
 .con-match-score{font-weight:700;color:#0a1628;min-width:28px;}
 .con-owner{font-size:11px;color:#aaa;}
@@ -1568,7 +1573,8 @@ function toggleDarkMode(){
 })();
 function isSocio(){return currentUser&&currentUser.perfil==='Sócio';}
 function sanitizeForParceiro(txt){
-  if(!txt||currentUser?.perfil!=='Parceiro')return txt;
+  const p=currentUser?.perfil;
+  if(!txt||!(p==='Parceiro'||p==='Associado'))return txt;
   let r=txt;
   const tokens=users.flatMap(u=>{
     const t=[];
@@ -2961,7 +2967,7 @@ function renderSin(){
         <span class="badge" style="background:${cb.bg};color:${cb.tx}">${syn.b}</span>
         <span class="badge" style="margin-left:auto;background:${syn.p==='alta'?'#E1F5EE':'#EEEDFE'};color:${syn.p==='alta'?'#085041':'#3C3489'}">${syn.p==='alta'?'Alta':'Média'}</span>
       </div>
-      ${ppl.length&&currentUser?.perfil!=='Parceiro'?`<div class="syn-ppl">${ppl.map(n=>`<span class="chip">${n}</span>`).join('')}</div>`:''}
+      ${(()=>{const p=currentUser?.perfil;const priv=p==='Parceiro'||p==='Associado';return ppl.length&&!priv?`<div class="syn-ppl">${ppl.map(n=>`<span class="chip">${n}</span>`).join('')}</div>`:''})()}
       <div class="syn-why syn-why-clip" id="sw-${syn.id}">${sanitizeForParceiro(syn.why)}</div>
       <button class="btn-leia-mais" onclick="toggleSynWhy(${syn.id})">↓ leia mais</button>
       ${syn.note&&isSocio()?`<div style="background:#0a1628;color:#e2e8f0;border-radius:8px;padding:9px 12px;margin-top:8px;font-size:12px;line-height:1.6"><span style="font-size:10px;font-weight:700;letter-spacing:.08em;opacity:.7;text-transform:uppercase">IA Hub</span><br>${syn.note}</div>`:''}
