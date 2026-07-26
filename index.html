@@ -11,8 +11,64 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:system-ui,sans-serif;background:#f5f5f3;color:#1a1a1a;font-size:14px;}
+body{font-family:system-ui,sans-serif;background:#f5f5f3;color:#1a1a1a;font-size:14px;transition:background .2s,color .2s;}
 :root{--azul:#0891b2;--azul2:#06b6d4;--azul-esc:#0a1628;--verde:#0F6E56;--amber:#854F0B;}
+
+/* ===== DARK MODE ===== */
+[data-theme="dark"]{color-scheme:dark;}
+[data-theme="dark"] body{background:#0f1117;color:#d1d5db;}
+[data-theme="dark"] .topbar{background:#13182b;border-color:#1e2a42;}
+[data-theme="dark"] .topbar-brand span{color:#e2e8f0;}
+[data-theme="dark"] .tabs-wrap{background:#13182b;border-color:#1e2a42;}
+[data-theme="dark"] .tab{color:#6b7280;}
+[data-theme="dark"] .tab:hover{color:#e2e8f0;}
+[data-theme="dark"] .tab.active{color:#22d3ee;border-bottom-color:#22d3ee;}
+[data-theme="dark"] .app{background:transparent;}
+[data-theme="dark"] .stat,.stat-sub{background:#1a2035;border-color:#1e2a42;}
+[data-theme="dark"] .stat-value{color:#e2e8f0;}
+[data-theme="dark"] .stat-label{color:#6b7280;}
+[data-theme="dark"] .section-hdr{color:#94a3b8;border-color:#1e2a42;}
+[data-theme="dark"] .table-wrap{background:#1a2035;border-color:#1e2a42;}
+[data-theme="dark"] th{background:#131d33;color:#6b7280;border-color:#1e2a42;}
+[data-theme="dark"] td{color:#d1d5db;border-color:#1e2a42;}
+[data-theme="dark"] tr:hover td{background:#1e2a42;}
+[data-theme="dark"] .modal{background:#1a2035;border:1px solid #1e2a42;}
+[data-theme="dark"] .modal h2,.modal label{color:#e2e8f0;}
+[data-theme="dark"] .modal input,.modal select,.modal textarea,.controls input,.controls select{background:#0f1117;border-color:#2d3748;color:#e2e8f0;}
+[data-theme="dark"] .overlay{background:rgba(0,0,0,.7);}
+[data-theme="dark"] .pj-card,.con-card,.rel-box,.chart-box,.info-box,.agenda-cfg,.fin-planilha,.fin-saldo-bar,.vit-card,.vit-card-v2{background:#1a2035;border-color:#1e2a42;}
+[data-theme="dark"] .pj-title,.con-title,.vit-card-nome{color:#e2e8f0;}
+[data-theme="dark"] .pj-body,.con-desc,.vit-card-tagline,.syn-why,.fu-txt{color:#9ca3af;}
+[data-theme="dark"] .syn-card{background:#1a2035;border-color:#1e2a42;}
+[data-theme="dark"] .chip{background:#1e2a42;border-color:#2d3748;color:#94a3b8;}
+[data-theme="dark"] .user-pill{background:#1a2035;border-color:#1e2a42;color:#94a3b8;}
+[data-theme="dark"] .user-menu{background:#1a2035;border-color:#1e2a42;}
+[data-theme="dark"] .user-menu button{color:#e2e8f0;}
+[data-theme="dark"] .user-menu button:hover{background:#1e2a42;}
+[data-theme="dark"] .notif-btn{background:#1a2035;border-color:#1e2a42;color:#94a3b8;}
+[data-theme="dark"] .btn-s{background:#1a2035;border-color:#3b4e6e;color:#93c5fd;}
+[data-theme="dark"] .btn-s:hover{background:#1e2a42;}
+[data-theme="dark"] .btn-leia-mais{color:#818cf8;}
+[data-theme="dark"] .empty-msg{color:#4b5563;}
+[data-theme="dark"] .add-fu-btn{background:#1a2035;border-color:#2554C7;color:#60a5fa;}
+[data-theme="dark"] .vit-card-tese{background:#1e2a42;border-left-color:#d4a017;}
+[data-theme="dark"] .vit-card-meta{background:#131d33;border-color:#1e2a42;}
+[data-theme="dark"] .vit-meta-label{color:#6b7280;}
+[data-theme="dark"] .vit-meta-val{color:#e2e8f0;}
+[data-theme="dark"] .vit-prog-track{background:#1e2a42;}
+[data-theme="dark"] .cal-grid,.cal-week-grid,.cal-day-view{background:#1a2035;border-color:#1e2a42;}
+[data-theme="dark"] .cal-dow,.cal-week-hdr{background:#131d33;color:#6b7280;border-color:#1e2a42;}
+[data-theme="dark"] .cal-day{border-color:#1e2a42;color:#9ca3af;}
+[data-theme="dark"] .cal-day.today{background:#1e2a42;}
+[data-theme="dark"] .cal-day:hover{background:#1e2a42;}
+[data-theme="dark"] .fin-planilha-hdr{background:#0a1628;}
+[data-theme="dark"] .fin-row{border-color:#1e2a42;}
+[data-theme="dark"] .fin-row:hover{background:#1e2a42;}
+[data-theme="dark"] .fin-cell{border-color:#1e2a42;}
+[data-theme="dark"] .fin-total-row{background:#131d33;border-color:#2d3748;}
+[data-theme="dark"] #net-box{background:#1a2035;border-color:#1e2a42;}
+[data-theme="dark"] #btn-dark-toggle{background:#1a2035;border-color:#1e2a42;color:#fbbf24;}
+
 
 /* ===== TELAS ===== */
 #screen-login,#screen-cadastro{display:none;min-height:100vh;}
@@ -424,6 +480,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <span>IA Hub</span>
     </div>
     <div class="topbar-right">
+      <button id="btn-dark-toggle" class="notif-btn" onclick="toggleDarkMode()" title="Alternar tema claro/escuro">🌙</button>
       <button class="notif-btn" onclick="showNotifPanel()" id="notif-btn" title="Notificações">
         🔔 <span class="notif-count" id="notif-count" style="display:none">0</span>
       </button>
@@ -1487,6 +1544,20 @@ function toggleInvProfile(){
   const wrap=document.getElementById('u-inv-profile');
   if(wrap)wrap.style.display=isInv?'block':'none';
 }
+function toggleDarkMode(){
+  const dark=document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme',dark?'light':'dark');
+  document.getElementById('btn-dark-toggle').textContent=dark?'🌙':'☀️';
+  localStorage.setItem('theme',dark?'light':'dark');
+}
+(function(){
+  const t=localStorage.getItem('theme')||'light';
+  document.documentElement.setAttribute('data-theme',t);
+  window.addEventListener('DOMContentLoaded',()=>{
+    const btn=document.getElementById('btn-dark-toggle');
+    if(btn)btn.textContent=t==='dark'?'☀️':'🌙';
+  });
+})();
 function isSocio(){return currentUser&&currentUser.perfil==='Sócio';}
 function sanitizeForParceiro(txt){
   if(!txt||currentUser?.perfil!=='Parceiro')return txt;
