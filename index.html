@@ -1113,7 +1113,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <button class="vit-ftab"        id="vit-ftab-deal"    onclick="vitShowFormTab('deal')">4. Deal</button>
       <button class="vit-ftab"        id="vit-ftab-extras"  onclick="vitShowFormTab('extras')">5. FAQ & Docs</button>
     </div>
-    <div style="min-height:360px">
+    <div style="height:440px;overflow-y:auto;padding-right:4px">
     <!-- Aba 1 -->
     <div id="vit-fsec-ident">
       <div class="fg">
@@ -2978,36 +2978,49 @@ function pipDrop(e,col){
   if(!_pipDragId)return;
   const i=users.findIndex(u=>u.id===_pipDragId);
   if(i===-1){_pipDragId=null;return;}
-  users[i]={...users[i],status:col};
-  saveData();renderPipeline();_pipDragId=null;
+  users[i]={...users[i],funil:col};
+  saveData();syncToSupabase();renderPipeline();_pipDragId=null;
 }
 function renderPipeline(){
   if(!isSocio()){document.getElementById('tab-pipeline').innerHTML='<div class="blocked"><h2>Acesso restrito</h2></div>';return;}
-  const COLS=['Em prospecção','Em negociação','Proposta enviada','Aguardando aprovação','Ativo','Inativo'];
-  const COL_COLORS={'Em prospecção':'#888','Em negociação':'#0891b2','Proposta enviada':'#854F0B','Aguardando aprovação':'#633806','Ativo':'#0F6E56','Inativo':'#aaa'};
+  const COLS=['Prospect','Contato feito','Proposta enviada','Fechado'];
+  const COL_COLORS={Prospect:'#888','Contato feito':'#0891b2','Proposta enviada':'#854F0B',Fechado:'#0F6E56'};
+  const ativos=users.filter(u=>u.status==='Ativo');
+  const semFunil=ativos.filter(u=>!COLS.includes(u.funil));
   const el=document.getElementById('tab-pipeline');
-  el.innerHTML=`<div class="section-hdr">Pipeline de Membros</div>
+  el.innerHTML=`<div class="app" style="padding-top:0">
+  <div class="section-hdr" style="margin-top:0">Pipeline — sincronizado com o campo Funil de cada membro</div>
   <div style="display:flex;gap:12px;overflow-x:auto;padding-bottom:16px">
     ${COLS.map(col=>{
-      const members=users.filter(u=>u.status===col);
-      return`<div style="min-width:200px;flex-shrink:0">
-        <div style="background:${COL_COLORS[col]};color:#fff;border-radius:8px 8px 0 0;padding:8px 12px;font-size:12px;font-weight:600;display:flex;justify-content:space-between">
-          <span>${col}</span><span>${members.length}</span>
+      const members=ativos.filter(u=>u.funil===col);
+      return`<div style="min-width:210px;flex-shrink:0">
+        <div style="background:${COL_COLORS[col]};color:#fff;border-radius:8px 8px 0 0;padding:8px 14px;font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center">
+          <span>${col}</span><span style="background:rgba(255,255,255,.25);border-radius:10px;padding:1px 7px">${members.length}</span>
         </div>
         <div style="background:#f5f5f3;border-radius:0 0 8px 8px;min-height:200px;padding:8px;display:flex;flex-direction:column;gap:8px;transition:background .15s" ondragover="pipDragOver(event)" ondragleave="pipDragLeave(event)" ondrop="pipDrop(event,'${col}')">
           ${members.length?members.map(u=>{
             const ps=PS[u.perfil]||{bg:'#eee',tx:'#555'};
             const segs=(u.seg||'').split(',').map(s=>s.trim()).filter(Boolean);
             return`<div draggable="true" ondragstart="pipDragStart(event,${u.id})" ondragend="pipDragEnd(event)" style="background:#fff;border:1px solid #eee;border-radius:8px;padding:10px;cursor:grab" onclick="openEditUsr(${u.id})">
-              <div style="font-size:13px;font-weight:600;margin-bottom:4px">${u.nome}</div>
+              <div style="font-size:13px;font-weight:600;margin-bottom:4px">${esc(u.nome)}</div>
               <span class="badge" style="background:${ps.bg};color:${ps.tx}">${u.perfil}</span>
               <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:2px">${segs.map(s=>`<span class="badge" style="background:${sc(s).bg};color:${sc(s).tx};font-size:10px">${s}</span>`).join('')}</div>
-              ${u.emp&&u.emp!=='?'?`<div style="font-size:11px;color:#888;margin-top:4px">${u.emp}</div>`:''}
+              ${u.emp&&u.emp!=='?'?`<div style="font-size:11px;color:#888;margin-top:4px">${esc(u.emp)}</div>`:''}
             </div>`;
-          }).join(''):`<div style="color:#aaa;font-size:12px;text-align:center;padding:20px">Arraste um membro para cá</div>`}
+          }).join(''):`<div style="color:#aaa;font-size:12px;text-align:center;padding:20px 8px">Arraste um card aqui<br>ou edite o Funil do membro</div>`}
         </div>
       </div>`;
     }).join('')}
+    ${semFunil.length?`<div style="min-width:210px;flex-shrink:0;opacity:.6">
+      <div style="background:#ccc;color:#fff;border-radius:8px 8px 0 0;padding:8px 14px;font-size:12px;font-weight:600;display:flex;justify-content:space-between">
+        <span>Sem funil</span><span>${semFunil.length}</span>
+      </div>
+      <div style="background:#f5f5f3;border-radius:0 0 8px 8px;min-height:60px;padding:8px;display:flex;flex-direction:column;gap:6px">
+        ${semFunil.map(u=>`<div style="background:#fff;border:1px solid #eee;border-radius:7px;padding:8px;font-size:12px;color:#888;cursor:pointer" onclick="openEditUsr(${u.id})">${esc(u.nome)}</div>`).join('')}
+      </div>
+    </div>`:''}
+  </div>
+  <div style="font-size:12px;color:#aaa;margin-top:4px">Arraste para mover · Clique no card para editar o membro · Funil atualizado aqui reflete em todo o sistema</div>
   </div>`;
 }
 
