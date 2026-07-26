@@ -275,6 +275,22 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 
 /* ===== VITRINE DE INVESTIMENTOS ===== */
 .vit-card{background:#fff;border:1px solid #eee;border-radius:12px;padding:18px;margin-bottom:12px;}
+.vit-card-v2{background:#fff;border:1px solid #e8e4dc;border-radius:16px;padding:22px;margin-bottom:14px;transition:box-shadow .2s;}
+.vit-card-v2:hover{box-shadow:0 4px 20px rgba(0,0,0,.07);}
+.vit-card-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;}
+.vit-card-nome{font-size:18px;font-weight:700;color:#0a1628;line-height:1.2;margin-bottom:5px;letter-spacing:-.01em;}
+.vit-card-tagline{font-size:13px;color:#6b7280;line-height:1.55;}
+.vit-card-tese{background:#f9f6ef;border-left:3px solid #b8860b;border-radius:0 8px 8px 0;padding:10px 14px;margin:14px 0;font-family:Georgia,'Times New Roman',serif;font-size:13px;color:#374151;line-height:1.75;font-style:italic;}
+.vit-card-prog{margin:14px 0;}
+.vit-card-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:0;margin:14px 0;background:#f9fafb;border-radius:10px;border:1px solid #f0f0ee;overflow:hidden;}
+.vit-meta-item{text-align:center;padding:10px 8px;border-right:1px solid #f0f0ee;}
+.vit-meta-item:last-child{border-right:none;}
+.vit-meta-label{font-size:9px;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-weight:600;}
+.vit-meta-val{font-size:13px;font-weight:700;color:#0a1628;}
+.vit-card-btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:16px;align-items:center;}
+.btn-vit-int{background:#0F6E56;color:#fff;border:none;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;}
+.btn-vit-int:hover{background:#0a5a45;}
+.btn-vit-int-done{background:#f0fdf4;color:#0F6E56;border:1px solid #bbf7d0;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:default;}
 .vit-prog-track{height:7px;background:#f0f0f0;border-radius:10px;overflow:hidden;margin-bottom:2px;}
 .vit-prog-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,#2554C7,#06b6d4);transition:width .4s;}
 .vit-s-ras{background:#f5f5f3;color:#888;}
@@ -1300,6 +1316,21 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     </div>
     <div id="vit-int-inner"></div>
   </div>
+
+<div class="overlay" id="ov-vit-int-rapido">
+  <div class="modal" style="max-width:420px">
+    <h2 id="vit-int-r-titulo" style="font-size:16px;font-weight:700;color:#0a1628;margin-bottom:6px">Registrar interesse</h2>
+    <p style="font-size:13px;color:#6b7280;margin-bottom:18px;line-height:1.6">Seu nome será registrado como interessado. O curador da IA Hub entrará em contato.</p>
+    <label>Valor pretendido <span style="color:#aaa;font-weight:400">(opcional)</span></label>
+    <input id="vit-int-r-val" placeholder="ex: R$ 10.000">
+    <label style="margin-top:12px">Mensagem <span style="color:#aaa;font-weight:400">(opcional)</span></label>
+    <textarea id="vit-int-r-nota" style="height:64px" placeholder="Alguma pergunta ou observação?"></textarea>
+    <div class="modal-btns" style="margin-top:18px">
+      <button class="btn-s" onclick="closeOv('ov-vit-int-rapido')">Cancelar</button>
+      <button class="btn-p" onclick="confirmarInteresseRapido()">Confirmar interesse</button>
+    </div>
+  </div>
+</div>
 </div>
 
 <script>
@@ -1524,7 +1555,7 @@ function buildTabs(){
     {id:'pipeline',label:'Pipeline',socio:true},
     {id:'meus-rendimentos',label:'Meus Rendimentos',notSocio:true},
     {id:'relatorio-rede',label:'Relatório da Rede',socio:true},
-    {id:'vitrine',label:'📈 Investimentos',socio:true},
+    {id:'vitrine',label:'📈 Investimentos',all:true},
   ];
   const bar=document.getElementById('tabs-bar');
   bar.innerHTML='';
@@ -1586,11 +1617,11 @@ function initFilters(){
 
 function closeOv(id){document.getElementById(id).classList.remove('open');}
 window.addEventListener('click',e=>{
-  ['ov-usr','ov-proj','ov-fu','ov-lanc','ov-sin','ov-notif','ov-evento','ov-con','ov-relatorio','ov-propor','ov-moderacao','ov-aprovacao','ov-revelar','ov-onboarding','ov-vit-detalhe','ov-vit-int'].forEach(id=>{if(e.target.id===id)closeOv(id);});
+  ['ov-usr','ov-proj','ov-fu','ov-lanc','ov-sin','ov-notif','ov-evento','ov-con','ov-relatorio','ov-propor','ov-moderacao','ov-aprovacao','ov-revelar','ov-onboarding','ov-vit-detalhe','ov-vit-int','ov-vit-int-rapido'].forEach(id=>{if(e.target.id===id)closeOv(id);});
 });
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
-    ['ov-usr','ov-proj','ov-fu','ov-lanc','ov-sin','ov-notif','ov-evento','ov-con','ov-relatorio','ov-propor','ov-moderacao','ov-aprovacao','ov-revelar','ov-onboarding','ov-vit-detalhe','ov-vit-int','ov-vit-manifesto'].forEach(id=>{
+    ['ov-usr','ov-proj','ov-fu','ov-lanc','ov-sin','ov-notif','ov-evento','ov-con','ov-relatorio','ov-propor','ov-moderacao','ov-aprovacao','ov-revelar','ov-onboarding','ov-vit-detalhe','ov-vit-int','ov-vit-int-rapido','ov-vit-manifesto'].forEach(id=>{
       const el=document.getElementById(id);if(el&&el.classList.contains('open'))closeOv(id);
     });
   }
@@ -5125,6 +5156,7 @@ function renderVitrine(){
   const q=(document.getElementById('vit-srch')||{value:''}).value.toLowerCase();
   const sf=(document.getElementById('vit-filt')||{value:''}).value;
   let list=[...projetosVitrine].sort((a,b)=>(b.criadoEm||'').localeCompare(a.criadoEm||''));
+  if(!isSocio())list=list.filter(p=>p.status==='aberto'||p.status==='aprovado');
   if(q)list=list.filter(p=>(p.nome||'').toLowerCase().includes(q)||(p.tagline||'').toLowerCase().includes(q)||(p.setor||'').toLowerCase().includes(q));
   if(sf)list=list.filter(p=>p.status===sf);
   const totInt=projetosVitrine.reduce((a,p)=>a+(p.interesses||[]).length,0);
@@ -5159,44 +5191,47 @@ function vitCardHTML(p){
   const pct=Math.round(comp/cotas*100);
   const ints=(p.interesses||[]).length;
   const showBar=p.status==='aberto'||p.status==='aprovado';
-  return`<div class="vit-card">
-    <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">
-      <div style="flex:1">
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:5px">
-          <span class="badge ${vitStatusCls(p.status)}">${vitStatusLabel(p.status)}</span>
-          ${p.setor?`<span class="badge" style="background:#f0f4ff;color:#2554C7">${esc(p.setor)}</span>`:''}
-          ${p.estagio?`<span class="badge" style="background:#f0fdf4;color:#166534">${esc(p.estagio)}</span>`:''}
-        </div>
-        <div class="pj-title">${esc(p.nome||'Sem título')}</div>
-        ${p.tagline?`<div style="font-size:12px;color:#555;margin-top:3px;line-height:1.5">${esc(p.tagline)}</div>`:''}
-        ${p.teseCurador?`<div style="background:#f8faff;border-left:3px solid #3b82f6;border-radius:0 7px 7px 0;padding:9px 12px;margin-top:8px;font-family:Georgia,'Times New Roman',serif;font-size:12px;color:#1a1a1a;line-height:1.6">"${esc(p.teseCurador)}"</div>`:''}
-      </div>
+  const isSoc=isSocio();
+  const jaInteressado=(p.interesses||[]).some(i=>i.userId===currentUser?.id||i.nome===currentUser?.nome);
+  const temMeta=p.captacaoTotal||p.ticketMinimo||p.retornoPrev||ints;
+  return`<div class="vit-card-v2">
+    <div class="vit-card-badges">
+      <span class="badge ${vitStatusCls(p.status)}">${vitStatusLabel(p.status)}</span>
+      ${p.setor?`<span class="badge" style="background:#f0f4ff;color:#2554C7">${esc(p.setor)}</span>`:''}
+      ${p.estagio?`<span class="badge" style="background:#f0fdf4;color:#166534">${esc(p.estagio)}</span>`:''}
     </div>
-    ${showBar?`<div style="margin:8px 0">
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:#888;margin-bottom:4px">
-        <span>${comp}/${cotas} cotas comprometidas</span>
-        <span style="font-weight:600;color:${pct>=80?'#0F6E56':'#0891b2'}">${pct}%</span>
+    <div class="vit-card-nome">${esc(p.nome||'Sem título')}</div>
+    ${p.tagline?`<div class="vit-card-tagline">${esc(p.tagline)}</div>`:''}
+    ${p.teseCurador?`<div class="vit-card-tese">"${esc(p.teseCurador)}"</div>`:''}
+    ${showBar?`<div class="vit-card-prog">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:#888;margin-bottom:5px">
+        <span>${comp} de ${cotas} cotas comprometidas</span>
+        <span style="font-weight:700;color:${pct>=80?'#0F6E56':'#0891b2'}">${pct}%</span>
       </div>
       <div class="vit-prog-track"><div class="vit-prog-fill" style="width:${pct}%"></div></div>
-      <div style="font-size:10px;color:#aaa;margin-top:3px">${hubN} reservadas IA Hub (${p.pctIAHub||50}%) · ${cotas-hubN} mercado externo</div>
+      ${isSoc?`<div style="font-size:10px;color:#aaa;margin-top:3px">${hubN} reservadas IA Hub · ${cotas-hubN} mercado externo</div>`:''}
     </div>`:''}
-    <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:#555;margin:8px 0">
-      ${p.captacaoTotal?`<span>💰 ${esc(p.captacaoTotal)}</span>`:''}
-      ${p.ticketMinimo?`<span>🎟 Mín. ${esc(p.ticketMinimo)}</span>`:''}
-      ${p.pctIAHub?`<span>🏛 ${p.pctIAHub}% IA Hub</span>`:''}
-      ${p.retornoPrev?`<span>📈 ${esc(p.retornoPrev)}</span>`:''}
-      ${ints?`<span style="color:#0F6E56;font-weight:600">✋ ${ints} interesse${ints>1?'s':''}</span>`:''}
-    </div>
-    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
-      <button class="btn-s btn-sm" onclick="openVitProj('${p.id}')">✏ Editar</button>
-      <button class="btn-s btn-sm" onclick="openVitDetalhe('${p.id}')">👁 Ver completo</button>
-      <button class="btn-s btn-sm" onclick="openVitInteresses('${p.id}')">✋ Interesses (${ints})</button>
-      ${p.status==='rascunho'?`<button class="btn-s btn-sm" style="border-color:#854F0B;color:#854F0B" onclick="vitMudaStatus('${p.id}','revisao')">→ Enviar para revisão</button>`:''}
-      ${p.status==='revisao'&&isSocio()?`<button class="btn-s btn-sm" style="border-color:#0F6E56;color:#0F6E56" onclick="vitMudaStatus('${p.id}','aprovado')">✓ Aprovar</button>`:''}
-      ${p.status==='aprovado'&&isSocio()?`<button class="btn-s btn-sm" style="border-color:#0891b2;color:#0891b2" onclick="vitMudaStatus('${p.id}','aberto')">🚀 Abrir para captação</button>`:''}
-      ${p.status==='aberto'?`<button class="btn-s btn-sm" style="border-color:#888;color:#888" onclick="vitMudaStatus('${p.id}','encerrado')">Encerrar</button>`:''}
-      ${(p.status==='aberto'||p.status==='aprovado')?`<button class="btn-s btn-sm" onclick="vitPublicLink('${p.id}')" style="border-color:#0891b2;color:#0891b2">🔗 Link público</button>`:''}
-      <button class="btn-d btn-sm" onclick="deleteVitProj('${p.id}')">✕</button>
+    ${temMeta?`<div class="vit-card-meta">
+      ${p.captacaoTotal?`<div class="vit-meta-item"><div class="vit-meta-label">Captação</div><div class="vit-meta-val">${esc(p.captacaoTotal)}</div></div>`:''}
+      ${p.ticketMinimo?`<div class="vit-meta-item"><div class="vit-meta-label">Ticket mín.</div><div class="vit-meta-val">${esc(p.ticketMinimo)}</div></div>`:''}
+      ${p.retornoPrev?`<div class="vit-meta-item"><div class="vit-meta-label">Retorno prev.</div><div class="vit-meta-val">${esc(p.retornoPrev)}</div></div>`:''}
+      ${ints?`<div class="vit-meta-item"><div class="vit-meta-label">Interesses</div><div class="vit-meta-val" style="color:#0F6E56">${ints}</div></div>`:''}
+    </div>`:''}
+    <div class="vit-card-btns">
+      ${(p.status==='aberto'||p.status==='aprovado')
+        ?(jaInteressado
+          ?`<button class="btn-vit-int-done" disabled>✓ Interesse registrado</button>`
+          :`<button class="btn-vit-int" onclick="abrirInteresseRapido('${p.id}')">✋ Tenho interesse</button>`)
+        :''}
+      <button class="btn-s btn-sm" onclick="openVitDetalhe('${p.id}')">Ver completo</button>
+      ${isSoc?`<button class="btn-s btn-sm" onclick="openVitProj('${p.id}')">Editar</button>`:''}
+      ${isSoc?`<button class="btn-s btn-sm" onclick="openVitInteresses('${p.id}')">Interesses (${ints})</button>`:''}
+      ${isSoc&&p.status==='rascunho'?`<button class="btn-s btn-sm" style="border-color:#854F0B;color:#854F0B" onclick="vitMudaStatus('${p.id}','revisao')">→ Revisão</button>`:''}
+      ${isSoc&&p.status==='revisao'?`<button class="btn-s btn-sm" style="border-color:#0F6E56;color:#0F6E56" onclick="vitMudaStatus('${p.id}','aprovado')">✓ Aprovar</button>`:''}
+      ${isSoc&&p.status==='aprovado'?`<button class="btn-s btn-sm" style="border-color:#0891b2;color:#0891b2" onclick="vitMudaStatus('${p.id}','aberto')">🚀 Abrir captação</button>`:''}
+      ${isSoc&&p.status==='aberto'?`<button class="btn-s btn-sm" style="border-color:#888;color:#888" onclick="vitMudaStatus('${p.id}','encerrado')">Encerrar</button>`:''}
+      ${isSoc&&(p.status==='aberto'||p.status==='aprovado')?`<button class="btn-s btn-sm" onclick="vitPublicLink('${p.id}')" style="border-color:#0891b2;color:#0891b2">🔗 Link</button>`:''}
+      ${isSoc?`<button class="btn-d btn-sm" onclick="deleteVitProj('${p.id}')">✕</button>`:''}
     </div>
   </div>`;
 }
@@ -5631,6 +5666,32 @@ function salvarVitInteresse(projId){
   p.cotasComprometidas=(p.interesses||[]).length;
   saveData();syncToSupabase();openVitInteresses(projId);renderVitrine();
   showToast('✅ Interesse registrado');
+}
+let _vitIntRapidoId=null;
+function abrirInteresseRapido(projId){
+  const p=projetosVitrine.find(p=>p.id===projId);if(!p)return;
+  _vitIntRapidoId=projId;
+  document.getElementById('vit-int-r-titulo').textContent='Interesse em: '+p.nome;
+  document.getElementById('vit-int-r-val').value='';
+  document.getElementById('vit-int-r-nota').value='';
+  document.getElementById('ov-vit-int-rapido').classList.add('open');
+}
+function confirmarInteresseRapido(){
+  const p=projetosVitrine.find(p=>p.id===_vitIntRapidoId);if(!p)return;
+  if(!p.interesses)p.interesses=[];
+  p.interesses.push({
+    nome:currentUser.nome,
+    userId:currentUser.id,
+    contato:currentUser.tel||currentUser.email||'',
+    valor:document.getElementById('vit-int-r-val').value.trim(),
+    perfil:'IA Hub',
+    nota:document.getElementById('vit-int-r-nota').value.trim(),
+    data:new Date().toLocaleDateString('pt-BR'),
+  });
+  p.cotasComprometidas=(p.interesses||[]).length;
+  closeOv('ov-vit-int-rapido');
+  saveData();syncToSupabase();renderVitrine();
+  showToast('✅ Interesse registrado — o curador entrará em contato!');
 }
 function removeVitInteresse(projId,idx){
   const p=projetosVitrine.find(p=>p.id===projId);if(!p||!p.interesses)return;
