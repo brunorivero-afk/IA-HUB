@@ -170,7 +170,6 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 /* ===== PAINÉIS COM LAYOUT INTERNO ===== */
 #tab-rede-membros.panel.active{overflow:hidden;}
 #mbr-pag button:disabled{opacity:.4;cursor:default;}
-#fin-planilha-wrap{max-height:calc(100vh - 560px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:#cbd5e1 transparent;}
 
 /* ===== COMPONENTES ===== */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px;}
@@ -3173,7 +3172,7 @@ function renderPipeline(){
   <div style="display:flex;gap:12px;overflow-x:auto;padding-bottom:16px">
     ${COLS.map(col=>{
       const members=ativos.filter(u=>u.funil===col);
-      return`<div style="min-width:210px;flex-shrink:0">
+      return`<div style="flex:1;min-width:180px">
         <div style="background:${COL_COLORS[col]};color:#fff;border-radius:8px 8px 0 0;padding:8px 14px;font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center">
           <span>${col}</span><span style="background:rgba(255,255,255,.25);border-radius:10px;padding:1px 7px">${members.length}</span>
         </div>
@@ -3191,7 +3190,7 @@ function renderPipeline(){
         </div>
       </div>`;
     }).join('')}
-    ${semFunil.length?`<div style="min-width:210px;flex-shrink:0;opacity:.6">
+    ${semFunil.length?`<div style="flex:1;min-width:180px;opacity:.6">
       <div style="background:#ccc;color:#fff;border-radius:8px 8px 0 0;padding:8px 14px;font-size:12px;font-weight:600;display:flex;justify-content:space-between">
         <span>Sem funil</span><span>${semFunil.length}</span>
       </div>
