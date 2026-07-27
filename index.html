@@ -11,6 +11,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
+html,body{margin:0;padding:0;height:100%;overflow:hidden;}
 body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size:14px;transition:background .2s,color .2s;}
 :root{--azul:#0a1628;--azul2:#d4a017;--azul-esc:#0a1628;--verde:#0F6E56;--amber:#d4a017;--amber-dk:#a07810;}
 
@@ -20,16 +21,16 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 [data-theme="dark"] .topbar{background:#13182b;border-color:#1e2a42;}
 [data-theme="dark"] .topbar-brand span{color:#e2e8f0;}
 [data-theme="dark"] .tabs-wrap{background:#13182b;border-color:#1e2a42;}
-[data-theme="dark"] .tab{color:#6b7280;}
+[data-theme="dark"] .tab{color:#94a3b8;}
 [data-theme="dark"] .tab:hover{color:#e2e8f0;}
 [data-theme="dark"] .tab.active{color:#d4a017;border-bottom-color:#d4a017;}
 [data-theme="dark"] .app{background:transparent;}
 [data-theme="dark"] .stat,.stat-sub{background:#1a2035;border-color:#1e2a42;}
 [data-theme="dark"] .stat-value{color:#e2e8f0;}
-[data-theme="dark"] .stat-label{color:#6b7280;}
-[data-theme="dark"] .section-hdr{color:#94a3b8;border-color:#1e2a42;}
+[data-theme="dark"] .stat-label{color:#94a3b8;}
+[data-theme="dark"] .section-hdr{color:#c0cce0;border-color:#1e2a42;}
 [data-theme="dark"] .table-wrap{background:#1a2035;border-color:#1e2a42;}
-[data-theme="dark"] th{background:#131d33;color:#6b7280;border-color:#1e2a42;}
+[data-theme="dark"] th{background:#131d33;color:#94a3b8;border-color:#1e2a42;}
 [data-theme="dark"] td{color:#d1d5db;border-color:#1e2a42;}
 [data-theme="dark"] tr:hover td{background:#1e2a42;}
 [data-theme="dark"] .modal{background:#1a2035;border:1px solid #1e2a42;}
@@ -50,15 +51,25 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 [data-theme="dark"] .btn-s{background:#1a2035;border-color:#3b4e6e;color:#e8c668;}
 [data-theme="dark"] .btn-s:hover{background:#1e2a42;}
 [data-theme="dark"] .btn-leia-mais{color:#818cf8;}
-[data-theme="dark"] .empty-msg{color:#4b5563;}
+[data-theme="dark"] .empty-msg{color:#94a3b8;}
 [data-theme="dark"] .add-fu-btn{background:#1a2035;border-color:#d4a017;color:#d4a017;}
+[data-theme="dark"] .fu-meta{color:#6b7280;}
+[data-theme="dark"] .con-owner{color:#6b7280;}
+[data-theme="dark"] .stat-sub{color:#6b7280;}
 [data-theme="dark"] .vit-card-tese{background:#1e2a42;border-left-color:#d4a017;}
 [data-theme="dark"] .vit-card-meta{background:#131d33;border-color:#1e2a42;}
-[data-theme="dark"] .vit-meta-label{color:#6b7280;}
+[data-theme="dark"] .vit-meta-label{color:#94a3b8;}
 [data-theme="dark"] .vit-meta-val{color:#e2e8f0;}
 [data-theme="dark"] .vit-prog-track{background:#1e2a42;}
+[data-theme="dark"] .vit-scorecard{background:#131d33;border-color:#1e2a42;}
+[data-theme="dark"] .vit-sc-overall-num{color:#e2e8f0;}
+[data-theme="dark"] .vit-sc-dim-hdr{color:#94a3b8;}
+[data-theme="dark"] .vit-sc-bar-track{background:#1e2a42;}
+[data-theme="dark"] .vit-sc-lbl{color:#94a3b8;}
+[data-theme="dark"] .vit-sc-val{color:#e2e8f0;}
+[data-theme="dark"] .vit-sc-slider{background:#1e2a42;}
 [data-theme="dark"] .cal-grid,.cal-week-grid,.cal-day-view{background:#1a2035;border-color:#1e2a42;}
-[data-theme="dark"] .cal-dow,.cal-week-hdr{background:#131d33;color:#6b7280;border-color:#1e2a42;}
+[data-theme="dark"] .cal-dow,.cal-week-hdr{background:#131d33;color:#94a3b8;border-color:#1e2a42;}
 [data-theme="dark"] .cal-day{border-color:#1e2a42;color:#9ca3af;}
 [data-theme="dark"] .cal-day.today{background:#1e2a42;}
 [data-theme="dark"] .cal-day:hover{background:#1e2a42;}
@@ -87,7 +98,7 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 #screen-login,#screen-cadastro{display:none;min-height:100vh;}
 #screen-main{display:none;}
 .screen-active{display:flex!important;}
-.screen-main-active{display:block!important;}
+.screen-main-active{display:grid!important;}
 
 /* ===== LOGIN / CADASTRO ===== */
 .auth-wrap{display:flex;min-height:100vh;}
@@ -138,16 +149,35 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 .tab:hover{color:#0a1628;}
 .tab.active{color:#d4a017;border-bottom-color:#d4a017;font-weight:500;}
 .tab.locked{opacity:.35;cursor:not-allowed;}
-.app{padding:20px 24px;max-width:1200px;margin:0 auto;}
+.app{grid-area:app;position:relative;overflow:hidden;min-height:0;}
 .panel{display:none;}
-.panel.active{display:block;}
+.panel.active{display:block;position:absolute;inset:0;overflow-y:auto;padding:20px 24px;box-sizing:border-box;scrollbar-width:none;-ms-overflow-style:none;}
+.panel.active::-webkit-scrollbar{display:none;}
+/* ===== SIDEBAR LAYOUT ===== */
+#screen-main{grid-template-columns:220px 1fr;grid-template-rows:auto 1fr;grid-template-areas:"sidebar topbar" "sidebar app";position:fixed;inset:0;overflow:hidden;}
+.topbar{grid-area:topbar;justify-content:flex-end;}
+.tabs-wrap{display:none;}
+.topbar-brand{display:none;}
+.sidebar{grid-area:sidebar;background:#0a1628;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid rgba(255,255,255,.05);}
+.sidebar-header{padding:22px 16px 16px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;}
+.sidebar-brand-name{font-family:Georgia,serif;font-size:16px;color:#fff;letter-spacing:-.2px;margin-top:10px;line-height:1.2;}
+.sidebar-brand-accent{color:#d4a017;}
+.sidebar-nav{flex:1;padding:8px;overflow-y:auto;}
+.sidebar .tab{display:flex;align-items:center;width:100%;box-sizing:border-box;text-align:left;border:none!important;border-radius:7px;padding:10px 12px;font-size:13px;color:#94a3b8;background:none;cursor:pointer;transition:background .15s,color .15s;margin-bottom:2px;white-space:normal;line-height:1.3;}
+.sidebar .tab:hover{background:rgba(255,255,255,.07);color:#e2e8f0;}
+.sidebar .tab.active{background:rgba(212,160,23,.15);color:#d4a017;font-weight:500;}
+
+/* ===== PAINÉIS COM LAYOUT INTERNO ===== */
+#tab-rede-membros.panel.active{overflow:hidden;}
+#mbr-pag button:disabled{opacity:.4;cursor:default;}
+#fin-planilha-wrap{max-height:calc(100vh - 560px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:#cbd5e1 transparent;}
 
 /* ===== COMPONENTES ===== */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px;}
 .stat{background:#fff;border-radius:10px;padding:14px;border:1px solid #eee;}
 .stat-label{font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;}
 .stat-value{font-size:24px;font-weight:600;color:#0a1628;font-variant-numeric:tabular-nums;}
-.stat-sub{font-size:11px;color:#aaa;margin-top:2px;}
+.stat-sub{font-size:11px;color:#777;margin-top:2px;}
 .controls{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
 .controls input,.controls select{flex:1;min-width:150px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;background:#fff;}
 .table-wrap{overflow-x:auto;background:#fff;border-radius:12px;border:1px solid #eee;}
@@ -177,8 +207,14 @@ button.btn-s:hover{background:#f5f0e8;}
 button.btn-d{background:#fff;border:1px solid #fecaca;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;color:#c0392b;}
 button.btn-sm{padding:4px 10px;font-size:11px;}
 .avatar{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;vertical-align:middle;margin-right:8px;}
-.empty-msg{text-align:center;color:#aaa;padding:48px;font-size:13px;}
-.blocked{text-align:center;padding:60px 20px;color:#aaa;}
+.empty-msg{text-align:center;color:#6b7280;padding:48px;font-size:13px;}
+.blocked{text-align:center;padding:60px 20px;color:#6b7280;}
+.pip-col-body{background:#f0ede8;transition:background .15s;}
+.pip-card{background:#fff;border:1px solid #e8e4dc;color:#1a1a1a;}
+.pip-card-nome{color:#0a1628;}
+[data-theme="dark"] .pip-col-body{background:#131d33!important;}
+[data-theme="dark"] .pip-card{background:#1a2540!important;border-color:#2d3748!important;}
+[data-theme="dark"] .pip-card-nome{color:#e2e8f0;}
 .blocked h2{font-size:18px;color:#888;margin-bottom:8px;}
 .section-hdr{font-family:Georgia,serif;font-size:15px;font-weight:normal;color:#0a1628;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid #eee;letter-spacing:-.1px;}
 
@@ -204,7 +240,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 .fu-item{position:relative;margin-bottom:10px;}
 .fu-item::before{content:'';position:absolute;left:-19px;top:5px;width:8px;height:8px;border-radius:50%;background:#d4a017;border:2px solid #fff;box-shadow:0 0 0 2px #d4a017;}
 .fu-txt{font-size:13px;color:#1a1a1a;}
-.fu-meta{font-size:11px;color:#aaa;margin-top:2px;}
+.fu-meta{font-size:11px;color:#777;margin-top:2px;}
 .fu-new-badge{background:#dcfce7;color:#166534;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:6px;font-weight:600;}
 .add-fu-btn{background:#fdf8ee;border:1px dashed #d4bf80;color:#0a1628;border-radius:8px;padding:7px 14px;font-size:12px;cursor:pointer;margin-top:8px;}
 
@@ -284,7 +320,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 .con-match-item{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid #e0dbd0;font-size:12px;}
 .con-match-item:last-child{border-bottom:none;}
 .con-match-score{font-weight:700;color:#0a1628;min-width:28px;}
-.con-owner{font-size:11px;color:#aaa;}
+.con-owner{font-size:11px;color:#777;}
 .porte-startup{background:#f0ede8;color:#5a4a3a;}
 .porte-pequena{background:#dcfce7;color:#166534;}
 .porte-media{background:#fef9c3;color:#854d0e;}
@@ -361,6 +397,21 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 .btn-vit-int:hover{background:#0a5a45;}
 .btn-vit-int-done{background:#f0fdf4;color:#0F6E56;border:1px solid #bbf7d0;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:default;}
 .vit-prog-track{height:7px;background:#f0f0f0;border-radius:10px;overflow:hidden;margin-bottom:2px;}
+.vit-scorecard{margin:12px 0 8px;border:1px solid #ede9e0;border-radius:10px;padding:12px 14px;background:#fefcf8;}
+.vit-sc-overall{display:flex;align-items:baseline;gap:3px;margin-bottom:10px;}
+.vit-sc-overall-num{font-family:Georgia,serif;font-size:21px;font-weight:normal;color:#0a1628;}
+.vit-sc-overall-den{font-size:12px;color:#9ca3af;}
+.vit-sc-overall-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-left:auto;}
+.vit-sc-dim{margin-bottom:6px;}
+.vit-sc-dim:last-child{margin-bottom:0;}
+.vit-sc-dim-hdr{display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin-bottom:3px;}
+.vit-sc-bar-track{height:4px;background:#e8e4dc;border-radius:3px;overflow:hidden;}
+.vit-sc-bar-fill{height:100%;background:#d4a017;border-radius:3px;}
+.vit-sc-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.vit-sc-lbl{font-size:12px;color:#374151;min-width:72px;font-weight:500;}
+.vit-sc-slider{flex:1;-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:#e5e7eb;outline:none;cursor:pointer;}
+.vit-sc-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#d4a017;cursor:pointer;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.vit-sc-val{font-size:12px;font-weight:700;color:#0a1628;min-width:30px;text-align:right;}
 .vit-prog-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,#0a1628,#d4a017);transition:width .4s;}
 .vit-s-ras{background:#f5f5f3;color:#888;}
 .vit-s-rev{background:#FAEEDA;color:#633806;}
@@ -487,6 +538,13 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 
 <!-- ============ TELA MAIN ============ -->
 <div id="screen-main">
+  <nav class="sidebar" id="main-sidebar">
+    <div class="sidebar-header">
+      <div id="logo-sidebar-wrap"></div>
+      <div class="sidebar-brand-name">IA <span class="sidebar-brand-accent">Hub</span></div>
+    </div>
+    <div id="tabs-bar" class="sidebar-nav"></div>
+  </nav>
   <div class="topbar">
     <div class="topbar-brand">
       <div id="logo-main-wrap"></div>
@@ -510,9 +568,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       </div>
     </div>
   </div>
-  <div class="tabs-wrap">
-    <div class="tabs" id="tabs-bar"></div>
-  </div>
+  <div class="tabs-wrap"></div>
   <div class="app">
     <!-- MAPA DE REDE -->
     <div class="panel" id="tab-rede">
@@ -600,7 +656,6 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
             <th id="th-email-col">Email</th><th>Segmento(s)</th>
             <th>Perfil</th><th id="th-status-col">Status</th>
             <th id="th-vinculo-col">Vinculado a</th>
-            <th id="th-comissao-col">Comissão</th>
             <th id="th-obs-col">Obs.</th><th></th><th></th>
           </tr></thead>
           <tbody id="mbr-tbody"></tbody>
@@ -1261,6 +1316,14 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
           </div>
           <div style="font-size:11px;color:#9ca3af;margin-top:3px">Apenas letras, números e hífens. Deixe em branco para gerar automaticamente.</div>
         </div>
+        <div class="full" style="border-top:1px solid #f0ede8;margin-top:4px;padding-top:14px">
+          <div style="font-size:12px;font-weight:700;color:#0a1628;margin-bottom:10px;letter-spacing:.03em">Scorecard do Curador <span style="font-size:11px;color:#9ca3af;font-weight:400;margin-left:6px">Avaliação interna 1–10</span></div>
+          <div class="vit-sc-row"><span class="vit-sc-lbl">Equipe</span><input type="range" id="vit-sc-equipe" min="1" max="10" value="5" class="vit-sc-slider" oninput="document.getElementById('vit-sc-v-equipe').textContent=this.value+'/10'"><span class="vit-sc-val" id="vit-sc-v-equipe">5/10</span></div>
+          <div class="vit-sc-row"><span class="vit-sc-lbl">Mercado</span><input type="range" id="vit-sc-mercado" min="1" max="10" value="5" class="vit-sc-slider" oninput="document.getElementById('vit-sc-v-mercado').textContent=this.value+'/10'"><span class="vit-sc-val" id="vit-sc-v-mercado">5/10</span></div>
+          <div class="vit-sc-row"><span class="vit-sc-lbl">Tração</span><input type="range" id="vit-sc-tracao" min="1" max="10" value="5" class="vit-sc-slider" oninput="document.getElementById('vit-sc-v-tracao').textContent=this.value+'/10'"><span class="vit-sc-val" id="vit-sc-v-tracao">5/10</span></div>
+          <div class="vit-sc-row"><span class="vit-sc-lbl">Modelo</span><input type="range" id="vit-sc-modelo" min="1" max="10" value="5" class="vit-sc-slider" oninput="document.getElementById('vit-sc-v-modelo').textContent=this.value+'/10'"><span class="vit-sc-val" id="vit-sc-v-modelo">5/10</span></div>
+          <div class="vit-sc-row" style="margin-bottom:0"><span class="vit-sc-lbl">Timing</span><input type="range" id="vit-sc-timing" min="1" max="10" value="5" class="vit-sc-slider" oninput="document.getElementById('vit-sc-v-timing').textContent=this.value+'/10'"><span class="vit-sc-val" id="vit-sc-v-timing">5/10</span></div>
+        </div>
         <div class="full fg-sec">Uso dos Recursos <button class="btn-s btn-sm" onclick="addVitUso()" style="margin-left:8px">+ Linha</button></div>
         <div class="full" id="vit-uso-list"></div>
       </div>
@@ -1460,6 +1523,7 @@ let users=[
 
 // Convidados externos cadastrados via agenda
 let convidadosExternos=[];
+let mbrPage=0;
 
 let projetos=[
   {id:201,nome:'Estruturação societária – Cliente ABC',desc:'Reorganização societária com holding e planejamento tributário.',status:'Em andamento',valor:18000,inicio:'2025-03-01',fim:'2025-08-31',recorr:'',recorrAte:'',participantes:[1,2,4],dist:{1:20,2:50,4:30},sinergia:'Advocacia ↔ Contabilidade',criadorId:1,lastSeen:{},followups:[{texto:'Reunião inicial. Levantamento de documentos em andamento.',data:'2025-03-10',autor:'Sócio Demo',ts:1}]},
@@ -1500,7 +1564,7 @@ function showScreen(name){
   document.getElementById('screen-main').style.display='none';
   if(name==='login'){document.getElementById('screen-login').style.display='flex';}
   else if(name==='cadastro'){document.getElementById('screen-cadastro').style.display='flex';}
-  else{document.getElementById('screen-main').style.display='block';}
+  else{document.getElementById('screen-main').style.display='grid';}
 }
 
 // ===================== LOGO =====================
@@ -1511,6 +1575,7 @@ function injectLogos(){
   document.getElementById('logo-login-sm-wrap').innerHTML=sm;
   document.getElementById('logo-cad-wrap').innerHTML=lg;
   document.getElementById('logo-main-wrap').innerHTML=sm;
+  document.getElementById('logo-sidebar-wrap').innerHTML=sm;
 }
 
 // ===================== LOGIN =====================
@@ -1698,6 +1763,7 @@ function showTab(name){
   if(name==='meus-rendimentos')renderMeusRendimentos();
   if(name==='relatorio-rede')renderRelatorioRede();
   if(name==='vitrine')renderVitrine();
+  setTimeout(sizeActivePanel,0);
   // Rastrear abas visitadas (para onboarding)
   if(name==='sinergias'){
     const idx=users.findIndex(u=>u.id===currentUser.id);
@@ -1705,6 +1771,8 @@ function showTab(name){
   }
 }
 
+function sizeActivePanel(){}
+window.addEventListener('resize',sizeActivePanel);
 function initFilters(){
   const allSegs=[...new Set(users.flatMap(u=>(u.seg||'').split(',').map(s=>s.trim()).filter(Boolean)))].sort();
   ['mbr-fseg','syn-seg'].forEach(id=>{
@@ -2118,6 +2186,8 @@ function renderMembros(){
   // Perfil cards (só sócios)
   const pcEl=document.getElementById('mbr-perfil-cards');
   if(pcEl)pcEl.style.display=socio?'block':'none';
+  const statsMbrEl=document.getElementById('stats-mbr');
+  if(statsMbrEl)statsMbrEl.style.display=socio?'none':'';
   if(socio){
     document.getElementById('cnt-socio').textContent=users.filter(u=>u.perfil==='Sócio').length;
     document.getElementById('cnt-assoc').textContent=users.filter(u=>u.perfil==='Associado').length;
@@ -2129,7 +2199,6 @@ function renderMembros(){
   const thEmail=document.getElementById('th-email-col');if(thEmail)thEmail.style.display=socio?'':'none';
   const thStatus=document.getElementById('th-status-col');if(thStatus)thStatus.style.display=socio?'':'none';
   const thVinculo=document.getElementById('th-vinculo-col');if(thVinculo)thVinculo.style.display=socio?'':'none';
-  const thComissao=document.getElementById('th-comissao-col');if(thComissao)thComissao.style.display=socio?'':'none';
 
   const q=(document.getElementById('mbr-q').value||'').toLowerCase();
   const fseg=document.getElementById('mbr-fseg').value;
@@ -2193,26 +2262,24 @@ function renderMembros(){
       <td><span class="badge" style="background:${ps.bg};color:${ps.tx}">${u.perfil}</span></td>
       <td style="display:${socio?'table-cell':'none'}"><span class="badge" style="background:${ss.bg};color:${ss.tx};white-space:nowrap">${u.status||'—'}</span></td>
       <td style="display:${socio?'table-cell':'none'};font-size:12px;color:#555">${vinculoNome}</td>
-      <td style="display:${socio?'table-cell':'none'};font-size:12px;color:#0F6E56;font-weight:500">${comissaoTxt}</td>
       <td style="display:${socio?'table-cell':'none'};color:#aaa;font-size:12px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.obs||'—'}</td>
       <td>${editBtn}</td>
     </tr>`;
   };
 
-  // MEMBROS DA REDE
+  // MEMBROS DA REDE — com paginação
   const showMembros=!fsecao||fsecao==='membros'||fsecao==='parceiros';
   const showExternos=!fsecao||fsecao==='externos';
+  const pageSize=5;
+  const listData=fsecao==='parceiros'?data.filter(u=>u.perfil==='Parceiro'):data;
+  const totalPages=Math.max(1,Math.ceil(listData.length/pageSize));
+  if(mbrPage>=totalPages)mbrPage=0;
+  const pageData=listData.slice(mbrPage*pageSize,(mbrPage+1)*pageSize);
   let rowsHtml='';
   if(showMembros){
     if(!fsecao||fsecao==='membros')rowsHtml+=`<tr><td colspan="11" style="background:#f5f0e8;font-size:11px;font-weight:700;color:#0a1628;padding:6px 14px;text-transform:uppercase;letter-spacing:.06em">Membros da rede</td></tr>`;
-    if(fsecao==='parceiros'){
-      const parceiros=data.filter(u=>u.perfil==='Parceiro');
-      if(!parceiros.length)rowsHtml+=`<tr><td colspan="11" class="empty-msg" style="padding:20px">Nenhum parceiro encontrado.</td></tr>`;
-      else rowsHtml+=parceiros.map(u=>buildRow(u,false)).join('');
-    } else {
-      if(!data.length)rowsHtml+=`<tr><td colspan="11" class="empty-msg">Nenhum membro encontrado.</td></tr>`;
-      else rowsHtml+=data.map(u=>buildRow(u,false)).join('');
-    }
+    if(!listData.length)rowsHtml+=`<tr><td colspan="11" class="empty-msg">Nenhum membro encontrado.</td></tr>`;
+    else rowsHtml+=pageData.map(u=>buildRow(u,false)).join('');
   }
   if(showExternos&&convidadosExternos.length){
     rowsHtml+=`<tr><td colspan="11" style="background:#fef9ee;font-size:11px;font-weight:700;color:#92400e;padding:6px 14px;text-transform:uppercase;letter-spacing:.06em">Convidados externos (${convidadosExternos.length})</td></tr>`;
@@ -2222,6 +2289,16 @@ function renderMembros(){
   }
   if(!rowsHtml)rowsHtml=`<tr><td colspan="11" class="empty-msg">Nenhum registro encontrado.</td></tr>`;
   tb.innerHTML=rowsHtml;
+  // Paginação
+  let pag=document.getElementById('mbr-pag');
+  if(!pag){pag=document.createElement('div');pag.id='mbr-pag';document.querySelector('#sub-tab-membros .table-wrap').after(pag);}
+  if(totalPages>1){
+    pag.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 2px;font-size:13px;color:#666">
+      <button class="btn-p btn-sm" onclick="mbrPage--;renderMembros()" ${mbrPage===0?'disabled':''}>← Anterior</button>
+      <span>${mbrPage+1} / ${totalPages} &nbsp;·&nbsp; ${listData.length} membros</span>
+      <button class="btn-p btn-sm" onclick="mbrPage++;renderMembros()" ${mbrPage>=totalPages-1?'disabled':''}>Próxima →</button>
+    </div>`;
+  } else {pag.innerHTML='';}
 }
 
 function removeExterno(id){
@@ -2505,11 +2582,11 @@ function renderFinCharts(){
   const GL={fixo:'Custo Fixo',variavel:'Custo Variável',insumo:'Insumos',investimento:'Investimentos',receita:'Receitas',comissao:'Comissões',outro:'Outros'};
   const gs=[...new Set(lancamentos.map(l=>l.grupo||'outro'))];
   const ctx1=document.getElementById('chart-fin-cat');
-  if(ctx1)chartInstances['chart-fin-cat']=new Chart(ctx1.getContext('2d'),{type:'bar',data:{labels:gs.map(g=>GL[g]||(customGroups[g]&&customGroups[g].label)||g),datasets:[{label:'Receitas',data:gs.map(g=>lancamentos.filter(l=>(l.grupo||'outro')===g&&l.tipo==='in').reduce((s,l)=>s+l.valor,0)),backgroundColor:'#0F6E56',borderRadius:4},{label:'Despesas',data:gs.map(g=>lancamentos.filter(l=>(l.grupo||'outro')===g&&l.tipo==='out').reduce((s,l)=>s+l.valor,0)),backgroundColor:'#c0392b',borderRadius:4}]},options:{plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'R$'+v.toLocaleString('pt-BR')}}}}});
+  if(ctx1)chartInstances['chart-fin-cat']=new Chart(ctx1.getContext('2d'),{type:'bar',data:{labels:gs.map(g=>GL[g]||(customGroups[g]&&customGroups[g].label)||g),datasets:[{label:'Receitas',data:gs.map(g=>lancamentos.filter(l=>(l.grupo||'outro')===g&&l.tipo==='in').reduce((s,l)=>s+l.valor,0)),backgroundColor:'#0F6E56',borderRadius:4},{label:'Despesas',data:gs.map(g=>lancamentos.filter(l=>(l.grupo||'outro')===g&&l.tipo==='out').reduce((s,l)=>s+l.valor,0)),backgroundColor:'#c0392b',borderRadius:4}]},options:{aspectRatio:3,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'R$'+v.toLocaleString('pt-BR')}}}}});
   const sorted=[...lancamentos].sort((a,b)=>(a.data||'').localeCompare(b.data||''));
   let acc=0;
   const ctx2=document.getElementById('chart-fin-saldo');
-  if(ctx2)chartInstances['chart-fin-saldo']=new Chart(ctx2.getContext('2d'),{type:'line',data:{labels:sorted.map(l=>l.data),datasets:[{label:'Saldo',data:sorted.map(l=>{acc+=l.tipo==='in'?l.valor:-l.valor;return acc;}),borderColor:'#0a1628',backgroundColor:'rgba(37,84,199,.08)',fill:true,tension:.3,pointRadius:3}]},options:{plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'R$'+v.toLocaleString('pt-BR')}}}}});
+  if(ctx2)chartInstances['chart-fin-saldo']=new Chart(ctx2.getContext('2d'),{type:'line',data:{labels:sorted.map(l=>l.data),datasets:[{label:'Saldo',data:sorted.map(l=>{acc+=l.tipo==='in'?l.valor:-l.valor;return acc;}),borderColor:'#0a1628',backgroundColor:'rgba(37,84,199,.08)',fill:true,tension:.3,pointRadius:3}]},options:{aspectRatio:3,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'R$'+v.toLocaleString('pt-BR')}}}}});
 }
 
 function openAddLanc(){
@@ -3100,17 +3177,17 @@ function renderPipeline(){
         <div style="background:${COL_COLORS[col]};color:#fff;border-radius:8px 8px 0 0;padding:8px 14px;font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center">
           <span>${col}</span><span style="background:rgba(255,255,255,.25);border-radius:10px;padding:1px 7px">${members.length}</span>
         </div>
-        <div style="background:#f5f5f3;border-radius:0 0 8px 8px;min-height:200px;padding:8px;display:flex;flex-direction:column;gap:8px;transition:background .15s" ondragover="pipDragOver(event)" ondragleave="pipDragLeave(event)" ondrop="pipDrop(event,'${col}')">
+        <div class="pip-col-body" style="border-radius:0 0 8px 8px;min-height:200px;padding:8px;display:flex;flex-direction:column;gap:8px;" ondragover="pipDragOver(event)" ondragleave="pipDragLeave(event)" ondrop="pipDrop(event,'${col}')">
           ${members.length?members.map(u=>{
             const ps=PS[u.perfil]||{bg:'#eee',tx:'#555'};
             const segs=(u.seg||'').split(',').map(s=>s.trim()).filter(Boolean);
-            return`<div draggable="true" ondragstart="pipDragStart(event,${u.id})" ondragend="pipDragEnd(event)" style="background:#fff;border:1px solid #eee;border-radius:8px;padding:10px;cursor:grab" onclick="openEditUsr(${u.id})">
-              <div style="font-size:13px;font-weight:600;margin-bottom:4px">${esc(u.nome)}</div>
+            return`<div draggable="true" ondragstart="pipDragStart(event,${u.id})" ondragend="pipDragEnd(event)" class="pip-card" style="border-radius:8px;padding:10px;cursor:grab" onclick="openEditUsr(${u.id})">
+              <div class="pip-card-nome" style="font-size:13px;font-weight:600;margin-bottom:4px">${esc(u.nome)}</div>
               <span class="badge" style="background:${ps.bg};color:${ps.tx}">${u.perfil}</span>
               <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:2px">${segs.map(s=>`<span class="badge" style="background:${sc(s).bg};color:${sc(s).tx};font-size:10px">${s}</span>`).join('')}</div>
-              ${u.emp&&u.emp!=='?'?`<div style="font-size:11px;color:#888;margin-top:4px">${esc(u.emp)}</div>`:''}
+              ${u.emp&&u.emp!=='?'?`<div style="font-size:11px;color:#9ca3af;margin-top:4px">${esc(u.emp)}</div>`:''}
             </div>`;
-          }).join(''):`<div style="color:#aaa;font-size:12px;text-align:center;padding:20px 8px">Arraste um card aqui<br>ou edite o Funil do membro</div>`}
+          }).join(''):`<div style="color:#6b7280;font-size:12px;text-align:center;padding:20px 8px">Arraste um card aqui<br>ou edite o Funil do membro</div>`}
         </div>
       </div>`;
     }).join('')}
@@ -3118,12 +3195,12 @@ function renderPipeline(){
       <div style="background:#ccc;color:#fff;border-radius:8px 8px 0 0;padding:8px 14px;font-size:12px;font-weight:600;display:flex;justify-content:space-between">
         <span>Sem funil</span><span>${semFunil.length}</span>
       </div>
-      <div style="background:#f5f5f3;border-radius:0 0 8px 8px;min-height:60px;padding:8px;display:flex;flex-direction:column;gap:6px">
-        ${semFunil.map(u=>`<div style="background:#fff;border:1px solid #eee;border-radius:7px;padding:8px;font-size:12px;color:#888;cursor:pointer" onclick="openEditUsr(${u.id})">${esc(u.nome)}</div>`).join('')}
+      <div class="pip-col-body" style="border-radius:0 0 8px 8px;min-height:60px;padding:8px;display:flex;flex-direction:column;gap:6px">
+        ${semFunil.map(u=>`<div class="pip-card" style="border-radius:7px;padding:8px;font-size:12px;cursor:pointer" onclick="openEditUsr(${u.id})">${esc(u.nome)}</div>`).join('')}
       </div>
     </div>`:''}
   </div>
-  <div style="font-size:12px;color:#aaa;margin-top:4px">Arraste para mover · Clique no card para editar o membro · Funil atualizado aqui reflete em todo o sistema</div>
+  <div style="font-size:12px;color:#6b7280;margin-top:4px">Arraste para mover · Clique no card para editar o membro · Funil atualizado aqui reflete em todo o sistema</div>
   </div>`;
 }
 
@@ -3510,6 +3587,7 @@ function switchMbrTab(tab){
     const el=document.getElementById('con-inner-mbr');
     if(el) renderConexoes(el);
   }
+  setTimeout(sizeActivePanel,0);
 }
 
 function switchEvTab(tab){
@@ -5319,6 +5397,7 @@ function vitCardHTML(p){
     <div class="vit-card-nome">${esc(p.nome||'Sem título')}</div>
     ${p.tagline?`<div class="vit-card-tagline">${esc(p.tagline)}</div>`:''}
     ${p.teseCurador?`<div class="vit-card-tese">"${esc(p.teseCurador)}"</div>`:''}
+    ${(()=>{const sc=p.scorecard;if(!sc)return '';const dims=[['Equipe','equipe'],['Mercado','mercado'],['Tração','tracao'],['Modelo','modelo'],['Timing','timing']];const vals=dims.map(([,k])=>sc[k]||0).filter(v=>v>0);if(!vals.length)return '';const avg=(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1);return`<div class="vit-scorecard"><div class="vit-sc-overall"><span class="vit-sc-overall-num">${avg}</span><span class="vit-sc-overall-den">/10</span><span class="vit-sc-overall-lbl">Scorecard</span></div>${dims.filter(([,k])=>sc[k]).map(([lbl,k])=>`<div class="vit-sc-dim"><div class="vit-sc-dim-hdr"><span>${lbl}</span><span>${sc[k]}/10</span></div><div class="vit-sc-bar-track"><div class="vit-sc-bar-fill" style="width:${sc[k]*10}%"></div></div></div>`).join('')}</div>`;})()}
     ${showBar?`<div class="vit-card-prog">
       <div style="display:flex;justify-content:space-between;font-size:11px;color:#888;margin-bottom:5px">
         <span>${comp} de ${cotas} cotas comprometidas</span>
@@ -5407,6 +5486,7 @@ function openVitProj(id){
   const teseEl=document.getElementById('vit-f-tese');if(teseEl)teseEl.value=p?(p.teseCurador||''):'';
   const linkEl=document.getElementById('vit-f-linkid');
   if(linkEl){linkEl.value=p?(p.publicToken||vitSlugify(p.nome||'')):'';linkEl.dataset.manual=p&&p.publicToken?'1':'';}
+  {const sc=p?.scorecard||{};['equipe','mercado','tracao','modelo','timing'].forEach(d=>{const val=sc[d]||5;const sl=document.getElementById('vit-sc-'+d);const lb=document.getElementById('vit-sc-v-'+d);if(sl)sl.value=val;if(lb)lb.textContent=val+'/10';});}
   _vitTimeSet(p?p.time||[]:[]);
   _vitUsoSet(p?p.usoRecursos||[]:[{desc:'Tecnologia & Produto',pct:60},{desc:'Comercial & Marketing',pct:25},{desc:'Operações',pct:15}]);
   _vitFAQSet(p?p.faq||[]:[]);
@@ -5447,6 +5527,7 @@ function saveVitProj(){
     captacaoTotal:g('vit-f-captacao'),ticketMinimo:g('vit-f-ticket'),
     pctIAHub:gn('vit-f-pcthub')||50,cotas:gn('vit-f-cotas')||50,
     retornoPrev:g('vit-f-retorno'),prazoMeses:g('vit-f-prazo'),
+    scorecard:{equipe:parseInt(document.getElementById('vit-sc-equipe')?.value)||5,mercado:parseInt(document.getElementById('vit-sc-mercado')?.value)||5,tracao:parseInt(document.getElementById('vit-sc-tracao')?.value)||5,modelo:parseInt(document.getElementById('vit-sc-modelo')?.value)||5,timing:parseInt(document.getElementById('vit-sc-timing')?.value)||5},
     time:_vitTime.filter(m=>m.nome),usoRecursos:_vitUso.filter(u=>u.desc),
     faq:_vitFAQ.filter(f=>f.pergunta),docs:_vitDocs.filter(d=>d.titulo),
   };
