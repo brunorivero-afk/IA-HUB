@@ -154,7 +154,7 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 .panel.active{display:block;position:absolute;inset:0;overflow-y:auto;padding:20px 24px;box-sizing:border-box;scrollbar-width:none;-ms-overflow-style:none;}
 .panel.active::-webkit-scrollbar{display:none;}
 /* ===== SIDEBAR LAYOUT ===== */
-#screen-main{grid-template-columns:220px 1fr;grid-template-rows:auto 1fr;grid-template-areas:"sidebar topbar" "sidebar app";position:fixed;inset:0;overflow:hidden;}
+#screen-main{grid-template-columns:190px 1fr;grid-template-rows:auto 1fr;grid-template-areas:"sidebar topbar" "sidebar app";position:fixed;inset:0;overflow:hidden;}
 .topbar{grid-area:topbar;justify-content:flex-end;}
 .tabs-wrap{display:none;}
 .topbar-brand{display:none;}
@@ -169,6 +169,16 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 
 /* ===== PAINÉIS COM LAYOUT INTERNO ===== */
 #mbr-pag button:disabled{opacity:.4;cursor:default;}
+#mbr-perfil-cards .stat{padding:8px 12px;}
+#mbr-perfil-cards .stat-value{font-size:18px;}
+#mbr-perfil-cards{margin-bottom:10px!important;}
+#mbr-tbody td,#tab-rede-membros thead th{padding:8px 6px;}
+#tab-rede-membros table{font-size:12px;}
+#tab-rede-membros.panel.active{overflow-x:hidden;}
+#tab-rede-membros .table-wrap{overflow-x:hidden;}
+#tab-rede-membros thead th{text-align:center;}
+#mbr-tbody td{text-align:center;}
+#mbr-tbody td:first-child{text-align:left;}
 
 /* ===== COMPONENTES ===== */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px;}
@@ -609,7 +619,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <div id="sub-tab-membros">
       <!-- Cards perfil (só sócios) -->
       <div id="mbr-perfil-cards" style="display:none;margin-bottom:16px">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:16px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:10px">
           <div class="stat"><div class="stat-label">Sócios</div><div class="stat-value" id="cnt-socio" style="color:#854F0B">0</div></div>
           <div class="stat"><div class="stat-label">Associados</div><div class="stat-value" id="cnt-assoc" style="color:#0F6E56">0</div></div>
           <div class="stat"><div class="stat-label">Parceiros</div><div class="stat-value" id="cnt-parc" style="color:#0a1628">0</div></div>
@@ -651,10 +661,10 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
         <table style="table-layout:fixed;width:100%">
           <thead><tr>
             <th style="width:24%">Nome</th><th style="width:7%">Tipo</th><th style="width:20%">Empresa</th>
-            <th style="width:24%">Segmento(s)</th>
+            <th style="width:21%">Segmento(s)</th>
             <th style="width:13%">Perfil</th>
             <th id="th-vinculo-col" style="width:8%">Vinculado a</th>
-            <th style="width:4%"></th>
+            <th style="width:7%"></th>
           </tr></thead>
           <tbody id="mbr-tbody"></tbody>
         </table>
@@ -2230,10 +2240,7 @@ function renderMembros(){
         <td>${socio?`<button class="btn-d btn-sm" onclick="removeExterno(${u.id})">✕</button>`:''}</td>
       </tr>`;
     }
-    const editBtn=socio?`<div style="display:flex;gap:4px">
-      <button class="btn-s btn-sm" onclick="openEditUsr(${u.id})">Editar</button>
-      <button class="btn-d btn-sm" onclick="removeUsr(${u.id})">✕</button>
-    </div>`:'';
+    const editBtn=`<div style="display:flex;gap:3px;justify-content:center">${socio?`<button class="btn-s btn-sm" onclick="openEditUsr(${u.id})" title="Editar" style="padding:3px 7px">✏</button><button class="btn-d btn-sm" onclick="removeUsr(${u.id})" title="Remover" style="padding:3px 7px">✕</button>`:''}</div>`;
     const vinculoNome=u.vinculoId?(users.find(x=>x.id===u.vinculoId)||{}).nome||'—':'—';
     const comissaoTxt=u.comissao?`${u.comissao}% (${(u.comissaoModelo||'').replace('por_projeto','por projeto')||'—'})`:'—';
     const ts=(() => { try { return calcTrustScore(u.id); } catch(e){ return {score:0,detalhes:[]}; } })();
@@ -2262,7 +2269,6 @@ function renderMembros(){
   const listData=fsecao==='parceiros'?data.filter(u=>u.perfil==='Parceiro'):data;
   let rowsHtml='';
   if(showMembros){
-    if(!fsecao||fsecao==='membros')rowsHtml+=`<tr><td colspan="7" style="background:#f5f0e8;font-size:11px;font-weight:700;color:#0a1628;padding:6px 14px;text-transform:uppercase;letter-spacing:.06em">Membros da rede</td></tr>`;
     if(!listData.length)rowsHtml+=`<tr><td colspan="7" class="empty-msg">Nenhum membro encontrado.</td></tr>`;
     else rowsHtml+=listData.map(u=>buildRow(u,false)).join('');
   }
@@ -3131,51 +3137,39 @@ function pipDragLeave(e){e.currentTarget.style.background='#f5f5f3';}
 function pipDrop(e,col){
   e.preventDefault();e.currentTarget.style.background='#f5f5f3';
   if(!_pipDragId)return;
-  const i=users.findIndex(u=>u.id===_pipDragId);
+  const i=projetos.findIndex(p=>p.id===_pipDragId);
   if(i===-1){_pipDragId=null;return;}
-  users[i]={...users[i],funil:col};
+  projetos[i]={...projetos[i],pipStatus:col};
   saveData();syncToSupabase();renderPipeline();_pipDragId=null;
 }
 function renderPipeline(){
   if(!isSocio()){document.getElementById('tab-pipeline').innerHTML='<div class="blocked"><h2>Acesso restrito</h2></div>';return;}
   const COLS=['Prospect','Contato feito','Proposta enviada','Fechado'];
   const COL_COLORS={Prospect:'#888','Contato feito':'#0a1628','Proposta enviada':'#854F0B',Fechado:'#0F6E56'};
-  const ativos=users.filter(u=>u.status==='Ativo');
-  const semFunil=ativos.filter(u=>!COLS.includes(u.funil));
   const el=document.getElementById('tab-pipeline');
   el.innerHTML=`<div class="app" style="padding-top:0">
-  <div class="section-hdr" style="margin-top:0">Pipeline — sincronizado com o campo Funil de cada membro</div>
+  <div class="section-hdr" style="margin-top:0">Pipeline de Negócios</div>
   <div style="display:flex;gap:12px;overflow-x:auto;padding-bottom:16px">
     ${COLS.map(col=>{
-      const members=ativos.filter(u=>u.funil===col);
+      const cards=projetos.filter(p=>(p.pipStatus||'Prospect')===col);
       return`<div style="flex:1;min-width:180px">
         <div style="background:${COL_COLORS[col]};color:#fff;border-radius:8px 8px 0 0;padding:8px 14px;font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center">
-          <span>${col}</span><span style="background:rgba(255,255,255,.25);border-radius:10px;padding:1px 7px">${members.length}</span>
+          <span>${col}</span><span style="background:rgba(255,255,255,.25);border-radius:10px;padding:1px 7px">${cards.length}</span>
         </div>
         <div class="pip-col-body" style="border-radius:0 0 8px 8px;min-height:200px;padding:8px;display:flex;flex-direction:column;gap:8px;" ondragover="pipDragOver(event)" ondragleave="pipDragLeave(event)" ondrop="pipDrop(event,'${col}')">
-          ${members.length?members.map(u=>{
-            const ps=PS[u.perfil]||{bg:'#eee',tx:'#555'};
-            const segs=(u.seg||'').split(',').map(s=>s.trim()).filter(Boolean);
-            return`<div draggable="true" ondragstart="pipDragStart(event,${u.id})" ondragend="pipDragEnd(event)" class="pip-card" style="border-radius:8px;padding:10px;cursor:grab" onclick="openEditUsr(${u.id})">
-              <div class="pip-card-nome" style="font-size:13px;font-weight:600;margin-bottom:4px">${esc(u.nome)}</div>
-              <span class="badge" style="background:${ps.bg};color:${ps.tx}">${u.perfil}</span>
-              <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:2px">${segs.map(s=>`<span class="badge" style="background:${sc(s).bg};color:${sc(s).tx};font-size:10px">${s}</span>`).join('')}</div>
-              ${u.emp&&u.emp!=='?'?`<div style="font-size:11px;color:#9ca3af;margin-top:4px">${esc(u.emp)}</div>`:''}
+          ${cards.length?cards.map(p=>{
+            const parts=p.participantes.map(id=>{const u=users.find(x=>x.id===id);return u?u.nome.split(' ')[0]:'?';});
+            return`<div draggable="true" ondragstart="pipDragStart(event,${p.id})" ondragend="pipDragEnd(event)" class="pip-card" style="border-radius:8px;padding:10px;cursor:grab" onclick="openEditProj(${p.id})">
+              <div class="pip-card-nome" style="font-size:13px;font-weight:600;margin-bottom:6px">${esc(p.nome)}</div>
+              ${p.valor?`<div style="font-size:12px;color:#0F6E56;font-weight:600;margin-bottom:4px">R$ ${p.valor.toLocaleString('pt-BR')}</div>`:''}
+              ${parts.length?`<div style="font-size:11px;color:#9ca3af">${parts.slice(0,3).join(', ')}</div>`:''}
             </div>`;
-          }).join(''):`<div style="color:#6b7280;font-size:12px;text-align:center;padding:20px 8px">Arraste um card aqui<br>ou edite o Funil do membro</div>`}
+          }).join(''):`<div style="color:#6b7280;font-size:12px;text-align:center;padding:20px 8px">Arraste um negócio aqui</div>`}
         </div>
       </div>`;
     }).join('')}
-    ${semFunil.length?`<div style="flex:1;min-width:180px;opacity:.6">
-      <div style="background:#ccc;color:#fff;border-radius:8px 8px 0 0;padding:8px 14px;font-size:12px;font-weight:600;display:flex;justify-content:space-between">
-        <span>Sem funil</span><span>${semFunil.length}</span>
-      </div>
-      <div class="pip-col-body" style="border-radius:0 0 8px 8px;min-height:60px;padding:8px;display:flex;flex-direction:column;gap:6px">
-        ${semFunil.map(u=>`<div class="pip-card" style="border-radius:7px;padding:8px;font-size:12px;cursor:pointer" onclick="openEditUsr(${u.id})">${esc(u.nome)}</div>`).join('')}
-      </div>
-    </div>`:''}
   </div>
-  <div style="font-size:12px;color:#6b7280;margin-top:4px">Arraste para mover · Clique no card para editar o membro · Funil atualizado aqui reflete em todo o sistema</div>
+  <div style="font-size:12px;color:#6b7280;margin-top:4px">Arraste para mover · Clique no card para editar o projeto</div>
   </div>`;
 }
 
