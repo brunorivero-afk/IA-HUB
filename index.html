@@ -2259,35 +2259,21 @@ function renderMembros(){
   // MEMBROS DA REDE — com paginação
   const showMembros=!fsecao||fsecao==='membros'||fsecao==='parceiros';
   const showExternos=!fsecao||fsecao==='externos';
-  const pageSize=5;
   const listData=fsecao==='parceiros'?data.filter(u=>u.perfil==='Parceiro'):data;
-  const totalPages=Math.max(1,Math.ceil(listData.length/pageSize));
-  if(mbrPage>=totalPages)mbrPage=0;
-  const pageData=listData.slice(mbrPage*pageSize,(mbrPage+1)*pageSize);
   let rowsHtml='';
   if(showMembros){
-    if(!fsecao||fsecao==='membros')rowsHtml+=`<tr><td colspan="11" style="background:#f5f0e8;font-size:11px;font-weight:700;color:#0a1628;padding:6px 14px;text-transform:uppercase;letter-spacing:.06em">Membros da rede</td></tr>`;
-    if(!listData.length)rowsHtml+=`<tr><td colspan="11" class="empty-msg">Nenhum membro encontrado.</td></tr>`;
-    else rowsHtml+=pageData.map(u=>buildRow(u,false)).join('');
+    if(!fsecao||fsecao==='membros')rowsHtml+=`<tr><td colspan="7" style="background:#f5f0e8;font-size:11px;font-weight:700;color:#0a1628;padding:6px 14px;text-transform:uppercase;letter-spacing:.06em">Membros da rede</td></tr>`;
+    if(!listData.length)rowsHtml+=`<tr><td colspan="7" class="empty-msg">Nenhum membro encontrado.</td></tr>`;
+    else rowsHtml+=listData.map(u=>buildRow(u,false)).join('');
   }
   if(showExternos&&convidadosExternos.length){
-    rowsHtml+=`<tr><td colspan="11" style="background:#fef9ee;font-size:11px;font-weight:700;color:#92400e;padding:6px 14px;text-transform:uppercase;letter-spacing:.06em">Convidados externos (${convidadosExternos.length})</td></tr>`;
+    rowsHtml+=`<tr><td colspan="7" style="background:#fef9ee;font-size:11px;font-weight:700;color:#92400e;padding:6px 14px;text-transform:uppercase;letter-spacing:.06em">Convidados externos (${convidadosExternos.length})</td></tr>`;
     rowsHtml+=convidadosExternos.map(c=>buildRow(c,true)).join('');
   } else if(showExternos&&fsecao==='externos'){
-    rowsHtml+=`<tr><td colspan="11" class="empty-msg" style="padding:20px">Nenhum convidado externo ainda. Cadastre na Agenda ao marcar uma reunião.</td></tr>`;
+    rowsHtml+=`<tr><td colspan="7" class="empty-msg" style="padding:20px">Nenhum convidado externo ainda. Cadastre na Agenda ao marcar uma reunião.</td></tr>`;
   }
-  if(!rowsHtml)rowsHtml=`<tr><td colspan="11" class="empty-msg">Nenhum registro encontrado.</td></tr>`;
+  if(!rowsHtml)rowsHtml=`<tr><td colspan="7" class="empty-msg">Nenhum registro encontrado.</td></tr>`;
   tb.innerHTML=rowsHtml;
-  // Paginação
-  let pag=document.getElementById('mbr-pag');
-  if(!pag){pag=document.createElement('div');pag.id='mbr-pag';document.querySelector('#sub-tab-membros .table-wrap').after(pag);}
-  if(totalPages>1){
-    pag.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 2px;font-size:13px;color:#666">
-      <button class="btn-p btn-sm" onclick="mbrPage--;renderMembros()" ${mbrPage===0?'disabled':''}>← Anterior</button>
-      <span>${mbrPage+1} / ${totalPages} &nbsp;·&nbsp; ${listData.length} membros</span>
-      <button class="btn-p btn-sm" onclick="mbrPage++;renderMembros()" ${mbrPage>=totalPages-1?'disabled':''}>Próxima →</button>
-    </div>`;
-  } else {pag.innerHTML='';}
 }
 
 function removeExterno(id){
