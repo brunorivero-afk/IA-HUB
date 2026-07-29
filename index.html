@@ -2570,7 +2570,7 @@ function quickSaveLanc(grupo,cat,inputId){
   const existing=lancamentos.find(l=>l.grupo===grupo&&l.cat===cat&&(l.data||'').startsWith(mes));
   if(existing){existing.valor=val;}
   else if(val>0){lancamentos.push({id:Date.now(),desc:cat,grupo,cat,tipo:'out',valor:val,data:hoje,recorr:'Mensal',obs:'',partId:null,partNome:'',comissaoPct:0,anexo:null});}
-  if(val>0){saveData();showToast('✅ '+cat+': R$ '+val.toLocaleString('pt-BR'));}
+  if(val>0){saveData();renderPlanilha();showToast('✅ '+cat+': R$ '+val.toLocaleString('pt-BR'));}
 }
 
 function renderFinLancamentos(){}
@@ -3179,7 +3179,7 @@ function renderPipeline(){
           ${members.length?members.map(u=>{
             const ps=PS[u.perfil]||{bg:'#eee',tx:'#555'};
             const segs=(u.seg||'').split(',').map(s=>s.trim()).filter(Boolean);
-            return`<div draggable="true" ondragstart="pipDragStart(event,${u.id})" ondragend="pipDragEnd(event)" class="pip-card" style="border-radius:8px;padding:8px 10px;cursor:grab;max-height:76px;overflow:hidden" onclick="openEditUsr(${u.id})">
+            return`<div draggable="true" ondragstart="pipDragStart(event,${u.id})" ondragend="pipDragEnd(event)" class="pip-card" style="border-radius:8px;padding:8px 10px;cursor:grab;height:76px;overflow:hidden;box-sizing:border-box" onclick="openEditUsr(${u.id})">
               <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px">
                 <div class="pip-card-nome" style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1">${esc(u.nome)}</div>
                 ${u.emp&&u.emp!=='?'?`<div style="font-size:10px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px;flex-shrink:0">${esc(u.emp)}</div>`:''}
