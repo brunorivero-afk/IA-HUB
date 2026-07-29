@@ -2244,15 +2244,13 @@ function renderMembros(){
     const tl=trustLabel(ts.score);
     const TAG_ICONS={investidor:'💰',inv_potencial:'🌱',superconector:'🌐',autoridade:'🏆',decisor:'🎯',influenciador:'📣',indicador:'🤝',serial:'🏗',nacional:'🌍',mentor:'🤲',captador:'💼'};
     const TAG_LABELS={investidor:'Investidor ativo',inv_potencial:'Investidor potencial',superconector:'Superconector',autoridade:'Autoridade',decisor:'Decisor',influenciador:'Influenciador',indicador:'Indicador ativo',serial:'Empreendedor serial',nacional:'Alcance nacional',mentor:'Mentor',captador:'Captador'};
-    const tagsHtml=socio&&u.tagsRede&&u.tagsRede.length?`<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:5px">${u.tagsRede.map(t=>`<span style="background:#ede9fe;color:#5b21b6;border-radius:20px;font-size:10px;padding:2px 7px;font-weight:600">${TAG_ICONS[t]||'•'} ${TAG_LABELS[t]||t}</span>`).join('')}</div>`:'';
-    const pesoHtml=socio&&u.pesoRede?`<div style="font-size:11px;margin-top:3px">${'⭐'.repeat(u.pesoRede)}<span style="color:#7c3aed;margin-left:5px;font-size:10px">${['','Básico','Razoável','Relevante','Muito valioso','Estratégico'][u.pesoRede]||''}</span></div>`:'';
-    // Item 12: selo de membro verificado
+    const tagsHtml=socio&&u.tagsRede&&u.tagsRede.length?u.tagsRede.map(t=>`<span style="background:#ede9fe;color:#5b21b6;border-radius:20px;font-size:10px;padding:2px 7px;font-weight:600;flex-shrink:0;white-space:nowrap">${TAG_ICONS[t]||'•'} ${TAG_LABELS[t]||t}</span>`).join(''):'';
+    const pesoHtml=socio&&u.pesoRede?`<span style="font-size:11px;flex-shrink:0;white-space:nowrap">${'⭐'.repeat(u.pesoRede)}</span>`:'';
     const aprovadorNome=u.aprovadoPor?(users.find(x=>x.id===u.aprovadoPor)||{}).nome||'IA Hub':'IA Hub';
     const dataEntradaFmt=u.dataEntrada?new Date(u.dataEntrada).toLocaleDateString('pt-BR'):'—';
-    const seloVerificado=u.dataEntrada?`<span title="Aprovado por: ${aprovadorNome} | Membro desde: ${dataEntradaFmt}" style="display:inline-flex;align-items:center;gap:3px;background:#E1F5EE;color:#085041;border-radius:20px;padding:2px 7px;font-size:10px;font-weight:600;margin-left:4px;cursor:help">✓ Verificado</span>`:'';
-    const membroDesdeHtml=u.dataEntrada?`<div style="font-size:10px;color:#888;margin-top:1px">desde ${dataEntradaFmt} · por ${aprovadorNome}</div>`:'';
-    return`<tr>
-      <td><span class="avatar" style="background:${ps.bg};color:${ps.tx}">${initials(u.nome)}</span><strong>${u.nome}</strong>${seloVerificado} ${socio?trustBadgeHtml(u.id):''}${membroDesdeHtml}${tagsHtml}${pesoHtml}</td>
+    const seloVerificado=u.dataEntrada?`<span title="Aprovado por: ${aprovadorNome} | Membro desde: ${dataEntradaFmt}" style="display:inline-flex;align-items:center;gap:3px;background:#E1F5EE;color:#085041;border-radius:20px;padding:2px 7px;font-size:10px;font-weight:600;flex-shrink:0;cursor:help">✓</span>`:'';
+    return`<tr style="height:52px">
+      <td style="max-width:300px"><div style="display:flex;align-items:center;gap:4px;flex-wrap:nowrap;overflow:hidden"><span class="avatar" style="background:${ps.bg};color:${ps.tx};flex-shrink:0">${initials(u.nome)}</span><strong style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:40px">${u.nome}</strong>${seloVerificado}${socio?trustBadgeHtml(u.id):''}${tagsHtml}${pesoHtml}</div></td>
       <td>${tipoTag}</td>
       <td style="color:#666">${u.emp||'—'}</td>
       <td style="display:${socio?'table-cell':'none'};color:#666;font-size:12px">${u.email||'—'}</td>
