@@ -3179,11 +3179,15 @@ function renderPipeline(){
           ${members.length?members.map(u=>{
             const ps=PS[u.perfil]||{bg:'#eee',tx:'#555'};
             const segs=(u.seg||'').split(',').map(s=>s.trim()).filter(Boolean);
-            return`<div draggable="true" ondragstart="pipDragStart(event,${u.id})" ondragend="pipDragEnd(event)" class="pip-card" style="border-radius:8px;padding:10px;cursor:grab" onclick="openEditUsr(${u.id})">
-              <div class="pip-card-nome" style="font-size:13px;font-weight:600;margin-bottom:4px">${esc(u.nome)}</div>
-              <span class="badge" style="background:${ps.bg};color:${ps.tx}">${u.perfil}</span>
-              <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:2px">${segs.map(s=>`<span class="badge" style="background:${sc(s).bg};color:${sc(s).tx};font-size:10px">${s}</span>`).join('')}</div>
-              ${u.emp&&u.emp!=='?'?`<div style="font-size:11px;color:#9ca3af;margin-top:4px">${esc(u.emp)}</div>`:''}
+            return`<div draggable="true" ondragstart="pipDragStart(event,${u.id})" ondragend="pipDragEnd(event)" class="pip-card" style="border-radius:8px;padding:8px 10px;cursor:grab;max-height:76px;overflow:hidden" onclick="openEditUsr(${u.id})">
+              <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px">
+                <div class="pip-card-nome" style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1">${esc(u.nome)}</div>
+                ${u.emp&&u.emp!=='?'?`<div style="font-size:10px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px;flex-shrink:0">${esc(u.emp)}</div>`:''}
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:3px;align-items:center">
+                <span class="badge" style="background:${ps.bg};color:${ps.tx}">${u.perfil}</span>
+                ${segs.map(s=>`<span class="badge" style="background:${sc(s).bg};color:${sc(s).tx};font-size:10px">${s}</span>`).join('')}
+              </div>
             </div>`;
           }).join(''):`<div style="color:#6b7280;font-size:12px;text-align:center;padding:20px 8px">Arraste um card aqui<br>ou edite o Funil do membro</div>`}
         </div>
