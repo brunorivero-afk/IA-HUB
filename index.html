@@ -650,10 +650,10 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <div class="table-wrap">
         <table style="table-layout:fixed;width:100%">
           <thead><tr>
-            <th style="width:22%">Nome</th><th style="width:8%">Tipo</th><th style="width:20%">Empresa</th>
-            <th style="width:22%">Segmento(s)</th>
-            <th style="width:12%">Perfil</th>
-            <th id="th-vinculo-col" style="width:12%">Vinculado a</th>
+            <th style="width:24%">Nome</th><th style="width:7%">Tipo</th><th style="width:20%">Empresa</th>
+            <th style="width:24%">Segmento(s)</th>
+            <th style="width:13%">Perfil</th>
+            <th id="th-vinculo-col" style="width:8%">Vinculado a</th>
             <th style="width:4%"></th>
           </tr></thead>
           <tbody id="mbr-tbody"></tbody>
@@ -2245,11 +2245,8 @@ function renderMembros(){
     const aprovadorNome=u.aprovadoPor?(users.find(x=>x.id===u.aprovadoPor)||{}).nome||'IA Hub':'IA Hub';
     const dataEntradaFmt=u.dataEntrada?new Date(u.dataEntrada).toLocaleDateString('pt-BR'):'—';
     const seloVerificado=u.dataEntrada?`<span title="Aprovado por: ${aprovadorNome} | Membro desde: ${dataEntradaFmt}" style="display:inline-flex;align-items:center;gap:3px;background:#E1F5EE;color:#085041;border-radius:20px;padding:2px 7px;font-size:10px;font-weight:600;flex-shrink:0;cursor:help">✓</span>`:'';
-    const nomePartes=u.nome.trim().split(' ');
-    const nomeL1=nomePartes[0];
-    const nomeL2=nomePartes.slice(1).join(' ');
     return`<tr>
-      <td><div style="display:flex;align-items:center;gap:6px;overflow:hidden"><span class="avatar" style="background:${ps.bg};color:${ps.tx};flex-shrink:0">${initials(u.nome)}</span><div style="min-width:0;overflow:hidden"><div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${nomeL1}</div>${nomeL2?`<div style="font-size:11px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${nomeL2}</div>`:''}<div style="display:flex;flex-wrap:nowrap;gap:3px;margin-top:2px;overflow:hidden">${seloVerificado}${socio?trustBadgeHtml(u.id):''}${tagsHtml}${pesoHtml}</div></div></div></td>
+      <td><div style="display:flex;align-items:center;gap:7px;overflow:hidden"><span class="avatar" style="background:${ps.bg};color:${ps.tx};flex-shrink:0">${initials(u.nome)}</span><span style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(u.nome)}</span></div></td>
       <td>${tipoTag}</td>
       <td style="color:#666;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.emp||'—'}</td>
       <td style="overflow:hidden">${segs.map(s=>`<span class="badge" style="background:${sc(s).bg};color:${sc(s).tx}">${s}</span>`).join('')||'—'}</td>
