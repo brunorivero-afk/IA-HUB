@@ -1762,7 +1762,7 @@ function showTab(name){
   if(panel)panel.classList.add('active');
   if(tbtn)tbtn.classList.add('active');
   if(name==='rede')renderRede();
-  if(name==='rede-membros'){renderMembros();renderConexoes();switchMbrTab(isSocio()?'membros':'conexoes');}
+  if(name==='rede-membros'){renderMembros();renderConexoes();switchMbrTab((isSocio()||(currentUser&&(currentUser.perfil==='Parceiro'||currentUser.perfil==='Associado')))?'membros':'conexoes');}
   if(name==='financeiro')renderFinanceiro();
   if(name==='projetos')renderProjetos();
   if(name==='sinergias')renderSin();
@@ -3547,11 +3547,11 @@ function renderRanking(){
 let evConvidados=[];
 
 function switchMbrTab(tab){
-  // Não-sócios só podem ver conexões
-  if(!isSocio()) tab='conexoes';
-  // Mostrar/ocultar botão Membros conforme perfil
+  const parcAssoc=currentUser&&(currentUser.perfil==='Parceiro'||currentUser.perfil==='Associado');
+  // Operador e outros sem perfil específico só veem conexões; Parceiro/Associado veem as duas abas
+  if(!isSocio()&&!parcAssoc) tab='conexoes';
   const subBar=document.getElementById('sub-tabs-bar');
-  if(subBar) subBar.style.display=isSocio()?'flex':'none';
+  if(subBar) subBar.style.display=(isSocio()||parcAssoc)?'flex':'none';
   ['membros','conexoes'].forEach(t=>{
     const panel=document.getElementById('sub-tab-'+t);
     if(panel)panel.style.display=t===tab?'block':'none';
