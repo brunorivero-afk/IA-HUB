@@ -1594,7 +1594,7 @@ function doLogin(){
   if(!u){
     // Tenta recuperar: email+senha corretos mas status foi corrompido por bug de pipeline
     const cand=users.find(x=>x.email.toLowerCase()===email&&x.senha===senha);
-    if(cand&&cand.status!=='Inativo'){
+    if(cand){
       cand.status='Ativo';saveData();syncToSupabase();u=cand;
     }
   }
