@@ -613,8 +613,9 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <div class="panel" id="tab-rede-membros">
       <!-- Sub-abas internas (Membros só para sócios) -->
       <div id="sub-tabs-bar" style="display:flex;gap:8px;margin-bottom:20px">
-        <button id="sub-btn-membros" class="btn-p" style="flex:1" onclick="switchMbrTab('membros')">👥 Membros</button>
-        <button id="sub-btn-conexoes" class="btn-p" style="flex:1;background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="switchMbrTab('conexoes')">🔗 Conexões</button>
+        <button id="sub-btn-membros" class="btn-p" style="flex:1;min-width:0" onclick="switchMbrTab('membros')">👥 Membros</button>
+        <button id="sub-btn-conexoes" class="btn-p" style="flex:1;min-width:0;background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="switchMbrTab('conexoes')">🔗 Conexões</button>
+        <button id="sub-btn-cred" class="btn-p" onclick="openCred()" style="flex:0 0 auto;white-space:nowrap;background:#5b21b6;display:none">🔑 Credenciais</button>
       </div>
       <div id="sub-tab-membros">
       <!-- Cards perfil (só sócios) -->
@@ -656,7 +657,6 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
           <option value="externos">Convidados externos</option>
         </select>
         <button class="btn-p" id="btn-novo-membro" onclick="openAddUsr()">+ Novo membro</button>
-        <button class="btn-p" id="btn-credenciais" onclick="openCred()" style="display:none;background:#5b21b6">🔑 Credenciais</button>
       </div>
       <div class="table-wrap">
         <table style="table-layout:fixed;width:100%">
@@ -2194,7 +2194,6 @@ function fillLcPart(){
 function renderMembros(){
   const socio=isSocio();
   const bNM=document.getElementById('btn-novo-membro');if(bNM)bNM.style.display=isSocio()?'inline-block':'none';
-  const bCred=document.getElementById('btn-credenciais');if(bCred)bCred.style.display=isSocio()?'inline-block':'none';
 
   // Parceiro / Associado: tabela limitada (sem nome, sem empresa)
   if(currentUser&&(currentUser.perfil==='Parceiro'||currentUser.perfil==='Associado')){
@@ -3581,6 +3580,8 @@ function switchMbrTab(tab){
   if(!isSocio()&&!parcAssoc) tab='conexoes';
   const subBar=document.getElementById('sub-tabs-bar');
   if(subBar) subBar.style.display=(isSocio()||parcAssoc)?'flex':'none';
+  const credBtn=document.getElementById('sub-btn-cred');
+  if(credBtn) credBtn.style.display=isSocio()?'inline-block':'none';
   ['membros','conexoes'].forEach(t=>{
     const panel=document.getElementById('sub-tab-'+t);
     if(panel)panel.style.display=t===tab?'block':'none';
