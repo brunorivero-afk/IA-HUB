@@ -72,6 +72,19 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 [data-theme="dark"] .vit-sc-lbl{color:#94a3b8;}
 [data-theme="dark"] .vit-sc-val{color:#e2e8f0;}
 [data-theme="dark"] .vit-sc-slider{background:#1e2a42;}
+[data-theme="dark"] .tr-section{border-color:#1e2a42;}
+[data-theme="dark"] .tr-hdr{background:#0a1628;}
+[data-theme="dark"] .tr-card{background:#1a2035;border-color:#1e2a42;}
+[data-theme="dark"] .tr-card:hover{background:#1e2a42;}
+[data-theme="dark"] .tr-card-name{color:#e2e8f0;}
+[data-theme="dark"] .tr-card-setor{color:#6b7280;}
+[data-theme="dark"] .tr-pill-prom{background:#1e2a42;color:#94a3b8;}
+[data-theme="dark"] .tr-pill-entr-ok{background:#052e16;color:#86efac;}
+[data-theme="dark"] .tr-pill-entr-warn{background:#1c1400;color:#fcd34d;}
+[data-theme="dark"] .tr-pill-entr-bad{background:#1c0009;color:#fca5a5;}
+[data-theme="dark"] .tr-meta-lbl{color:#6b7280;}
+[data-theme="dark"] .tr-meta-val{color:#d1d5db;}
+[data-theme="dark"] .tr-nota{color:#9ca3af;}
 [data-theme="dark"] .cal-grid,.cal-week-grid,.cal-day-view{background:#1a2035;border-color:#1e2a42;}
 [data-theme="dark"] .cal-dow,.cal-week-hdr{background:#131d33;color:#94a3b8;border-color:#1e2a42;}
 [data-theme="dark"] .cal-day{border-color:#1e2a42;color:#9ca3af;}
@@ -456,6 +469,37 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 .vit-s-apr{background:#f5f0e8;color:#0a1628;}
 .vit-s-abe{background:#E1F5EE;color:#085041;}
 .vit-s-enc{background:#fee2e2;color:#991b1b;}
+/* ===== TRACK RECORD ===== */
+.tr-section{margin-bottom:20px;border:1px solid #e8e4dc;border-radius:14px;overflow:hidden;}
+.tr-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#0a1628;color:#fff;}
+.tr-hdr-title{font-family:Georgia,serif;font-size:14px;font-weight:normal;letter-spacing:.03em;}
+.tr-hdr-badge{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;background:rgba(212,160,23,.25);color:#d4a017;border:1px solid rgba(212,160,23,.4);border-radius:20px;padding:2px 10px;}
+.tr-card{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start;padding:16px 18px;border-bottom:1px solid #f0f0ee;background:#fff;}
+.tr-card:last-child{border-bottom:none;}
+.tr-card:hover{background:#fdfcfa;}
+.tr-card-name{font-weight:600;font-size:14px;color:#0a1628;margin-bottom:3px;}
+.tr-card-setor{font-size:11px;color:#9ca3af;margin-bottom:10px;}
+.tr-compare{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.tr-pill{display:flex;flex-direction:column;align-items:center;padding:7px 14px;border-radius:8px;min-width:80px;}
+.tr-pill-label{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;opacity:.7;}
+.tr-pill-val{font-size:15px;font-weight:700;font-family:Georgia,serif;}
+.tr-pill-prom{background:#f5f0e8;color:#0a1628;}
+.tr-pill-entr-ok{background:#f0fdf4;color:#14532d;}
+.tr-pill-entr-warn{background:#fffbeb;color:#78350f;}
+.tr-pill-entr-bad{background:#fff1f2;color:#9f1239;}
+.tr-arrow{font-size:18px;color:#ccc;}
+.tr-delta{font-size:11px;font-weight:700;padding:3px 8px;border-radius:10px;}
+.tr-delta-ok{background:#dcfce7;color:#14532d;}
+.tr-delta-warn{background:#fef9c3;color:#78350f;}
+.tr-delta-bad{background:#ffe4e6;color:#9f1239;}
+.tr-meta{display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;}
+.tr-meta-item{display:flex;flex-direction:column;gap:1px;}
+.tr-meta-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;}
+.tr-meta-val{font-size:12px;font-weight:600;color:#374151;}
+.tr-nota{margin-top:10px;font-size:12px;color:#6b7280;font-style:italic;border-left:2px solid #d4a017;padding-left:10px;line-height:1.5;}
+.tr-card-actions{display:flex;flex-direction:column;gap:6px;align-items:flex-end;}
+/* Modal resultado */
+.tr-res-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .vit-form-tabs{display:flex;gap:0;border-bottom:1px solid #eee;margin-bottom:18px;overflow-x:auto;}
 .vit-ftab{padding:8px 14px;font-size:12px;cursor:pointer;color:#888;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;white-space:nowrap;}
 .vit-ftab:hover{color:#0a1628;}
@@ -1381,6 +1425,26 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <button class="btn-s" onclick="closeVitForm()">Cancelar</button>
       <button class="btn-s" id="btn-vit-discard" style="display:none;color:#dc2626" onclick="vitClearDraft();document.getElementById('btn-vit-discard').style.display='none';showToast('🗑 Rascunho descartado')">Limpar rascunho</button>
       <button class="btn-p" onclick="saveVitProj()">Salvar Projeto</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== VITRINE: MODAL RESULTADO FINAL ===== -->
+<div class="overlay" id="ov-vit-resultado">
+  <div class="modal" style="width:540px;max-width:96vw">
+    <button onclick="closeOv('ov-vit-resultado')" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:20px;color:#aaa;cursor:pointer;line-height:1">✕</button>
+    <h2 style="margin-bottom:4px">Registrar Resultado Final</h2>
+    <p style="font-size:13px;color:#888;margin-bottom:20px">Estes dados formam o seu Track Record como curador.</p>
+    <div class="tr-res-grid">
+      <div><label>Retorno Prometido (ex: 35% a.a.)</label><input id="tr-f-prom" placeholder="ex: 35% a.a." readonly style="background:#f5f5f3;color:#888"></div>
+      <div><label>Retorno Entregue *</label><input id="tr-f-real" placeholder="ex: 42% a.a."></div>
+      <div><label>Capital Efetivamente Captado</label><input id="tr-f-cap" placeholder="ex: R$ 1.2M"></div>
+      <div><label>Prazo Real de Encerramento</label><input id="tr-f-prazo" placeholder="ex: 18 meses"></div>
+    </div>
+    <div style="margin-top:14px"><label>Nota do Curador (opcional)</label><textarea id="tr-f-nota" placeholder="Comentário sobre o resultado, lições aprendidas..." style="height:72px;margin-top:4px"></textarea></div>
+    <div class="modal-btns">
+      <button class="btn-s" onclick="closeOv('ov-vit-resultado')">Cancelar</button>
+      <button class="btn-p" onclick="saveVitResultado()">Encerrar e Salvar</button>
     </div>
   </div>
 </div>
@@ -5411,12 +5475,15 @@ function renderVitrine(){
   if(sf)list=list.filter(p=>p.status===sf);
   const totInt=projetosVitrine.reduce((a,p)=>a+(p.interesses||[]).length,0);
   const emCap=projetosVitrine.filter(p=>p.status==='aberto').length;
+  const encerradosComDados=projetosVitrine.filter(p=>p.status==='encerrado'&&p.retornoReal);
   el.innerHTML=`
   <div class="stats">
     <div class="stat"><div class="stat-label">Projetos</div><div class="stat-value">${projetosVitrine.length}</div></div>
     <div class="stat"><div class="stat-label">Em captação</div><div class="stat-value" style="color:#0a1628">${emCap}</div></div>
     <div class="stat"><div class="stat-label">Interesses registrados</div><div class="stat-value" style="color:#0F6E56">${totInt}</div></div>
+    ${encerradosComDados.length?`<div class="stat"><div class="stat-label">Track Record</div><div class="stat-value" style="color:#d4a017">${encerradosComDados.length} op${encerradosComDados.length>1?'s':''}</div></div>`:''}
   </div>
+  ${encerradosComDados.length?renderTrackRecord(encerradosComDados):''}
   <div class="controls">
     <input id="vit-srch" placeholder="Buscar projeto..." oninput="renderVitrine()" value="${esc(q)}" style="flex:1">
     <select id="vit-filt" onchange="renderVitrine()">
@@ -5487,10 +5554,77 @@ function vitCardHTML(p){
   </div>`;
 }
 
+let _vitResultadoId=null;
 function vitMudaStatus(id,s){
   const p=projetosVitrine.find(p=>p.id===id);if(!p)return;
+  if(s==='encerrado'){openVitResultado(id);return;}
   p.status=s; saveData();syncToSupabase();renderVitrine();
   showToast('Status: '+vitStatusLabel(s));
+}
+function openVitResultado(id){
+  const p=projetosVitrine.find(p=>p.id===id);if(!p)return;
+  _vitResultadoId=id;
+  const g=k=>document.getElementById(k);
+  g('tr-f-prom').value=p.retornoPrev||'';
+  g('tr-f-real').value=p.retornoReal||'';
+  g('tr-f-cap').value=p.capitalLevantado||'';
+  g('tr-f-prazo').value=p.prazoReal||'';
+  g('tr-f-nota').value=p.notaCurador||'';
+  document.getElementById('ov-vit-resultado').classList.add('open');
+}
+function saveVitResultado(){
+  const p=projetosVitrine.find(p=>p.id===_vitResultadoId);if(!p)return;
+  const g=k=>document.getElementById(k)?.value?.trim()||'';
+  const real=g('tr-f-real');
+  if(!real){showToast('⚠ Informe o retorno entregue');return;}
+  p.status='encerrado';
+  p.retornoReal=real;
+  p.capitalLevantado=g('tr-f-cap');
+  p.prazoReal=g('tr-f-prazo');
+  p.notaCurador=g('tr-f-nota');
+  p.dataEncerramento=new Date().toISOString().slice(0,10);
+  closeOv('ov-vit-resultado');
+  saveData();syncToSupabase();renderVitrine();
+  showToast('✅ Resultado registrado no Track Record');
+}
+function renderTrackRecord(lista){
+  function parsePct(s){if(!s)return null;const m=s.match(/(\d+([.,]\d+)?)/);return m?parseFloat(m[1].replace(',','.')):null;}
+  const cards=lista.map(p=>{
+    const prom=parsePct(p.retornoPrev);
+    const real=parsePct(p.retornoReal);
+    let deltaCls='',deltaTxt='';
+    if(prom!==null&&real!==null){
+      const d=real-prom;
+      if(d>=0){deltaCls='tr-delta-ok';deltaTxt=`+${d.toFixed(1)}%`;}
+      else if(d>=-5){deltaCls='tr-delta-warn';deltaTxt=`${d.toFixed(1)}%`;}
+      else{deltaCls='tr-delta-bad';deltaTxt=`${d.toFixed(1)}%`;}
+    }
+    const entrCls=deltaTxt?(deltaCls==='tr-delta-ok'?'tr-pill-entr-ok':deltaCls==='tr-delta-warn'?'tr-pill-entr-warn':'tr-pill-entr-bad'):'tr-pill-entr-ok';
+    return`<div class="tr-card">
+      <div>
+        <div class="tr-card-name">${esc(p.nome||'Projeto')}</div>
+        <div class="tr-card-setor">${p.setor?esc(p.setor)+' · ':''} ${p.dataEncerramento||''}</div>
+        <div class="tr-compare">
+          ${p.retornoPrev?`<div class="tr-pill tr-pill-prom"><div class="tr-pill-label">Prometido</div><div class="tr-pill-val">${esc(p.retornoPrev)}</div></div><div class="tr-arrow">→</div>`:''}
+          <div class="tr-pill ${entrCls}"><div class="tr-pill-label">Entregue</div><div class="tr-pill-val">${esc(p.retornoReal)}</div></div>
+          ${deltaTxt?`<span class="tr-delta ${deltaCls}">${deltaTxt}</span>`:''}
+        </div>
+        <div class="tr-meta">
+          ${p.capitalLevantado?`<div class="tr-meta-item"><div class="tr-meta-lbl">Capital</div><div class="tr-meta-val">${esc(p.capitalLevantado)}</div></div>`:''}
+          ${p.prazoReal?`<div class="tr-meta-item"><div class="tr-meta-lbl">Prazo</div><div class="tr-meta-val">${esc(p.prazoReal)}</div></div>`:''}
+        </div>
+        ${p.notaCurador?`<div class="tr-nota">${esc(p.notaCurador)}</div>`:''}
+      </div>
+      ${isSocio()?`<div class="tr-card-actions"><button class="btn-s btn-sm" onclick="openVitResultado('${p.id}')">✏ Editar</button></div>`:''}
+    </div>`;
+  }).join('');
+  return`<div class="tr-section">
+    <div class="tr-hdr">
+      <span class="tr-hdr-title">Track Record do Curador</span>
+      <span class="tr-hdr-badge">${lista.length} operaç${lista.length>1?'ões':'ão'} encerrada${lista.length>1?'s':''}</span>
+    </div>
+    ${cards}
+  </div>`;
 }
 function deleteVitProj(id){
   if(!confirm('Excluir este projeto de Investimentos?'))return;
