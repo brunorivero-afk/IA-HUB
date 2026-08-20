@@ -1441,6 +1441,17 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <div><label>Capital Efetivamente Captado</label><input id="tr-f-cap" placeholder="ex: R$ 1.2M"></div>
       <div><label>Prazo Real de Encerramento</label><input id="tr-f-prazo" placeholder="ex: 18 meses"></div>
     </div>
+    <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end">
+      <div>
+        <label>Capital Total Apurado (R$) <span style="font-size:11px;color:#aaa;font-weight:normal">— para cálculo da comissão</span></label>
+        <input id="tr-f-apurado" type="number" placeholder="ex: 150000" oninput="trCalcComissao()" style="margin-top:4px">
+      </div>
+      <div id="tr-comissao-preview" style="display:none;background:#f5f0e8;border:1px solid #e8e0d0;border-radius:8px;padding:10px 14px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#9ca3af;margin-bottom:2px">Comissão Hub — Art. 4</div>
+        <div id="tr-comissao-val" style="font-family:Georgia,serif;font-size:18px;color:#0a1628;font-weight:normal"></div>
+        <div style="font-size:10px;color:#aaa;margin-top:1px">20% do valor apurado</div>
+      </div>
+    </div>
     <div style="margin-top:14px"><label>Nota do Curador (opcional)</label><textarea id="tr-f-nota" placeholder="Comentário sobre o resultado, lições aprendidas..." style="height:72px;margin-top:4px"></textarea></div>
     <div class="modal-btns">
       <button class="btn-s" onclick="closeOv('ov-vit-resultado')">Cancelar</button>
@@ -5561,6 +5572,16 @@ function vitMudaStatus(id,s){
   p.status=s; saveData();syncToSupabase();renderVitrine();
   showToast('Status: '+vitStatusLabel(s));
 }
+function trCalcComissao(){
+  const v=parseFloat(document.getElementById('tr-f-apurado')?.value||'');
+  const pv=document.getElementById('tr-comissao-preview');
+  const vv=document.getElementById('tr-comissao-val');
+  if(!pv||!vv)return;
+  if(isNaN(v)||v<=0){pv.style.display='none';return;}
+  const c=v*0.2;
+  vv.textContent='R$ '+c.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+  pv.style.display='block';
+}
 function openVitResultado(id){
   const p=projetosVitrine.find(p=>p.id===id);if(!p)return;
   _vitResultadoId=id;
@@ -5570,6 +5591,9 @@ function openVitResultado(id){
   g('tr-f-cap').value=p.capitalLevantado||'';
   g('tr-f-prazo').value=p.prazoReal||'';
   g('tr-f-nota').value=p.notaCurador||'';
+  g('tr-f-apurado').value=p.capitalApurado||'';
+  document.getElementById('tr-comissao-preview').style.display=p.capitalApurado?'block':'none';
+  if(p.capitalApurado)trCalcComissao();
   document.getElementById('ov-vit-resultado').classList.add('open');
 }
 function saveVitResultado(){
@@ -5577,11 +5601,14 @@ function saveVitResultado(){
   const g=k=>document.getElementById(k)?.value?.trim()||'';
   const real=g('tr-f-real');
   if(!real){showToast('⚠ Informe o retorno entregue');return;}
+  const apurado=parseFloat(document.getElementById('tr-f-apurado')?.value||'');
   p.status='encerrado';
   p.retornoReal=real;
   p.capitalLevantado=g('tr-f-cap');
   p.prazoReal=g('tr-f-prazo');
   p.notaCurador=g('tr-f-nota');
+  p.capitalApurado=isNaN(apurado)||apurado<=0?null:apurado;
+  p.comissaoHub=p.capitalApurado?Math.round(p.capitalApurado*0.2):null;
   p.dataEncerramento=new Date().toISOString().slice(0,10);
   closeOv('ov-vit-resultado');
   saveData();syncToSupabase();renderVitrine();
@@ -5612,6 +5639,7 @@ function renderTrackRecord(lista){
         <div class="tr-meta">
           ${p.capitalLevantado?`<div class="tr-meta-item"><div class="tr-meta-lbl">Capital</div><div class="tr-meta-val">${esc(p.capitalLevantado)}</div></div>`:''}
           ${p.prazoReal?`<div class="tr-meta-item"><div class="tr-meta-lbl">Prazo</div><div class="tr-meta-val">${esc(p.prazoReal)}</div></div>`:''}
+          ${p.comissaoHub?`<div class="tr-meta-item"><div class="tr-meta-lbl">Comissão Hub (20%)</div><div class="tr-meta-val" style="color:#d4a017">R$ ${p.comissaoHub.toLocaleString('pt-BR')}</div></div>`:''}
         </div>
         ${p.notaCurador?`<div class="tr-nota">${esc(p.notaCurador)}</div>`:''}
       </div>
