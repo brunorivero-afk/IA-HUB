@@ -162,6 +162,30 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 .topbar{grid-area:topbar;justify-content:flex-end;}
 .tabs-wrap{display:none;}
 .topbar-brand{display:none;}
+/* Hamburger — oculto no desktop */
+#btn-menu{display:none;background:none;border:none;cursor:pointer;font-size:22px;color:#0a1628;padding:2px 8px;line-height:1;flex-shrink:0;}
+[data-theme="dark"] #btn-menu{color:#e2e8f0;}
+/* Overlay do sidebar no mobile */
+#sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:190;}
+#sidebar-overlay.open{display:block;}
+
+/* ===== RESPONSIVO MOBILE ===== */
+@media(max-width:768px){
+  /* Grid: sem coluna sidebar */
+  #screen-main{grid-template-columns:1fr;grid-template-rows:auto 1fr;grid-template-areas:"topbar" "app";}
+  /* Sidebar: overlay deslizante */
+  .sidebar{position:fixed;top:0;left:0;bottom:0;width:240px;z-index:200;transform:translateX(-100%);transition:transform .25s ease;display:flex!important;}
+  .sidebar.open{transform:translateX(0);}
+  /* Topbar: mostra brand + hamburger */
+  .topbar{justify-content:space-between;padding:10px 16px;grid-area:topbar;}
+  .topbar-brand{display:flex!important;}
+  #btn-menu{display:block!important;}
+  /* Painel: menos padding lateral */
+  .panel.active{padding:16px;}
+  /* Topbar: esconde "Reservar sala" texto se pequeno */
+  #btn-reservar-sala{font-size:0;padding:6px 10px;}
+  #btn-reservar-sala::first-line{font-size:16px;}
+}
 .sidebar{grid-area:sidebar;background:#0a1628;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid rgba(255,255,255,.05);}
 .sidebar-header{padding:22px 16px 16px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;}
 .sidebar-brand-name{font-family:Georgia,serif;font-size:16px;color:#fff;letter-spacing:-.2px;margin-top:10px;line-height:1.2;}
@@ -559,8 +583,10 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     </div>
     <div id="tabs-bar" class="sidebar-nav"></div>
   </nav>
+  <div id="sidebar-overlay" onclick="closeSidebar()"></div>
   <div class="topbar">
     <div class="topbar-brand">
+      <button id="btn-menu" onclick="toggleSidebar()" title="Menu">☰</button>
       <div id="logo-main-wrap"></div>
       <span>IA Hub</span>
     </div>
@@ -1778,6 +1804,8 @@ function buildTabs(){
 }
 
 function showTab(name){
+  // Fecha sidebar no mobile ao trocar de aba
+  if(window.innerWidth<=768)closeSidebar();
   // Operador só pode ver a tela de nova conexão
   if(isOperador()){
     document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
@@ -1815,6 +1843,22 @@ function showTab(name){
 
 function sizeActivePanel(){}
 window.addEventListener('resize',sizeActivePanel);
+
+// ===== SIDEBAR MOBILE =====
+function toggleSidebar(){
+  const sb=document.getElementById('main-sidebar');
+  const ov=document.getElementById('sidebar-overlay');
+  if(!sb||!ov)return;
+  const isOpen=sb.classList.contains('open');
+  sb.classList.toggle('open',!isOpen);
+  ov.classList.toggle('open',!isOpen);
+}
+function closeSidebar(){
+  const sb=document.getElementById('main-sidebar');
+  const ov=document.getElementById('sidebar-overlay');
+  if(sb)sb.classList.remove('open');
+  if(ov)ov.classList.remove('open');
+}
 function initFilters(){
   const allSegs=[...new Set(users.flatMap(u=>(u.seg||'').split(',').map(s=>s.trim()).filter(Boolean)))].sort();
   ['mbr-fseg','syn-seg'].forEach(id=>{
