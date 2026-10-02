@@ -42,7 +42,7 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 [data-theme="dark"] .modal input,.modal select,.modal textarea,.controls input,.controls select{background:#0f1117;border-color:#2d3748;color:#e2e8f0;}
 [data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:#0f1117!important;border-color:#2d3748!important;color:#e2e8f0!important;}
 [data-theme="dark"] .overlay{background:rgba(0,0,0,.7);}
-[data-theme="dark"] .pj-card,.con-card,.rel-box,.chart-box,.info-box,.agenda-cfg,.fin-planilha,.fin-saldo-bar,.vit-card,.vit-card-v2{background:#1a2035;border-color:#1e2a42;}
+[data-theme="dark"] .pj-card,.con-card,.rel-box,.chart-box,.info-box,.fin-planilha,.fin-saldo-bar,.vit-card,.vit-card-v2{background:#1a2035;border-color:#1e2a42;}
 [data-theme="dark"] .pj-title,.con-title,.vit-card-nome{color:#e2e8f0;}
 [data-theme="dark"] .pj-body,.con-desc,.vit-card-tagline,.syn-why,.fu-txt{color:#9ca3af;}
 [data-theme="dark"] .syn-card{background:#1a2035;border-color:#1e2a42;}
@@ -195,9 +195,6 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
   #btn-menu{display:block!important;}
   /* Painel: menos padding lateral */
   .panel.active{padding:16px;}
-  /* Topbar: esconde "Reservar sala" texto se pequeno */
-  #btn-reservar-sala{font-size:0;padding:6px 10px;}
-  #btn-reservar-sala::first-line{font-size:16px;}
 }
 .sidebar{grid-area:sidebar;background:#0a1628;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid rgba(255,255,255,.05);}
 .sidebar-header{padding:22px 16px 16px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;}
@@ -377,53 +374,6 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 .porte-media{background:#fef9c3;color:#854d0e;}
 .porte-grande{background:#fee2e2;color:#991b1b;}
 .porte-multi{background:#f3e8ff;color:#6b21a8;}
-
-/* ===== AGENDA ===== */
-.agenda-cfg{background:#fff;border:1px solid #eee;border-radius:12px;padding:20px;margin-bottom:16px;}
-.agenda-cfg h3{font-size:14px;font-weight:600;margin-bottom:8px;color:#0a1628;}
-.agenda-cfg p{font-size:13px;color:#888;line-height:1.7;margin-bottom:10px;}
-.agenda-cfg code{background:#f5f5f3;padding:2px 6px;border-radius:4px;font-size:12px;}
-.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
-.cal-nav{display:flex;align-items:center;gap:8px;}
-.cal-nav button{background:#fff;border:1px solid #0a1628;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;color:#0a1628;}
-.cal-title{font-size:16px;font-weight:600;color:#0a1628;}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden;}
-.cal-dow{background:#fafafa;text-align:center;font-size:11px;font-weight:600;color:#888;padding:8px 0;text-transform:uppercase;border-bottom:1px solid #eee;}
-.cal-day{min-height:88px;border:0.5px solid #f0f0f0;padding:6px;position:relative;font-size:12px;color:#555;cursor:pointer;}
-.cal-day:hover{background:#fafaf8;}
-.cal-day.other-month{color:#ccc;background:#fafafa;}
-.cal-day.today{background:#fdf8ee;}
-.cal-day .daynum{font-weight:600;margin-bottom:4px;}
-.cal-evt{background:#0a1628;color:#fff;border-radius:4px;padding:1px 5px;font-size:10px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.cal-evt.local{background:#854F0B;}
-.agenda-list{margin-top:16px;}
-.agenda-evt-item{background:#fff;border:1px solid #eee;border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;}
-.agenda-evt-time{font-size:12px;color:#888;white-space:nowrap;}
-.agenda-evt-title{font-size:13px;font-weight:500;color:#0a1628;}
-.agenda-evt-desc{font-size:12px;color:#888;margin-top:2px;}
-.gcal-status{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:5px 12px;border-radius:20px;}
-.gcal-on{background:#E1F5EE;color:#085041;}
-.gcal-off{background:#F1EFE8;color:#888;}
-.cal-view-btn{background:#fff;border:1px solid #0a1628;color:#0a1628;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;}
-.cal-view-btn.active{background:#0a1628;color:#fff;}
-.cal-week-grid{display:grid;grid-template-columns:60px repeat(7,1fr);border:1px solid #eee;border-radius:12px;overflow:hidden;background:#fff;}
-.cal-week-hdr{background:#fafafa;font-size:11px;font-weight:600;color:#888;padding:8px 6px;text-align:center;border-bottom:1px solid #eee;}
-.cal-week-time{font-size:10px;color:#aaa;padding:2px 4px;border-right:1px solid #f0f0f0;border-bottom:1px solid #f8f8f8;text-align:right;}
-.cal-week-cell{border-left:0.5px solid #f0f0f0;border-bottom:0.5px solid #f8f8f8;min-height:28px;position:relative;cursor:pointer;}
-.cal-week-cell:hover{background:#fafaf8;}
-.cal-week-evt{position:absolute;left:1px;right:1px;background:#0a1628;color:#fff;border-radius:3px;font-size:9px;padding:1px 3px;overflow:hidden;z-index:1;}
-.cal-day-view{background:#fff;border:1px solid #eee;border-radius:12px;overflow:hidden;}
-.cal-day-hour{display:flex;border-bottom:0.5px solid #f0f0f0;min-height:44px;}
-.cal-day-hour-lbl{width:60px;font-size:11px;color:#aaa;padding:4px 8px;border-right:1px solid #f0f0f0;flex-shrink:0;}
-.cal-day-hour-slot{flex:1;cursor:pointer;padding:2px;}
-.cal-day-hour-slot:hover{background:#fafaf8;}
-.cal-sala-badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:10px;margin-right:4px;}
-.sala1{background:#dbeafe;color:#1e40af;}
-.sala2{background:#ede9fe;color:#5b21b6;}
-.ranking-row{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:0.5px solid #f0f0f0;font-size:13px;}
-.ranking-row:last-child{border-bottom:none;}
-.ranking-pos{font-size:16px;font-weight:700;color:#0a1628;width:28px;}
-.ranking-bar{height:6px;border-radius:3px;background:#0a1628;margin-top:3px;}
 
 /* ===== NOTIF BAR ===== */
 .notif-bar{background:#0d2240;color:#fff;border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;}
@@ -640,7 +590,6 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
         🔔 <span class="notif-count" id="notif-count" style="display:none">0</span>
       </button>
       <button id="btn-aprovacao" class="notif-btn" onclick="openAprovacaoPanel()" style="display:none" title="Membros aguardando aprovação">👥 <span class="notif-count" id="aprovacao-count" style="display:none">0</span></button>
-      <button id="btn-reservar-sala" class="btn-p" style="display:none" onclick="openAddEvento()" title="Reservar sala de reunião">📅 Reservar sala</button>
       <div class="user-dropdown" id="user-dropdown">
         <button class="user-pill" id="user-pill" onclick="toggleUserMenu(event)">—</button>
         <div class="user-menu" id="user-menu">
@@ -793,10 +742,6 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <!-- VITRINE DE INVESTIMENTOS -->
     <div class="panel" id="tab-vitrine">
       <div id="vit-inner"></div>
-    </div>
-    <!-- AGENDA -->
-    <div class="panel" id="tab-agenda">
-      <div id="agenda-inner"></div>
     </div>
     <!-- MEU RELATÓRIO (overlay) -->
     <div class="overlay" id="ov-relatorio" style="align-items:flex-start;overflow-y:auto;padding:20px 0">
@@ -1092,71 +1037,6 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <button class="btn-s" id="btn-del-con" style="display:none;margin-right:auto;color:#c0392b;border-color:#fecaca" onclick="deleteCon()">Remover</button>
       <button class="btn-s" onclick="closeOv('ov-con')">Cancelar</button>
       <button class="btn-p" onclick="saveCon()">Salvar conexão</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal lançamento financeiro -->
-<div class="overlay" id="ov-evento">
-  <div class="modal" style="width:520px">
-    <h2 id="evento-ttl">Nova reunião / evento</h2>
-    <!-- Abas do modal -->
-    <div style="display:flex;gap:8px;margin-bottom:16px">
-      <button id="ev-tab-btn-reuniao" class="btn-p" style="flex:1" onclick="switchEvTab('reuniao')">Reunião</button>
-      <button id="ev-tab-btn-convidado" class="btn-p" style="flex:1;background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="switchEvTab('convidado')">+ Convidado externo</button>
-    </div>
-    <!-- Aba Reunião -->
-    <div id="ev-tab-reuniao">
-      <div class="fg">
-        <div class="full"><label>Título *</label><input id="ev-titulo" placeholder="Ex: Reunião de alinhamento"></div>
-        <div><label>Data *</label><input id="ev-data" type="date"></div>
-        <div><label>Hora início</label><input id="ev-hora" type="time" value="09:00"></div>
-        <div><label>Hora fim</label><input id="ev-horafim" type="time" value="10:00"></div>
-        <div><label>Espaço</label>
-          <select id="ev-sala">
-            <option value="">Sem espaço específico</option>
-            <option value="Sala de Reuniões">Sala de Reuniões</option>
-            <option value="Lounge">Lounge</option>
-          </select></div>
-        <div><label>Tipo</label>
-          <select id="ev-tipo">
-            <option>Reunião</option><option>Evento</option><option>Compromisso</option><option>Outro</option>
-          </select></div>
-        <div class="full"><label>Participantes da rede</label>
-          <select id="ev-parts" multiple style="height:90px"></select>
-          <div style="font-size:11px;color:#aaa;margin-top:3px">Segure Ctrl para selecionar mais de um</div>
-        </div>
-        <div class="full"><label>Descrição / Pauta</label>
-          <textarea id="ev-desc" placeholder="Pauta, tópicos ou observações..."></textarea>
-        </div>
-      </div>
-    </div>
-    <!-- Aba Convidado externo -->
-    <div id="ev-tab-convidado" style="display:none">
-      <p style="font-size:13px;color:#888;margin-bottom:14px">Cadastre quem vem de fora da rede. Os dados ficam vinculados a esta reunião.</p>
-      <div id="ev-convidados-list" style="margin-bottom:12px"></div>
-      <div style="background:#f8f9ff;border:1px solid #e0e8ff;border-radius:10px;padding:14px">
-        <div style="font-size:12px;font-weight:600;color:#0a1628;margin-bottom:10px">Adicionar convidado</div>
-        <div class="fg">
-          <div><label>Nome *</label><input id="conv-nome" placeholder="Nome completo"></div>
-          <div><label>Empresa</label><input id="conv-emp" placeholder="Empresa ou organização"></div>
-          <div class="full"><label>Segmento de atuação</label><input id="conv-seg" placeholder="Ex: Advocacia, Tecnologia..."></div>
-          <div class="full"><label>Área de interesse</label><input id="conv-interesse" placeholder="Ex: Parceria comercial, Captação de clientes..."></div>
-          <div class="full"><label>Descrição / Observações</label>
-            <textarea id="conv-desc" placeholder="Contexto da visita, potencial de negócio, observações..." style="height:60px"></textarea>
-          </div>
-        </div>
-        <button class="btn-p" style="margin-top:10px;width:100%" onclick="addConvidado()">+ Adicionar à reunião</button>
-      </div>
-    </div>
-    <div id="ev-gcal-link" style="display:none;margin-top:10px;padding:10px;background:#eff6ff;border-radius:8px;font-size:12px;color:#0a1628"></div>
-    <div style="margin-top:10px;padding:10px;background:#eff6ff;border-radius:8px;font-size:12px;color:#0a1628">
-      📧 Participantes receberão notificação interna + link para adicionar ao Google Calendar.
-    </div>
-    <div class="modal-btns">
-      <button class="btn-s" id="btn-del-evento" style="display:none;margin-right:auto;color:#c0392b;border-color:#fecaca" onclick="deleteEvento()">Remover</button>
-      <button class="btn-s" onclick="closeOv('ov-evento')">Cancelar</button>
-      <button class="btn-p" onclick="saveEvento()">Salvar</button>
     </div>
   </div>
 </div>
@@ -1664,7 +1544,6 @@ let users=[
   {id:24,nome:'Operador CorpLink',emp:'CorpLink',email:'operador@corplink.co',senha:'corplink2026',perfil:'Operador',status:'Ativo',seg:'CorpLink',ativ:['Gestão de Parceria'],vinculoId:null,comissao:0},
 ];
 
-// Convidados externos cadastrados via agenda
 let convidadosExternos=[];
 let mbrPage=0;
 
@@ -1823,12 +1702,9 @@ function setupMain(){
   initFilters();
   updateNotifBadge();
   updateAprovacaoBadge();
-  // Botão "Reservar sala" aparece só para não sócios
-  const btnRS=document.getElementById('btn-reservar-sala');
-  if(btnRS)btnRS.style.display=isSocio()?'none':'inline-block';
   // Operador: esconder botões desnecessários
   if(isOperador()){
-    ['btn-aprovacao','notif-btn','btn-reservar-sala'].forEach(id=>{
+    ['btn-aprovacao','notif-btn'].forEach(id=>{
       const el=document.getElementById(id);if(el)el.style.display='none';
     });
     const btnMinhaArea=document.getElementById('um-minha-area');
@@ -1858,7 +1734,6 @@ function buildTabs(){
     {id:'financeiro',label:'Financeiro',socio:true},
     {id:'projetos',label:'Projetos',all:true},
     {id:'sinergias',label:'Sinergias',socioAssoc:true},
-    {id:'agenda',label:'Agenda',socio:true},
     {id:'pipeline',label:'Pipeline',socio:true},
     {id:'meus-rendimentos',label:'Meus Rendimentos',notSocio:true},
     {id:'relatorio-rede',label:'Relatório da Rede',socio:true},
@@ -1903,7 +1778,6 @@ function showTab(name){
   if(name==='financeiro')renderFinanceiro();
   if(name==='projetos')renderProjetos();
   if(name==='sinergias')renderSin();
-  if(name==='agenda')renderAgenda();
   if(name==='pipeline')renderPipeline();
   if(name==='meus-rendimentos')renderMeusRendimentos();
   if(name==='relatorio-rede')renderRelatorioRede();
@@ -1945,11 +1819,11 @@ function initFilters(){
 
 function closeOv(id){document.getElementById(id).classList.remove('open');}
 window.addEventListener('click',e=>{
-  ['ov-usr','ov-proj','ov-fu','ov-lanc','ov-sin','ov-notif','ov-evento','ov-con','ov-relatorio','ov-propor','ov-moderacao','ov-aprovacao','ov-revelar','ov-onboarding','ov-vit-detalhe','ov-vit-int','ov-vit-int-rapido','ov-cred'].forEach(id=>{if(e.target.id===id)closeOv(id);});
+  ['ov-usr','ov-proj','ov-fu','ov-lanc','ov-sin','ov-notif','ov-con','ov-relatorio','ov-propor','ov-moderacao','ov-aprovacao','ov-revelar','ov-onboarding','ov-vit-detalhe','ov-vit-int','ov-vit-int-rapido','ov-cred'].forEach(id=>{if(e.target.id===id)closeOv(id);});
 });
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
-    ['ov-usr','ov-proj','ov-fu','ov-lanc','ov-sin','ov-notif','ov-evento','ov-con','ov-relatorio','ov-propor','ov-moderacao','ov-aprovacao','ov-revelar','ov-onboarding','ov-vit-detalhe','ov-vit-int','ov-vit-int-rapido','ov-vit-manifesto','ov-cred'].forEach(id=>{
+    ['ov-usr','ov-proj','ov-fu','ov-lanc','ov-sin','ov-notif','ov-con','ov-relatorio','ov-propor','ov-moderacao','ov-aprovacao','ov-revelar','ov-onboarding','ov-vit-detalhe','ov-vit-int','ov-vit-int-rapido','ov-vit-manifesto','ov-cred'].forEach(id=>{
       const el=document.getElementById(id);if(el&&el.classList.contains('open'))closeOv(id);
     });
   }
@@ -2437,7 +2311,7 @@ function renderMembros(){
     rowsHtml+=`<tr><td colspan="7" style="background:#fef9ee;font-size:11px;font-weight:700;color:#92400e;padding:6px 14px;text-transform:uppercase;letter-spacing:.06em">Convidados externos (${convidadosExternos.length})</td></tr>`;
     rowsHtml+=convidadosExternos.map(c=>buildRow(c,true)).join('');
   } else if(showExternos&&fsecao==='externos'){
-    rowsHtml+=`<tr><td colspan="7" class="empty-msg" style="padding:20px">Nenhum convidado externo ainda. Cadastre na Agenda ao marcar uma reunião.</td></tr>`;
+    rowsHtml+=`<tr><td colspan="7" class="empty-msg" style="padding:20px">Nenhum convidado externo ainda.</td></tr>`;
   }
   if(!rowsHtml)rowsHtml=`<tr><td colspan="7" class="empty-msg">Nenhum registro encontrado.</td></tr>`;
   tb.innerHTML=rowsHtml;
@@ -3497,207 +3371,8 @@ function showToast(msg){
 }
 
 
-// ===================== AGENDA (local + link Google Calendar) =====================
-let agendaLocalEvents=[
-  {id:1,titulo:'Reunião de follow-up - Projeto ABC',data:new Date().toISOString().split('T')[0],hora:'10:00',horafim:'11:00',sala:'Sala de Reuniões',tipo:'Reunião',participantes:[1,2],desc:'Revisão de status com Eduardo Santos.',criadorId:1}
-];
-let agendaViewDate=new Date();
-let agendaView='month';
-let editEventoId=null;
-
-function localStorage_safe_get(k){try{return localStorage.getItem(k);}catch(e){return null;}}
-function localStorage_safe_set(k,v){try{localStorage.setItem(k,v);}catch(e){}}
-
-function gerarGcalLink(ev){
-  const d=(ev.data||'').replace(/-/g,'');
-  const hI=(ev.hora||'0900').replace(':','');
-  const hF=(ev.horafim||'1000').replace(':','');
-  const start=d+'T'+hI+'00';const end=d+'T'+hF+'00';
-  const parts=(ev.participantes||[]).map(id=>(users.find(u=>u.id===id)||{}).nome||'').filter(Boolean);
-  const details=encodeURIComponent((ev.desc||'')+(parts.length?'\nParticipantes: '+parts.join(', '):''));
-  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(ev.titulo)+'&dates='+start+'/'+end+'&details='+details+'&location='+encodeURIComponent(ev.sala||'');
-}
-
-function renderAgenda(){
-  const el=document.getElementById('agenda-inner');
-  const today=new Date().toISOString().split('T')[0];
-  el.innerHTML=`
-    <div class="agenda-cfg">
-      <h3>📅 Agenda do Escritório — Salas de Reunião</h3>
-      <p>Dois espaços disponíveis: <strong>Sala de Reuniões</strong> e <strong>Lounge</strong>. Associados, parceiros e convidados podem reservar clicando em "+ Novo evento". Após salvar, clique em "Adicionar ao Google Calendar" para sincronizar com sua agenda pessoal (1 clique).</p>
-    </div>
-    <div class="cal-header">
-      <div class="cal-nav">
-        <button onclick="agendaNav(-1)">←</button>
-        <span class="cal-title" id="cal-title-month"></span>
-        <button onclick="agendaNav(1)">→</button>
-        <button onclick="agendaGoToday()">Hoje</button>
-        <div style="display:flex;gap:4px;margin-left:10px">
-          <button class="cal-view-btn" id="vbtn-day" onclick="setAgendaView('day')">Dia</button>
-          <button class="cal-view-btn" id="vbtn-week" onclick="setAgendaView('week')">Semana</button>
-          <button class="cal-view-btn" id="vbtn-month" onclick="setAgendaView('month')">Mês</button>
-        </div>
-      </div>
-      <button class="btn-p" onclick="openAddEvento()">+ Novo evento</button>
-    </div>
-    <div id="cal-main-view"></div>
-    <div class="agenda-list" style="margin-top:20px">
-      <div class="section-hdr">Próximos eventos</div>
-      <div id="agenda-upcoming"></div>
-    </div>
-    <div style="margin-top:20px">
-      <div class="section-hdr">🏆 Ranking de uso das salas</div>
-      <div id="agenda-ranking"></div>
-    </div>`;
-  updateViewBtns();
-  buildAgendaView();
-  renderUpcoming();
-  renderRanking();
-}
-
-function updateViewBtns(){
-  ['day','week','month'].forEach(v=>{
-    const b=document.getElementById('vbtn-'+v);
-    if(b)b.className='cal-view-btn'+(agendaView===v?' active':'');
-  });
-}
-function setAgendaView(v){agendaView=v;renderAgenda();}
-function agendaNav(d){
-  if(agendaView==='month')agendaViewDate.setMonth(agendaViewDate.getMonth()+d);
-  else if(agendaView==='week')agendaViewDate.setDate(agendaViewDate.getDate()+d*7);
-  else agendaViewDate.setDate(agendaViewDate.getDate()+d);
-  renderAgenda();
-}
-function agendaGoToday(){agendaViewDate=new Date();renderAgenda();}
-function agendaChangeMonth(d){agendaNav(d);}
-function getAllAgendaEvents(){return agendaLocalEvents;}
-function buildCalendar(){}
-
-function buildAgendaView(){
-  const el=document.getElementById('cal-main-view');if(!el)return;
-  if(agendaView==='month')buildMonthView(el);
-  else if(agendaView==='week')buildWeekView(el);
-  else buildDayView(el);
-}
-
-function buildMonthView(el){
-  const y=agendaViewDate.getFullYear(),m=agendaViewDate.getMonth();
-  const mn=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  document.getElementById('cal-title-month').textContent=mn[m]+' '+y;
-  const fd=new Date(y,m,1).getDay(),dim=new Date(y,m+1,0).getDate(),dip=new Date(y,m,0).getDate();
-  const ts=new Date().toISOString().split('T')[0];
-  let h='<div class="cal-grid">';
-  ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].forEach(d=>h+=`<div class="cal-dow">${d}</div>`);
-  for(let i=fd-1;i>=0;i--)h+=`<div class="cal-day other-month"><div class="daynum">${dip-i}</div></div>`;
-  for(let d=1;d<=dim;d++){
-    const ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-    const isT=ds===ts;
-    const evts=agendaLocalEvents.filter(e=>e.data===ds);
-    let eh=evts.slice(0,3).map(e=>{
-      const sc=e.sala==='Sala de Reuniões'?'#0a1628':e.sala==='Lounge'?'#7c3aed':'#854F0B';
-      return`<div class="cal-evt" style="background:${sc};cursor:pointer" onclick="event.stopPropagation();openEditEvento(${e.id})" title="${e.titulo}">${e.hora||''} ${e.titulo}</div>`;
-    }).join('');
-    if(evts.length>3)eh+=`<div style="font-size:10px;color:#aaa">+${evts.length-3} mais</div>`;
-    h+=`<div class="cal-day${isT?' today':''}" onclick="openAddEvento('${ds}')"><div class="daynum">${d}</div>${eh}</div>`;
-  }
-  const rem=(7-((fd+dim)%7))%7;
-  for(let d=1;d<=rem;d++)h+=`<div class="cal-day other-month"><div class="daynum">${d}</div></div>`;
-  el.innerHTML=h+'</div>';
-}
-
-function buildWeekView(el){
-  const curr=new Date(agendaViewDate);curr.setDate(curr.getDate()-curr.getDay());
-  const days=[];for(let i=0;i<7;i++){const d=new Date(curr);d.setDate(curr.getDate()+i);days.push(d);}
-  const mn=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  document.getElementById('cal-title-month').textContent=days[0].getDate()+' '+mn[days[0].getMonth()]+' – '+days[6].getDate()+' '+mn[days[6].getMonth()]+' '+days[6].getFullYear();
-  const dn=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-  const ts=new Date().toISOString().split('T')[0];
-  let h='<div class="cal-week-grid"><div class="cal-week-hdr"></div>';
-  days.forEach((d,i)=>{
-    const ds=d.toISOString().split('T')[0];const isT=ds===ts;
-    h+=`<div class="cal-week-hdr" style="${isT?'background:#eff6ff;color:#0a1628':''}"><div>${dn[i]}</div><div style="font-size:16px;font-weight:700">${d.getDate()}</div></div>`;
-  });
-  for(let hh=7;hh<21;hh++){
-    h+=`<div class="cal-week-time">${String(hh).padStart(2,'0')}:00</div>`;
-    days.forEach(d=>{
-      const ds=d.toISOString().split('T')[0];
-      const evts=agendaLocalEvents.filter(e=>e.data===ds&&parseInt((e.hora||'0').split(':')[0])===hh);
-      h+=`<div class="cal-week-cell" onclick="openAddEvento('${ds}')">`;
-      evts.forEach(e=>{const sc=e.sala==='Lounge'?'#7c3aed':'#0a1628';h+=`<div class="cal-week-evt" style="background:${sc}" onclick="event.stopPropagation();openEditEvento(${e.id})">${e.titulo}</div>`;});
-      h+='</div>';
-    });
-  }
-  el.innerHTML=h+'</div>';
-}
-
-function buildDayView(el){
-  const ds=agendaViewDate.toISOString().split('T')[0];
-  const mn=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  document.getElementById('cal-title-month').textContent=agendaViewDate.getDate()+' de '+mn[agendaViewDate.getMonth()]+' de '+agendaViewDate.getFullYear();
-  let h='<div class="cal-day-view">';
-  for(let hh=7;hh<21;hh++){
-    const evts=agendaLocalEvents.filter(e=>e.data===ds&&parseInt((e.hora||'0').split(':')[0])===hh);
-    h+=`<div class="cal-day-hour"><div class="cal-day-hour-lbl">${String(hh).padStart(2,'0')}:00</div><div class="cal-day-hour-slot" onclick="openAddEvento('${ds}')">`;
-    evts.forEach(e=>{
-      const sc=e.sala==='Sala de Reuniões'?'sala1':e.sala==='Lounge'?'sala2':'';
-      h+=`<span class="cal-sala-badge ${sc}" onclick="event.stopPropagation();openEditEvento(${e.id})" style="cursor:pointer">${e.hora} ${e.titulo}${e.sala?' · '+e.sala:''}</span>`;
-    });
-    h+='</div></div>';
-  }
-  el.innerHTML=h+'</div>';
-}
-
-function renderUpcoming(){
-  const today=new Date().toISOString().split('T')[0];
-  const evts=agendaLocalEvents.filter(e=>e.data>=today).sort((a,b)=>(a.data+a.hora).localeCompare(b.data+b.hora)).slice(0,8);
-  const el=document.getElementById('agenda-upcoming');if(!el)return;
-  if(!evts.length){el.innerHTML='<div class="empty-msg">Nenhum evento futuro.</div>';return;}
-  el.innerHTML=evts.map(e=>{
-    const parts=(e.participantes||[]).map(id=>(users.find(u=>u.id===id)||{}).nome||'').filter(Boolean);
-    const sc=e.sala==='Sala de Reuniões'?'sala1':e.sala==='Lounge'?'sala2':'';
-    const gcalLink=gerarGcalLink(e);
-    return`<div class="agenda-evt-item" onclick="openEditEvento(${e.id})" style="cursor:pointer">
-      <div style="flex:1">
-        <div class="agenda-evt-title">${e.sala?`<span class="cal-sala-badge ${sc}">${e.sala}</span>`:''} ${e.titulo} <span class="badge" style="background:#f0f0ee;color:#555">${e.tipo||'Reunião'}</span></div>
-        ${parts.length?`<div class="agenda-evt-desc">👥 ${parts.join(', ')}</div>`:''}
-        ${e.desc?`<div class="agenda-evt-desc">${e.desc}</div>`:''}
-        <a href="${gcalLink}" target="_blank" onclick="event.stopPropagation()" style="font-size:11px;color:#0a1628;display:inline-block;margin-top:4px">📅 Adicionar ao Google Calendar</a>
-      </div>
-      <div class="agenda-evt-time">${new Date(e.data+'T00:00:00').toLocaleDateString('pt-BR')} · ${e.hora||''}${e.horafim?' – '+e.horafim:''}</div>
-    </div>`;
-  }).join('');
-}
-
-function renderRanking(){
-  const el=document.getElementById('agenda-ranking');if(!el)return;
-  const counts={};
-  agendaLocalEvents.forEach(ev=>{
-    const uid=ev.criadorId;if(!uid)return;
-    counts[uid]=(counts[uid]||0)+1;
-  });
-  const sala1=agendaLocalEvents.filter(e=>e.sala==='Sala de Reuniões').length;
-  const sala2=agendaLocalEvents.filter(e=>e.sala==='Lounge').length;
-  const ranked=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
-  const maxC=Math.max(1,...Object.values(counts));
-  const medals=['🥇','🥈','🥉'];
-  el.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-    <div class="fin-sec"><h3>Quem mais marcou reuniões</h3>
-    ${ranked.length?ranked.map(([uid,cnt],i)=>{
-      const u=users.find(x=>x.id===parseInt(uid));
-      return`<div class="ranking-row"><div><span class="ranking-pos">${medals[i]||i+1}</span>${u?u.nome:'?'}</div>
-      <div style="text-align:right"><strong>${cnt}</strong> evento${cnt!==1?'s':''}<div class="ranking-bar" style="width:${Math.round(cnt/maxC*100)}%"></div></div></div>`;
-    }).join(''):'<div style="color:#aaa;font-size:13px;padding:8px">Nenhum dado ainda.</div>'}
-    </div>
-    <div class="fin-sec"><h3>Uso por sala</h3>
-      <div class="ranking-row"><div><span class="cal-sala-badge sala1">Sala de Reuniões</span></div><div><strong>${sala1}</strong> uso${sala1!==1?'s':''}</div></div>
-      <div class="ranking-row"><div><span class="cal-sala-badge sala2">Lounge</span></div><div><strong>${sala2}</strong> uso${sala2!==1?'s':''}</div></div>
-      <div class="ranking-row" style="color:#888;font-size:12px"><div>Total</div><div><strong>${agendaLocalEvents.length}</strong> eventos</div></div>
-    </div>
-  </div>`;
-}
 
 // Convidados temporários (vinculados ao evento sendo criado/editado)
-let evConvidados=[];
 
 function switchMbrTab(tab){
   const parcAssoc=currentUser&&(currentUser.perfil==='Parceiro'||currentUser.perfil==='Associado');
@@ -3722,133 +3397,7 @@ function switchMbrTab(tab){
   setTimeout(sizeActivePanel,0);
 }
 
-function switchEvTab(tab){
-  ['reuniao','convidado'].forEach(t=>{
-    document.getElementById('ev-tab-'+t).style.display=t===tab?'block':'none';
-    const btn=document.getElementById('ev-tab-btn-'+t);
-    if(!btn)return;
-    if(t===tab){btn.style.background='#0a1628';btn.style.color='#fff';btn.style.border='1.5px solid #0a1628';}
-    else{btn.style.background='#fff';btn.style.color='#0a1628';btn.style.border='1.5px solid #0a1628';}
-  });
-}
 
-function addConvidado(){
-  const nome=document.getElementById('conv-nome').value.trim();
-  if(!nome){alert('Informe o nome do convidado.');return;}
-  const conv={
-    id:Date.now(),nome,
-    emp:document.getElementById('conv-emp').value.trim(),
-    seg:document.getElementById('conv-seg').value.trim(),
-    interesse:document.getElementById('conv-interesse').value.trim(),
-    desc:document.getElementById('conv-desc').value.trim(),
-    externo:true,
-    desde:new Date().toLocaleDateString('pt-BR')
-  };
-  evConvidados.push(conv);
-  // Salva também na lista global de convidados externos
-  if(!convidadosExternos.find(c=>c.nome.toLowerCase()===nome.toLowerCase())){
-    convidadosExternos.push({...conv});
-    saveData();
-    showToast('✅ Convidado adicionado e salvo na rede!');
-  } else {
-    showToast('✅ Convidado adicionado à reunião!');
-  }
-  ['conv-nome','conv-emp','conv-seg','conv-interesse','conv-desc'].forEach(id=>document.getElementById(id).value='');
-  renderConvidadosList();
-}
-
-function renderConvidadosList(){
-  const el=document.getElementById('ev-convidados-list');if(!el)return;
-  if(!evConvidados.length){el.innerHTML='';return;}
-  el.innerHTML=evConvidados.map((c,i)=>`
-    <div style="background:#fff;border:1px solid #eee;border-radius:8px;padding:10px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:flex-start">
-      <div>
-        <div style="font-size:13px;font-weight:500">${c.nome}${c.emp?' · '+c.emp:''}</div>
-        ${c.seg?`<div style="font-size:11px;color:#888">${c.seg}${c.interesse?' · '+c.interesse:''}</div>`:''}
-        ${c.desc?`<div style="font-size:12px;color:#555;margin-top:2px">${c.desc}</div>`:''}
-      </div>
-      <button class="btn-d btn-sm" onclick="evConvidados.splice(${i},1);renderConvidadosList()">✕</button>
-    </div>`).join('');
-}
-
-function fillEventoParticipantes(selected){
-  const sel=document.getElementById('ev-parts');if(!sel)return;
-  sel.innerHTML='';
-  users.filter(u=>u.status==='Ativo').forEach(u=>{
-    const o=document.createElement('option');
-    o.value=u.id;
-    o.text=u.nome+' ('+u.perfil+')';
-    if(selected&&selected.includes(u.id))o.selected=true;
-    sel.appendChild(o);
-  });
-}
-
-function openAddEvento(dateStr){
-  editEventoId=null;
-  evConvidados=[];
-  document.getElementById('evento-ttl').textContent='Nova reunião / evento';
-  ['ev-titulo','ev-desc'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('ev-data').value=dateStr||new Date().toISOString().split('T')[0];
-  document.getElementById('ev-hora').value='09:00';
-  document.getElementById('ev-horafim').value='10:00';
-  document.getElementById('ev-sala').value='';
-  document.getElementById('ev-tipo').value='Reunião';
-  document.getElementById('ev-gcal-link').style.display='none';
-  document.getElementById('btn-del-evento').style.display='none';
-  renderConvidadosList();
-  fillEventoParticipantes([]);
-  switchEvTab('reuniao');
-  document.getElementById('ov-evento').classList.add('open');
-}
-
-function openEditEvento(id){
-  const ev=agendaLocalEvents.find(e=>e.id===id);if(!ev)return;
-  editEventoId=id;
-  evConvidados=ev.convidados?[...ev.convidados]:[];
-  document.getElementById('evento-ttl').textContent='Editar evento';
-  document.getElementById('ev-titulo').value=ev.titulo;
-  document.getElementById('ev-data').value=ev.data;
-  document.getElementById('ev-hora').value=ev.hora||'09:00';
-  document.getElementById('ev-horafim').value=ev.horafim||'10:00';
-  document.getElementById('ev-sala').value=ev.sala||'';
-  document.getElementById('ev-tipo').value=ev.tipo||'Reunião';
-  document.getElementById('ev-desc').value=ev.desc||'';
-  document.getElementById('btn-del-evento').style.display='inline-block';
-  fillEventoParticipantes(ev.participantes||[]);
-  renderConvidadosList();
-  const lnk=gerarGcalLink(ev);
-  document.getElementById('ev-gcal-link').style.display='block';
-  document.getElementById('ev-gcal-link').innerHTML=`<a href="${lnk}" target="_blank" style="color:#0a1628;font-weight:500">📅 Abrir no Google Calendar para adicionar à sua agenda pessoal</a>`;
-  switchEvTab('reuniao');
-  document.getElementById('ov-evento').classList.add('open');
-}
-
-function saveEvento(){
-  const titulo=document.getElementById('ev-titulo').value.trim();
-  const data=document.getElementById('ev-data').value;
-  if(!titulo||!data){alert('Título e data são obrigatórios.');return;}
-  const parts=Array.from(document.getElementById('ev-parts').selectedOptions).map(o=>parseInt(o.value));
-  const obj={titulo,data,hora:document.getElementById('ev-hora').value,horafim:document.getElementById('ev-horafim').value,sala:document.getElementById('ev-sala').value,tipo:document.getElementById('ev-tipo').value,desc:document.getElementById('ev-desc').value.trim(),participantes:parts,convidados:[...evConvidados],criadorId:currentUser.id};
-  if(editEventoId){
-    const i=agendaLocalEvents.findIndex(e=>e.id===editEventoId);
-    agendaLocalEvents[i]={...agendaLocalEvents[i],...obj};
-  } else {
-    agendaLocalEvents.push({...obj,id:Date.now()});
-    const outros=parts.filter(id=>id!==currentUser.id);
-    if(outros.length){
-      notificacoes.push({id:Date.now(),txt:'📅 Nova reunião: "'+titulo+'" em '+new Date(data+'T00:00:00').toLocaleDateString('pt-BR')+' às '+obj.hora+(obj.sala?' ('+obj.sala+')':'')+(evConvidados.length?' · '+evConvidados.length+' convidado(s) externo(s)':'')+'.',ts:Date.now(),lido:false,destinos:outros});
-      updateNotifBadge();
-    }
-  }
-  closeOv('ov-evento');renderAgenda();saveData();
-  showToast('✅ Evento salvo!');
-}
-
-function deleteEvento(){
-  if(!editEventoId||!confirm('Remover este evento?'))return;
-  agendaLocalEvents=agendaLocalEvents.filter(e=>e.id!==editEventoId);
-  closeOv('ov-evento');renderAgenda();saveData();
-}
 
 
 function abrirMinhaArea(){
@@ -5062,7 +4611,7 @@ try{supaClient=supabase.createClient(SUPA_URL,SUPA_KEY);}catch(e){console.warn('
 function getStateSnapshot(){
   return{
     users,projetos,lancamentos,sinergias,conexoes,
-    agendaLocalEvents,notificacoes,oportunidadesPendentes,
+    notificacoes,oportunidadesPendentes,
     convidadosExternos,customGroups,interessesPendentes,
     projetosVitrine
   };
@@ -5075,7 +4624,6 @@ function applyStateSnapshot(d){
   if(d.lancamentos)lancamentos=d.lancamentos;
   if(d.sinergias)sinergias=d.sinergias;
   if(d.conexoes)conexoes=d.conexoes;
-  if(d.agendaLocalEvents)agendaLocalEvents=d.agendaLocalEvents;
   if(d.notificacoes)notificacoes=d.notificacoes;
   if(d.oportunidadesPendentes)oportunidadesPendentes=d.oportunidadesPendentes;
   if(d.convidadosExternos)convidadosExternos=d.convidadosExternos;
@@ -5112,7 +4660,6 @@ function saveData(){
     localStorage.setItem('iahub_lancamentos',JSON.stringify(lancamentos));
     localStorage.setItem('iahub_sinergias',JSON.stringify(sinergias));
     localStorage.setItem('iahub_conexoes',JSON.stringify(conexoes));
-    localStorage.setItem('iahub_agenda',JSON.stringify(agendaLocalEvents));
     localStorage.setItem('iahub_notificacoes',JSON.stringify(notificacoes));
     localStorage.setItem('iahub_oportunidades',JSON.stringify(oportunidadesPendentes));
     localStorage.setItem('iahub_externos',JSON.stringify(convidadosExternos));
@@ -5128,7 +4675,6 @@ function loadData(){
     const l=localStorage.getItem('iahub_lancamentos');if(l)lancamentos=JSON.parse(l);
     const s=localStorage.getItem('iahub_sinergias');if(s)sinergias=JSON.parse(s);
     const c=localStorage.getItem('iahub_conexoes');if(c)conexoes=JSON.parse(c);
-    const a=localStorage.getItem('iahub_agenda');if(a)agendaLocalEvents=JSON.parse(a);
     const n=localStorage.getItem('iahub_notificacoes');if(n)notificacoes=JSON.parse(n);
     const o=localStorage.getItem('iahub_oportunidades');if(o)oportunidadesPendentes=JSON.parse(o);
     const e=localStorage.getItem('iahub_externos');if(e)convidadosExternos=JSON.parse(e);
