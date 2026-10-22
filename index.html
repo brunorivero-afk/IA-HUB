@@ -1114,6 +1114,16 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
   </div>
 </div>
 
+<!-- Overlay ficha do cliente -->
+<div class="overlay" id="ov-ficha">
+  <div class="modal" style="width:520px;max-height:88vh;display:flex;flex-direction:column">
+    <div id="ov-ficha-content" style="flex:1;overflow-y:auto;min-height:0"></div>
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid #f0f0f0;text-align:right;flex-shrink:0">
+      <button class="btn-sec" onclick="closeOv('ov-ficha')">Fechar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Overlay clientes inativos -->
 <div class="overlay" id="ov-inativos">
   <div class="modal" style="width:580px;max-height:88vh;display:flex;flex-direction:column">
@@ -2824,6 +2834,46 @@ function removePagamento(id){
   pagamentos=pagamentos.filter(p=>p.id!==id);
   saveData();renderFinanceiro();
 }
+function abrirFichaCliente(negId){
+  const ref=negocios.find(n=>n.id===negId);if(!ref)return;
+  // Agrupa por CNPJ (se preenchido) ou por titulo
+  const chave=ref.cnpj?ref.cnpj.replace(/\D/g,''):null;
+  const todos=negocios.filter(n=>{
+    if(chave&&n.cnpj)return n.cnpj.replace(/\D/g,'')===chave;
+    return n.titulo===ref.titulo;
+  });
+  const etapaColor=e=>NEG_COL_COLOR[e]||'#64748b';
+  const html=`
+    <div style="margin-bottom:16px">
+      <div style="font-size:18px;font-weight:700;color:#0a1628">${esc(ref.titulo)}</div>
+      ${ref.razaoSocial?`<div style="font-size:12px;color:#6b7280">${esc(ref.razaoSocial)}</div>`:''}
+      ${ref.cnpj?`<div style="font-size:12px;color:#9ca3af">CNPJ: ${esc(ref.cnpj)}</div>`:''}
+      ${ref.perfilTributario?`<div style="font-size:12px;color:#854F0B;margin-top:2px">📋 ${esc(ref.perfilTributario)}</div>`:''}
+    </div>
+    <div style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">
+      ${todos.length} serviço${todos.length!==1?'s':''}
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${todos.map(n=>{
+        const port=n.portafolioId?portfolio.find(p=>p.id===n.portafolioId):null;
+        const orig=n.originadorId?users.find(u=>u.id===n.originadorId):null;
+        const cor=etapaColor(n.status||'Prospecção');
+        return`<div style="background:#fff;border:1px solid #eee;border-left:3px solid ${cor};border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+          <div>
+            ${port?`<span class="badge ${_portTipoCls(port.tipo)}" style="font-size:10px;padding:1px 7px;margin-bottom:4px;display:inline-block">${esc(port.nome)}</span>`:''}
+            ${n.notas?`<div style="font-size:12px;color:#6b7280;margin-top:4px">${esc(n.notas)}</div>`:''}
+            ${orig?`<div style="font-size:11px;color:#9ca3af;margin-top:4px">✦ ${orig.nome.split(' ')[0]}</div>`:''}
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+            <span style="font-size:11px;font-weight:700;color:${cor};background:${cor}1a;border-radius:6px;padding:2px 8px">${n.status||'Prospecção'}</span>
+            <button class="btn-s btn-sm" onclick="closeOv('ov-ficha');openNegModal(${n.id})">Editar</button>
+          </div>
+        </div>`;}).join('')}
+    </div>`;
+  document.getElementById('ov-ficha-content').innerHTML=html;
+  document.getElementById('ov-ficha').classList.add('open');
+}
+
 function abrirInativos(){
   const portFil=_pipFilter!=='all'?_pipFilter:null;
   let lista=negocios.filter(n=>n.status==='Perdido');
@@ -3797,6 +3847,9 @@ function _renderClientesView(){
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
                   ${orig?`<div style="font-size:11px;color:#9ca3af">✦ ${orig.nome.split(' ')[0]}</div>`:'<div></div>'}
                   ${n.segmento?`<div style="font-size:10px;color:#6b7280;background:#f3f4f6;border-radius:6px;padding:1px 6px">${esc(n.segmento)}</div>`:''}
+                </div>
+                <div style="margin-top:6px;padding-top:6px;border-top:1px solid #f0f0f0;text-align:right">
+                  <button onclick="event.stopPropagation();abrirFichaCliente(${n.id})" style="font-size:10px;color:#0059a9;background:none;border:none;cursor:pointer;padding:0;font-weight:600">👤 Ver cliente</button>
                 </div>
               </div>`;
             }).join(''):`<div style="color:#9ca3af;font-size:12px;text-align:center;padding:24px 8px">Arraste aqui</div>`}
