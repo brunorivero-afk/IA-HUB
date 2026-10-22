@@ -3267,10 +3267,11 @@ function toggleSynWhy(id){
 }
 
 // ===================== PIPELINE DE NEGÓCIOS =====================
-const NEG_COLS=['Prospecção','Qualificação','Proposta','Negociação','Fechado','Perdido'];
+const NEG_COLS=['Prospecção','Proposta','Negociação','Fechado','Pagamento Realizado','Perdido'];
 const NEG_COL_COLOR={
-  'Prospecção':'#64748b','Qualificação':'#0a1628','Proposta':'#854F0B',
-  'Negociação':'#0059a9','Fechado':'#0F6E56','Perdido':'#991b1b'
+  'Prospecção':'#64748b','Proposta':'#854F0B',
+  'Negociação':'#0059a9','Fechado':'#0F6E56',
+  'Pagamento Realizado':'#065f46','Perdido':'#991b1b'
 };
 const NEG_PAPEIS=['Originador','Comercial','Técnico','Curador','Sócio'];
 const PORT_TIPOS=['Próprio','Sócio','Rede'];
@@ -3429,8 +3430,8 @@ function openPortModal(id){
   document.getElementById('port-contato').value=p?p.nomeContato||'':'';
   document.getElementById('port-tipo').value=p?p.tipo:'Próprio';
   document.getElementById('port-comissao').value=p?p.comissaoNegociada||'':'';
-  const userOpts=users.map(u=>`<option value="${u.id}">${u.nome}</option>`).join('');
-  document.getElementById('port-resp').innerHTML='<option value="">— Nenhum —</option>'+userOpts;
+  const socioOpts=users.filter(u=>u.perfil==='Sócio'||u.perfil==='Sócio-Fundador').map(u=>`<option value="${u.id}">${u.nome}</option>`).join('');
+  document.getElementById('port-resp').innerHTML='<option value="">— Nenhum —</option>'+socioOpts;
   document.getElementById('port-resp').value=p?p.responsavelId||'':'';
   document.getElementById('port-desc').value=p?p.descricao||'':'';
   document.getElementById('ov-port').classList.add('open');
