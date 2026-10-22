@@ -1145,12 +1145,25 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
   </div>
 </div>
 
-<!-- Overlay extrato por sócio -->
+<!-- Overlay extrato de comissões -->
 <div class="overlay" id="ov-extrato">
-  <div class="modal" style="width:600px;max-height:90vh;overflow-y:auto">
-    <div id="ext-content"></div>
-    <div class="modal-footer" style="margin-top:16px;text-align:right">
+  <div class="modal" style="width:640px;max-height:92vh;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-shrink:0">
+      <h2 style="margin:0;font-size:17px;color:#0a1628">Extrato de Comissões</h2>
+      <button class="btn-s" onclick="closeOv('ov-extrato')" style="font-size:18px;padding:2px 10px">✕</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-shrink:0">
+      <select id="ext-pessoa-sel" onchange="_buildExtrato()" style="flex:1;padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:13px;font-weight:600;color:#0a1628">
+        <option value="">— Selecione o comissionado —</option>
+      </select>
+      <select id="ext-periodo-sel" onchange="_buildExtrato()" style="padding:8px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:13px;color:#0a1628">
+        <option value="">Todo o período</option>
+      </select>
+    </div>
+    <div id="ext-content" style="flex:1;overflow-y:auto;min-height:0"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:14px;border-top:1px solid #f0f0f0;flex-shrink:0">
       <button class="btn-sec" onclick="closeOv('ov-extrato')">Fechar</button>
+      <button class="btn-p" id="ext-pdf-btn" onclick="_imprimirExtrato()" style="display:none">🖨 Imprimir / Salvar PDF</button>
     </div>
   </div>
 </div>
@@ -2686,7 +2699,7 @@ function _renderFinNegocios(){
         </select>
       </div>
       <div style="display:flex;gap:8px">
-        <button class="btn-p" style="font-size:12px;padding:6px 14px;background:#f0faf4;color:#0F6E56;border:1.5px solid #0F6E56" onclick="abrirExtratoPor()">📋 Extrato por sócio</button>
+        <button class="btn-p" style="font-size:12px;padding:6px 14px;background:#f0faf4;color:#0F6E56;border:1.5px solid #0F6E56" onclick="abrirExtratoPor()">📋 Extrato</button>
         <button class="btn-p" style="font-size:12px;padding:6px 14px" onclick="openAddPagamento()">+ Registrar pagamento</button>
       </div>
     </div>
@@ -2801,30 +2814,95 @@ function removePagamento(id){
   pagamentos=pagamentos.filter(p=>p.id!==id);
   saveData();renderFinanceiro();
 }
-function abrirExtratoPor(){
-  const socios=users.filter(u=>isSocioUser(u));
-  const sel=document.getElementById('fin-neg-socio-fil');
-  const socioId=sel?parseInt(sel.value)||null:null;
-  const socio=socioId?users.find(u=>u.id===socioId):null;
-  const titulo=socio?`Extrato — ${socio.nome}`:'Extrato por Sócio';
-  let html=`<h2 style="margin:0 0 16px;font-size:18px;color:#0a1628">${titulo}</h2>`;
-  socios.filter(u=>!socioId||u.id===socioId).forEach(u=>{
-    const meusPag=pagamentos.filter(pg=>(pg.comissoes||[]).some(c=>c.socioId===u.id));
-    if(!meusPag.length&&socioId)return;
-    const total=meusPag.reduce((s,pg)=>{const c=pg.comissoes.find(c=>c.socioId===u.id);return s+(c?c.valor||0:0);},0);
-    html+=`<div style="margin-bottom:20px">
-      <div style="font-size:14px;font-weight:700;color:#0a1628;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #0a1628">${u.nome} · Total: R$ ${total.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
-      ${meusPag.length?meusPag.map(pg=>{
-        const c=pg.comissoes.find(c=>c.socioId===u.id);
-        const port=pg.portafolioId?portfolio.find(p=>p.id===pg.portafolioId):null;
-        return`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:13px">
-          <div><div style="font-weight:600">${esc(pg.descCliente||'—')}</div>${port?`<div style="font-size:11px;color:#6b7280">${esc(port.nome)}</div>`:''}</div>
-          <div style="text-align:right"><div style="color:#0F6E56;font-weight:600">R$ ${(c?.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div style="font-size:11px;color:#9ca3af">${pg.data||''}</div></div>
-        </div>`;}).join(''):'<div style="font-size:12px;color:#9ca3af">Nenhum pagamento.</div>'}
-    </div>`;
-  });
-  document.getElementById('ext-content').innerHTML=html;
+function abrirExtratoPor(preUserId){
+  // Monta lista de comissionados que aparecem em pagamentos
+  const idsComiss=[...new Set(pagamentos.flatMap(pg=>(pg.comissoes||[]).map(c=>c.socioId)).filter(Boolean))];
+  const comiss=users.filter(u=>idsComiss.includes(u.id));
+  const selPessoa=document.getElementById('ext-pessoa-sel');
+  selPessoa.innerHTML='<option value="">— Selecione o comissionado —</option>'+
+    comiss.map(u=>`<option value="${u.id}">${u.nome} (${u.perfil||''})</option>`).join('');
+  if(preUserId)selPessoa.value=preUserId;
+  // Monta lista de períodos (meses com pagamentos)
+  const meses=[...new Set(pagamentos.map(pg=>(pg.data||'').substring(0,7)).filter(Boolean))].sort().reverse();
+  const mn=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const selPer=document.getElementById('ext-periodo-sel');
+  selPer.innerHTML='<option value="">Todo o período</option>'+
+    meses.map(m=>{const[y,mo]=m.split('-');return`<option value="${m}">${mn[parseInt(mo)-1]}/${y}</option>`;}).join('');
+  _buildExtrato();
   document.getElementById('ov-extrato').classList.add('open');
+}
+
+function _buildExtrato(){
+  const userId=parseInt(document.getElementById('ext-pessoa-sel').value)||0;
+  const periodo=document.getElementById('ext-periodo-sel').value;
+  const pdfBtn=document.getElementById('ext-pdf-btn');
+  const el=document.getElementById('ext-content');
+  if(!userId){
+    el.innerHTML='<div style="text-align:center;padding:30px;color:#9ca3af">Selecione um comissionado acima.</div>';
+    pdfBtn.style.display='none';return;
+  }
+  const u=users.find(x=>x.id===userId);
+  if(!u){el.innerHTML='';pdfBtn.style.display='none';return;}
+  let meusPag=pagamentos.filter(pg=>(pg.comissoes||[]).some(c=>c.socioId===userId));
+  if(periodo)meusPag=meusPag.filter(pg=>(pg.data||'').startsWith(periodo));
+  meusPag=meusPag.slice().sort((a,b)=>(a.data||'').localeCompare(b.data||''));
+  const total=meusPag.reduce((s,pg)=>{const c=(pg.comissoes||[]).find(c=>c.socioId===userId);return s+(c?c.valor||0:0);},0);
+  const mn=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const perLabel=periodo?`${mn[parseInt(periodo.split('-')[1])-1]}/${periodo.split('-')[0]}`:'Todo o período';
+  el.innerHTML=`
+    <div style="border:1px solid #e5e7eb;border-radius:10px;overflow:hidden">
+      <div style="background:#0a1628;color:#fff;padding:16px 20px">
+        <div style="font-size:11px;letter-spacing:.08em;opacity:.7;text-transform:uppercase;margin-bottom:4px">IA Hub Connect · Extrato de Comissões</div>
+        <div style="font-size:18px;font-weight:700">${esc(u.nome)}</div>
+        <div style="font-size:12px;opacity:.8;margin-top:2px">${esc(u.perfil||'')}${u.emp?' · '+esc(u.emp):''} · ${perLabel}</div>
+      </div>
+      <div style="padding:0 20px">
+        ${meusPag.length?meusPag.map(pg=>{
+          const c=(pg.comissoes||[]).find(c=>c.socioId===userId);
+          const port=pg.portafolioId?portfolio.find(p=>p.id===pg.portafolioId):null;
+          const [yyyy,mm,dd]=(pg.data||'--').split('-');
+          const dataFmt=dd&&mm&&yyyy?`${dd}/${mm}/${yyyy}`:pg.data||'';
+          return`<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:12px 0;border-bottom:1px solid #f0f0f0">
+            <div>
+              <div style="font-size:13px;font-weight:600;color:#0a1628">${esc(pg.descCliente||'—')}</div>
+              ${port?`<div style="font-size:11px;color:#6b7280">${esc(port.nome)}</div>`:''}
+              ${pg.obs?`<div style="font-size:11px;color:#9ca3af">${esc(pg.obs)}</div>`:''}
+            </div>
+            <div style="text-align:right;flex-shrink:0;margin-left:16px">
+              <div style="font-size:14px;font-weight:700;color:#0F6E56">R$ ${(c?.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
+              <div style="font-size:11px;color:#9ca3af">${dataFmt}</div>
+            </div>
+          </div>`;}).join('')
+        :'<div style="padding:20px 0;text-align:center;color:#9ca3af;font-size:13px">Nenhum pagamento no período.</div>'}
+      </div>
+      <div style="background:#f9fafb;padding:14px 20px;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:13px;color:#6b7280">${meusPag.length} pagamento${meusPag.length!==1?'s':''}</div>
+        <div style="font-size:16px;font-weight:700;color:#0a1628">Total: R$ ${total.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
+      </div>
+    </div>`;
+  pdfBtn.style.display='inline-block';
+}
+
+function _imprimirExtrato(){
+  const userId=parseInt(document.getElementById('ext-pessoa-sel').value)||0;
+  const periodo=document.getElementById('ext-periodo-sel').value;
+  const u=users.find(x=>x.id===userId);
+  if(!u)return;
+  const content=document.getElementById('ext-content').innerHTML;
+  const win=window.open('','_blank','width=700,height=900');
+  win.document.write(`<!doctype html><html><head>
+    <meta charset="utf-8">
+    <title>Extrato ${u.nome}</title>
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#fff;padding:32px;color:#111}
+      @media print{body{padding:0}@page{margin:20mm}}
+    </style>
+  </head><body>
+    ${content}
+    <script>window.onload=function(){window.print();}<\/script>
+  </body></html>`);
+  win.document.close();
 }
 
 function gerarMeses(){
