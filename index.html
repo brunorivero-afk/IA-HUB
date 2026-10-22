@@ -746,16 +746,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <div id="con-inner"></div>
     </div>
     <!-- SINERGIAS -->
-    <div class="panel" id="tab-sinergias">
-      <div class="controls">
-        <select id="syn-f" onchange="renderSin()"><option value="all">Todas</option><option value="alta">Alta prioridade</option></select>
-        <select id="syn-seg" onchange="renderSin()"><option value="">Todos os segmentos</option></select>
-        <button class="btn-p" id="btn-nova-sin" style="display:none" onclick="openAddSin()">+ Nova sinergia</button>
-        <button class="btn-p" id="btn-regen-sin" style="display:none;background:#e8f0ff;color:#0a1628;border:1.5px solid #0a1628" onclick="regenerarSinBtn()">⚡ Regenerar</button>
-        <button class="btn-p" id="btn-enrich-sin" style="display:none;background:#f5f0ff;color:#6d28d9;border:1.5px solid #7c3aed" onclick="enriquecerTodasSinergias()">✨ Enriquecer todas com IA</button>
-      </div>
-      <div class="syn-grid" id="syn-grid"></div>
-    </div>
+    <div class="panel" id="tab-sinergias"></div>
     <!-- PIPELINE -->
     <div class="panel" id="tab-pipeline"></div>
     <!-- MEUS RENDIMENTOS -->
@@ -1123,6 +1114,47 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
   </div>
 </div>
 
+<!-- Modal pagamento de negócio -->
+<div class="overlay" id="ov-pag">
+  <div class="modal" style="width:500px;max-height:90vh;overflow-y:auto">
+    <h2 id="pag-ttl">Registrar Pagamento</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="grid-column:1/-1">
+        <label>Cliente *</label>
+        <select id="pag-neg" onchange="_onPagNegChange()" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px"></select>
+        <div id="pag-port-info" style="font-size:11px;color:#6b7280;margin-top:3px"></div>
+      </div>
+      <div><label>Valor Recebido (R$) *</label><input id="pag-valor" type="number" min="0" placeholder="0,00"></div>
+      <div><label>Data</label><input id="pag-data" type="date"></div>
+      <div style="grid-column:1/-1"><label>Observações</label><input id="pag-obs" placeholder="Referência, NF, parcela..."></div>
+    </div>
+    <div style="margin-top:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <label style="margin:0">Comissões para Sócios</label>
+        <button onclick="_addPagCom()" class="btn-sec" style="font-size:12px;padding:4px 10px">+ Adicionar</button>
+      </div>
+      <div id="pag-com-lista"></div>
+    </div>
+    <div class="modal-footer" style="display:flex;justify-content:space-between;margin-top:18px">
+      <button id="pag-del-btn" onclick="if(_pagEditId)removePagamento(_pagEditId)" style="border:none;background:none;color:#ef4444;cursor:pointer;font-size:13px">Excluir</button>
+      <div style="display:flex;gap:10px">
+        <button class="btn-sec" onclick="closeOv('ov-pag')">Cancelar</button>
+        <button class="btn-p" onclick="savePagamento()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay extrato por sócio -->
+<div class="overlay" id="ov-extrato">
+  <div class="modal" style="width:600px;max-height:90vh;overflow-y:auto">
+    <div id="ext-content"></div>
+    <div class="modal-footer" style="margin-top:16px;text-align:right">
+      <button class="btn-sec" onclick="closeOv('ov-extrato')">Fechar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal portfólio -->
 <div class="overlay" id="ov-port">
   <div class="modal" style="width:500px;max-height:90vh;overflow-y:auto">
@@ -1143,7 +1175,8 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       </div>
       <div><label>Comissão Negociada (%)</label><input id="port-comissao" type="number" min="0" max="100" placeholder="ex: 10"></div>
       <div style="grid-column:1/-1"><label>Responsável Principal</label><select id="port-resp" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px"></select></div>
-      <div style="grid-column:1/-1"><label>Descrição ou Observações</label><textarea id="port-desc" placeholder="Produto, serviço, modelo de negócio, condições…" style="width:100%;height:70px;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px;resize:vertical"></textarea></div>
+      <div style="grid-column:1/-1"><label>Cliente Ideal</label><textarea id="port-cliente-ideal" placeholder="Descreva quem este negócio serve — segmento, porte, perfil. Alimenta o match de Sinergias." style="width:100%;height:70px;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px;resize:vertical"></textarea></div>
+      <div style="grid-column:1/-1"><label>Descrição do Negócio</label><textarea id="port-desc" placeholder="O que é, como funciona, modelo de receita, condições…" style="width:100%;height:70px;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px;resize:vertical"></textarea></div>
     </div>
     <div class="modal-footer" style="display:flex;justify-content:space-between;margin-top:18px">
       <button onclick="if(_portEditId)removePort(_portEditId)" id="port-del-btn" style="border:none;background:none;color:#ef4444;cursor:pointer;font-size:13px">Excluir</button>
@@ -1650,6 +1683,7 @@ let mbrPage=0;
 
 let negocios=[];
 let portfolio=[];
+let pagamentos=[];
 
 let projetos=[
   {id:201,nome:'Estruturação societária – Cliente ABC',desc:'Reorganização societária com holding e planejamento tributário.',status:'Em andamento',valor:18000,inicio:'2025-03-01',fim:'2025-08-31',recorr:'',recorrAte:'',participantes:[1,2,4],dist:{1:20,2:50,4:30},sinergia:'Advocacia ↔ Contabilidade',criadorId:1,lastSeen:{},followups:[{texto:'Reunião inicial. Levantamento de documentos em andamento.',data:'2025-03-10',autor:'Sócio Demo',ts:1}]},
@@ -2574,9 +2608,21 @@ function removeUsr(id){
 }
 
 // ===================== FINANCEIRO =====================
+let _finSubtab='empresa';
 function renderFinanceiro(){
   const el=document.getElementById('fin-inner');
   if(!isSocio()){el.innerHTML=`<div class="blocked"><h2>Acesso restrito</h2><p>Somente sócios têm acesso ao módulo financeiro.</p></div>`;return;}
+  el.innerHTML=`
+    <div style="display:flex;gap:8px;padding:0 0 14px;flex-shrink:0">
+      <button class="pip-stab ${_finSubtab==='empresa'?'active':''}" onclick="_finSubtab='empresa';renderFinanceiro()">Empresa</button>
+      <button class="pip-stab ${_finSubtab==='negocios'?'active':''}" onclick="_finSubtab='negocios';renderFinanceiro()">Negócios</button>
+    </div>
+    <div id="fin-subtab-content"></div>`;
+  if(_finSubtab==='empresa') _renderFinEmpresa();
+  else _renderFinNegocios();
+}
+function _renderFinEmpresa(){
+  const el=document.getElementById('fin-subtab-content');
   const rec=lancamentos.filter(l=>l.tipo==='in').reduce((s,l)=>s+(l.valor||0),0);
   const desp=lancamentos.filter(l=>l.tipo==='out').reduce((s,l)=>s+(l.valor||0),0);
   const saldo=rec-desp;
@@ -2609,6 +2655,176 @@ function renderFinanceiro(){
     </div>`;
   renderPlanilha();
   renderFinCharts();
+}
+function _renderFinNegocios(){
+  const el=document.getElementById('fin-subtab-content');
+  const totalRec=pagamentos.reduce((s,p)=>s+(p.valorRecebido||0),0);
+  const totalCom=pagamentos.reduce((s,p)=>s+(p.comissoes||[]).reduce((a,c)=>a+(c.valor||0),0),0);
+  // Agrupa por portfólio
+  const porPort={};
+  pagamentos.forEach(pg=>{
+    const key=pg.portafolioId||0;
+    if(!porPort[key]){porPort[key]={total:0,count:0};}
+    porPort[key].total+=(pg.valorRecebido||0);
+    porPort[key].count++;
+  });
+  el.innerHTML=`
+    <div class="fin-saldo-bar" style="margin-bottom:14px">
+      <div class="fin-saldo-item"><div class="fin-saldo-label">Total recebido</div><div class="fin-saldo-val val-in">R$ ${totalRec.toLocaleString('pt-BR')}</div></div>
+      <div class="fin-saldo-item"><div class="fin-saldo-label">Comissões pagas</div><div class="fin-saldo-val val-out">R$ ${totalCom.toLocaleString('pt-BR')}</div></div>
+      <div class="fin-saldo-item"><div class="fin-saldo-label">Resultado líquido</div><div class="fin-saldo-val ${(totalRec-totalCom)>=0?'val-saldo-pos':'val-saldo-neg'}">R$ ${(totalRec-totalCom).toLocaleString('pt-BR')}</div></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <select id="fin-neg-port-fil" onchange="_renderFinNegocios()" style="padding:6px 10px;border:1.5px solid #e5e7eb;border-radius:20px;font-size:12px;font-weight:600;color:#0a1628;background:#fff">
+          <option value="">Todos os negócios</option>
+          ${portfolio.map(p=>`<option value="${p.id}">${esc(p.nome)}</option>`).join('')}
+        </select>
+        <select id="fin-neg-socio-fil" onchange="_renderFinNegocios()" style="padding:6px 10px;border:1.5px solid #e5e7eb;border-radius:20px;font-size:12px;font-weight:600;color:#0a1628;background:#fff">
+          <option value="">Todos os sócios</option>
+          ${users.filter(u=>isSocioUser(u)).map(u=>`<option value="${u.id}">${u.nome}</option>`).join('')}
+        </select>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-p" style="font-size:12px;padding:6px 14px;background:#f0faf4;color:#0F6E56;border:1.5px solid #0F6E56" onclick="abrirExtratoPor()">📋 Extrato por sócio</button>
+        <button class="btn-p" style="font-size:12px;padding:6px 14px" onclick="openAddPagamento()">+ Registrar pagamento</button>
+      </div>
+    </div>
+    <div id="fin-neg-lista">${_buildPagamentosList()}</div>`;
+}
+function _buildPagamentosList(){
+  const portFil=parseInt((document.getElementById('fin-neg-port-fil')||{}).value)||0;
+  const socioFil=parseInt((document.getElementById('fin-neg-socio-fil')||{}).value)||0;
+  let list=pagamentos;
+  if(portFil)list=list.filter(p=>p.portafolioId===portFil);
+  if(socioFil)list=list.filter(p=>(p.comissoes||[]).some(c=>c.socioId===socioFil));
+  if(!list.length)return`<div style="text-align:center;padding:40px;color:#9ca3af;font-size:14px">Nenhum pagamento registrado ainda.</div>`;
+  return`<div style="display:flex;flex-direction:column;gap:8px">
+    ${list.slice().reverse().map(pg=>{
+      const neg=pg.negId?negocios.find(n=>n.id===pg.negId):null;
+      const port=pg.portafolioId?portfolio.find(p=>p.id===pg.portafolioId):null;
+      const totalCom=(pg.comissoes||[]).reduce((s,c)=>s+(c.valor||0),0);
+      return`<div style="background:#fff;border:1px solid #eee;border-radius:10px;padding:12px 14px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#0a1628">${esc(neg?neg.titulo:pg.descCliente||'—')}</div>
+            ${port?`<span class="badge ${_portTipoCls(port.tipo)}" style="font-size:10px;padding:1px 7px">${esc(port.nome)}</span>`:''}
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:14px;font-weight:700;color:#0F6E56">R$ ${(pg.valorRecebido||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
+            <div style="font-size:11px;color:#9ca3af">${pg.data||''}</div>
+          </div>
+        </div>
+        ${(pg.comissoes||[]).length?`<div style="margin-top:8px;padding-top:8px;border-top:1px dashed #f0f0f0;display:flex;flex-wrap:wrap;gap:6px">
+          ${(pg.comissoes||[]).map(c=>{const u=users.find(x=>x.id===c.socioId);return u?`<span style="font-size:11px;background:#fdf3e3;color:#854F0B;border-radius:6px;padding:2px 8px">💰 ${u.nome.split(' ')[0]}: R$ ${(c.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</span>`:''}).join('')}
+        </div>`:''}
+        ${pg.obs?`<div style="margin-top:6px;font-size:12px;color:#6b7280">${esc(pg.obs)}</div>`:''}
+        <div style="margin-top:8px;display:flex;gap:6px">
+          <button class="btn-s btn-sm" onclick="openEditPagamento(${pg.id})">✏</button>
+          <button class="btn-d btn-sm" onclick="removePagamento(${pg.id})">✕</button>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+let _pagEditId=null;
+let _pagComTemp=[];
+function openAddPagamento(negId){
+  _pagEditId=null;_pagComTemp=[];
+  _buildPagModal(negId||null,null);
+  document.getElementById('ov-pag').classList.add('open');
+}
+function openEditPagamento(id){
+  const pg=pagamentos.find(p=>p.id===id);if(!pg)return;
+  _pagEditId=id;_pagComTemp=JSON.parse(JSON.stringify(pg.comissoes||[]));
+  _buildPagModal(pg.negId,pg);
+  document.getElementById('ov-pag').classList.add('open');
+}
+function _buildPagModal(negId,pg){
+  document.getElementById('pag-ttl').textContent=pg?'Editar Pagamento':'Registrar Pagamento';
+  document.getElementById('pag-del-btn').style.display=pg?'':'none';
+  const selNeg=document.getElementById('pag-neg');
+  const pagRealiz=negocios.filter(n=>n.status==='Pagamento Realizado');
+  selNeg.innerHTML='<option value="">— Selecione o cliente —</option>'+negocios.map(n=>{const p=n.portafolioId?portfolio.find(x=>x.id===n.portafolioId):null;return`<option value="${n.id}">${esc(n.titulo)}${p?' ('+esc(p.nome)+')':''}</option>`;}).join('');
+  if(negId)selNeg.value=negId;
+  else if(pg)selNeg.value=pg.negId||'';
+  _onPagNegChange();
+  document.getElementById('pag-valor').value=pg?pg.valorRecebido||'':'';
+  document.getElementById('pag-data').value=pg?pg.data||new Date().toISOString().slice(0,10):new Date().toISOString().slice(0,10);
+  document.getElementById('pag-obs').value=pg?pg.obs||'':'';
+  _renderPagComissoes();
+}
+function _onPagNegChange(){
+  const negId=parseInt(document.getElementById('pag-neg').value)||0;
+  const neg=negId?negocios.find(n=>n.id===negId):null;
+  const port=neg&&neg.portafolioId?portfolio.find(p=>p.id===neg.portafolioId):null;
+  document.getElementById('pag-port-info').textContent=port?'Negócio: '+port.nome:'';
+}
+function _renderPagComissoes(){
+  const socios=users.filter(u=>isSocioUser(u));
+  document.getElementById('pag-com-lista').innerHTML=_pagComTemp.map((c,i)=>`
+    <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
+      <select onchange="_pagComTemp[${i}].socioId=+this.value" style="flex:2;padding:5px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px">
+        ${socios.map(u=>`<option value="${u.id}" ${c.socioId===u.id?'selected':''}>${u.nome}</option>`).join('')}
+      </select>
+      <input type="number" min="0" placeholder="R$" value="${c.valor||''}"
+        onchange="_pagComTemp[${i}].valor=+this.value"
+        style="flex:1;padding:5px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px">
+      <button onclick="_pagComTemp.splice(${i},1);_renderPagComissoes()" style="border:none;background:none;color:#ef4444;cursor:pointer;font-size:16px">✕</button>
+    </div>`).join('')||'<div style="font-size:12px;color:#aaa;margin-bottom:6px">Nenhuma comissão.</div>';
+}
+function _addPagCom(){
+  _pagComTemp.push({socioId:users.filter(u=>isSocioUser(u))[0]?.id||0,valor:0});
+  _renderPagComissoes();
+}
+function savePagamento(){
+  const negId=parseInt(document.getElementById('pag-neg').value)||null;
+  const valor=parseFloat(document.getElementById('pag-valor').value)||0;
+  if(!valor){alert('Informe o valor recebido.');return;}
+  const neg=negId?negocios.find(n=>n.id===negId):null;
+  const obj={
+    negId,
+    descCliente:neg?neg.titulo:document.getElementById('pag-obs').value.trim(),
+    portafolioId:neg?neg.portafolioId||null:null,
+    valorRecebido:valor,
+    data:document.getElementById('pag-data').value,
+    obs:document.getElementById('pag-obs').value.trim(),
+    comissoes:_pagComTemp.filter(c=>c.valor>0),
+  };
+  if(_pagEditId){const i=pagamentos.findIndex(p=>p.id===_pagEditId);pagamentos[i]={...pagamentos[i],...obj};}
+  else pagamentos.push({...obj,id:Date.now()});
+  closeOv('ov-pag');saveData();renderFinanceiro();
+}
+function removePagamento(id){
+  if(!confirm('Remover este pagamento?'))return;
+  pagamentos=pagamentos.filter(p=>p.id!==id);
+  saveData();renderFinanceiro();
+}
+function abrirExtratoPor(){
+  const socios=users.filter(u=>isSocioUser(u));
+  const sel=document.getElementById('fin-neg-socio-fil');
+  const socioId=sel?parseInt(sel.value)||null:null;
+  const socio=socioId?users.find(u=>u.id===socioId):null;
+  const titulo=socio?`Extrato — ${socio.nome}`:'Extrato por Sócio';
+  let html=`<h2 style="margin:0 0 16px;font-size:18px;color:#0a1628">${titulo}</h2>`;
+  socios.filter(u=>!socioId||u.id===socioId).forEach(u=>{
+    const meusPag=pagamentos.filter(pg=>(pg.comissoes||[]).some(c=>c.socioId===u.id));
+    if(!meusPag.length&&socioId)return;
+    const total=meusPag.reduce((s,pg)=>{const c=pg.comissoes.find(c=>c.socioId===u.id);return s+(c?c.valor||0:0);},0);
+    html+=`<div style="margin-bottom:20px">
+      <div style="font-size:14px;font-weight:700;color:#0a1628;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #0a1628">${u.nome} · Total: R$ ${total.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
+      ${meusPag.length?meusPag.map(pg=>{
+        const c=pg.comissoes.find(c=>c.socioId===u.id);
+        const port=pg.portafolioId?portfolio.find(p=>p.id===pg.portafolioId):null;
+        return`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:13px">
+          <div><div style="font-weight:600">${esc(pg.descCliente||'—')}</div>${port?`<div style="font-size:11px;color:#6b7280">${esc(port.nome)}</div>`:''}</div>
+          <div style="text-align:right"><div style="color:#0F6E56;font-weight:600">R$ ${(c?.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div style="font-size:11px;color:#9ca3af">${pg.data||''}</div></div>
+        </div>`;}).join(''):'<div style="font-size:12px;color:#9ca3af">Nenhum pagamento.</div>'}
+    </div>`;
+  });
+  document.getElementById('ext-content').innerHTML=html;
+  document.getElementById('ov-extrato').classList.add('open');
 }
 
 function gerarMeses(){
@@ -3144,33 +3360,85 @@ FORMATO: 2 parágrafos curtos e densos. Sem títulos. Sem bullet points. Não me
   showToast(`✅ ${ok} sinergias enriquecidas${erros?` · ${erros} com erro`:''}. Revise e adicione sua nota pessoal em cada uma.`);
 }
 
+// Retorna score de match entre keywords e texto (contagem de palavras em comum)
+function _sinMatchScore(keywords,texto){
+  if(!keywords||!texto)return 0;
+  const words=keywords.toLowerCase().split(/[\s,;\/\-–]+/).filter(w=>w.length>3);
+  const txt=texto.toLowerCase();
+  return words.filter(w=>txt.includes(w)).length;
+}
+
 function renderSin(){
-  autoUpdateSinergiaPpl();
-  document.getElementById('btn-nova-sin').style.display=isSocio()?'inline-block':'none';
-  document.getElementById('btn-regen-sin').style.display=isSocio()?'inline-block':'none';
-  document.getElementById('btn-enrich-sin').style.display=isSocio()?'inline-block':'none';
-  const f=document.getElementById('syn-f').value;
-  const seg=document.getElementById('syn-seg').value;
-  const list=sinergias.filter(s=>(!f||f==='all'||s.p===f)&&(!seg||(s.a===seg||s.b===seg)));
-  document.getElementById('syn-grid').innerHTML=list.sort((a,b)=>b.p.localeCompare(a.p)).map(syn=>{
-    const ca=sc(syn.a),cb=sc(syn.b);
-    const ppl=[...(syn.ppl_a||[]),...(syn.ppl_b||[])];
-    const editBtn=isSocio()?`<div style="margin-top:10px;display:flex;gap:6px"><button class="btn-s btn-sm" onclick="openEditSin(${syn.id})">Editar</button><button class="btn-d btn-sm" onclick="removeSin(${syn.id})">Remover</button></div>`:'';
+  const panel=document.getElementById('tab-sinergias');
+  // Rebuilds controls every render so selects always have current data
+  panel.innerHTML=`
+    <div class="controls">
+      <select id="syn-port-fil" onchange="renderSin()" style="min-width:160px">
+        <option value="">Todos os negócios</option>
+        ${portfolio.map(p=>`<option value="${p.id}">${esc(p.nome)}</option>`).join('')}
+      </select>
+      <select id="syn-seg-fil" onchange="renderSin()" style="min-width:140px">
+        <option value="">Todos os segmentos</option>
+        ${[...new Set(conexoes.map(c=>c.seg).filter(Boolean))].sort().map(s=>`<option>${esc(s)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="syn-grid" id="syn-grid"></div>`;
+
+  const portFil=parseInt(document.getElementById('syn-port-fil').value)||0;
+  const segFil=document.getElementById('syn-seg-fil').value;
+
+  // Calcula matches: cada conexao × cada negócio do portfólio com clienteIdeal
+  const matches=[];
+  conexoes.filter(c=>c.status!=='rejeitado').forEach(con=>{
+    if(segFil&&con.seg!==segFil)return;
+    const keywords=(con.seg||'')+' '+(con.fitSegs||'')+' '+(con.desc||'');
+    portfolio.filter(p=>!portFil||p.id===portFil).forEach(p=>{
+      if(!p.clienteIdeal)return;
+      const score=_sinMatchScore(keywords,p.clienteIdeal+' '+(p.descricao||''));
+      if(score>0){
+        const nota=sinergias.find(s=>s.conId===con.id&&s.portId===p.id);
+        matches.push({con,port:p,score,nota:nota?nota.nota:'',notaId:nota?nota.id:null});
+      }
+    });
+  });
+
+  matches.sort((a,b)=>b.score-a.score);
+
+  const dono=u=>users.find(x=>x.id===u.criadorId);
+  document.getElementById('syn-grid').innerHTML=matches.length?matches.map(m=>{
+    const criador=dono(m.con);
+    const scoreLabel=m.score>=4?'Alta':m.score>=2?'Média':'Baixa';
+    const scoreBg=m.score>=4?'#E1F5EE':m.score>=2?'#FFF9EC':'#FEF2F2';
+    const scoreTx=m.score>=4?'#085041':m.score>=2?'#854F0B':'#991b1b';
     return`<div class="syn-card">
       <div class="syn-hdr">
-        <span class="badge" style="background:${ca.bg};color:${ca.tx}">${syn.a}</span>
-        <span style="color:#bbb">↔</span>
-        <span class="badge" style="background:${cb.bg};color:${cb.tx}">${syn.b}</span>
-        <span class="badge" style="margin-left:auto;background:${syn.p==='alta'?'#E1F5EE':'#EEEDFE'};color:${syn.p==='alta'?'#085041':'#3C3489'}">${syn.p==='alta'?'Alta':'Média'}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:700;color:#0a1628;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(m.con.seg||'—')}</div>
+          <div style="font-size:11px;color:#6b7280">${esc(m.con.porte||'')}${criador?' · via '+criador.nome.split(' ')[0]:''}</div>
+        </div>
+        <span style="color:#bbb;padding:0 6px">→</span>
+        <div style="flex:1;min-width:0">
+          <span class="badge ${_portTipoCls(m.port.tipo)}" style="font-size:10px;white-space:nowrap">${esc(m.port.nome)}</span>
+        </div>
+        <span class="badge" style="margin-left:auto;background:${scoreBg};color:${scoreTx};white-space:nowrap">${scoreLabel}</span>
       </div>
-      ${(()=>{const p=currentUser?.perfil;const priv=p==='Parceiro'||p==='Associado';return ppl.length&&!priv?`<div class="syn-ppl">${ppl.map(n=>`<span class="chip">${n}</span>`).join('')}</div>`:''})()}
-      <div class="syn-why syn-why-clip" id="sw-${syn.id}">${sanitizeForParceiro(syn.why)}</div>
-      <button class="btn-leia-mais" onclick="toggleSynWhy(${syn.id})">↓ leia mais</button>
-      ${syn.note&&isSocio()?`<div style="background:#0a1628;color:#e2e8f0;border-radius:8px;padding:9px 12px;margin-top:8px;font-size:12px;line-height:1.6"><span style="font-size:10px;font-weight:700;letter-spacing:.08em;opacity:.7;text-transform:uppercase">IA Hub</span><br>${syn.note}</div>`:''}
-      ${editBtn}
+      ${m.con.desc?`<div class="syn-why syn-why-clip" style="margin-top:8px">${esc(m.con.desc)}</div>`:''}
+      ${m.port.clienteIdeal?`<div style="font-size:11px;color:#854F0B;background:#fdf3e3;border-radius:6px;padding:4px 8px;margin-top:6px">🎯 ${esc(m.port.clienteIdeal)}</div>`:''}
+      ${m.nota?`<div style="background:#0a1628;color:#e2e8f0;border-radius:8px;padding:9px 12px;margin-top:8px;font-size:12px;line-height:1.6"><span style="font-size:10px;font-weight:700;letter-spacing:.08em;opacity:.7;text-transform:uppercase">Nota</span><br>${esc(m.nota)}</div>`:''}
+      ${isSocio()?`<div style="margin-top:8px">
+        <textarea placeholder="Adicionar nota sobre este match…" style="width:100%;padding:6px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px;resize:vertical;height:50px" id="sin-nota-${m.con.id}-${m.port.id}">${m.nota||''}</textarea>
+        <button class="btn-s btn-sm" style="margin-top:4px" onclick="saveSinNota(${m.con.id},${m.port.id})">Salvar nota</button>
+      </div>`:''}
     </div>`;
-  }).join('');
-  if(!list.length)document.getElementById('syn-grid').innerHTML=`<div class="empty-msg">Nenhuma sinergia encontrada.</div>`;
+  }).join(''):`<div class="empty-msg">${portfolio.some(p=>p.clienteIdeal)?'Nenhuma conexão encontrada para os filtros.':'Preencha o campo "Cliente Ideal" nos negócios do portfólio para ativar o match automático.'}</div>`;
+}
+
+function saveSinNota(conId,portId){
+  const nota=(document.getElementById(`sin-nota-${conId}-${portId}`)||{}).value||'';
+  const existing=sinergias.find(s=>s.conId===conId&&s.portId===portId);
+  if(existing)existing.nota=nota;
+  else sinergias.push({id:Date.now(),conId,portId,nota});
+  saveData();renderSin();
 }
 
 async function enriquecerSinergia(){
@@ -3338,10 +3606,11 @@ function _renderPortfolioView(){
               <span class="badge ${_portTipoCls(p.tipo)}" style="white-space:nowrap;flex-shrink:0">${p.tipo}</span>
             </div>
             ${p.razaoSocial?`<div style="font-size:11px;color:#9ca3af">${esc(p.razaoSocial)}</div>`:''}
-            ${p.nomeContato?`<div style="font-size:12px;color:#6b7280">📞 ${esc(p.nomeContato)}</div>`:''}
-            ${p.descricao?`<div style="font-size:12px;color:#6b7280;line-height:1.5">${esc(p.descricao)}</div>`:''}
+            ${p.clienteIdeal?`<div style="font-size:11px;color:#854F0B;background:#fdf3e3;border-radius:6px;padding:4px 8px;margin-top:2px;line-height:1.5">🎯 ${esc(p.clienteIdeal)}</div>`:''}
+            ${p.descricao?`<div style="font-size:12px;color:#6b7280;line-height:1.5;margin-top:4px">${esc(p.descricao)}</div>`:''}
             <div style="display:flex;gap:14px;font-size:12px;color:#888;flex-wrap:wrap;margin-top:4px">
               ${resp?`<span>👤 ${resp.nome.split(' ')[0]}</span>`:''}
+              ${p.nomeContato?`<span>📞 ${esc(p.nomeContato)}</span>`:''}
               ${p.comissaoNegociada?`<span>💰 ${p.comissaoNegociada}%</span>`:''}
             </div>
             <div style="display:flex;gap:10px;font-size:12px;margin-top:6px;padding-top:8px;border-top:1px solid #f0f0f0">
@@ -3433,6 +3702,7 @@ function openPortModal(id){
   const socioOpts=users.filter(u=>u.perfil==='Sócio'||u.perfil==='Sócio-Fundador').map(u=>`<option value="${u.id}">${u.nome}</option>`).join('');
   document.getElementById('port-resp').innerHTML='<option value="">— Nenhum —</option>'+socioOpts;
   document.getElementById('port-resp').value=p?p.responsavelId||'':'';
+  document.getElementById('port-cliente-ideal').value=p?p.clienteIdeal||'':'';
   document.getElementById('port-desc').value=p?p.descricao||'':'';
   document.getElementById('ov-port').classList.add('open');
 }
@@ -3447,6 +3717,7 @@ function savePort(){
     tipo:document.getElementById('port-tipo').value,
     comissaoNegociada:parseFloat(document.getElementById('port-comissao').value)||0,
     responsavelId:parseInt(document.getElementById('port-resp').value)||null,
+    clienteIdeal:document.getElementById('port-cliente-ideal').value.trim(),
     descricao:document.getElementById('port-desc').value.trim(),
   };
   if(_portEditId){
@@ -4926,7 +5197,7 @@ function getStateSnapshot(){
     users,projetos,lancamentos,sinergias,conexoes,
     notificacoes,oportunidadesPendentes,
     convidadosExternos,customGroups,interessesPendentes,
-    projetosVitrine,negocios,portfolio
+    projetosVitrine,negocios,portfolio,pagamentos
   };
 }
 
@@ -4945,6 +5216,7 @@ function applyStateSnapshot(d){
   if(d.projetosVitrine)projetosVitrine=d.projetosVitrine;
   if(d.negocios)negocios=d.negocios;
   if(d.portfolio)portfolio=d.portfolio;
+  if(d.pagamentos)pagamentos=d.pagamentos;
 }
 
 let _syncTimer=null;
@@ -4982,6 +5254,7 @@ function saveData(){
     localStorage.setItem('iahub_interesses',JSON.stringify(interessesPendentes));
     localStorage.setItem('iahub_negocios',JSON.stringify(negocios));
     localStorage.setItem('iahub_portfolio',JSON.stringify(portfolio));
+    localStorage.setItem('iahub_pagamentos',JSON.stringify(pagamentos));
   }catch(e){console.warn('saveData failed',e);}
   syncToSupabase();
 }
@@ -4999,6 +5272,7 @@ function loadData(){
     const int=localStorage.getItem('iahub_interesses');if(int)interessesPendentes=JSON.parse(int);
     const neg=localStorage.getItem('iahub_negocios');if(neg)negocios=JSON.parse(neg);
     const prt=localStorage.getItem('iahub_portfolio');if(prt)portfolio=JSON.parse(prt);
+    const pag=localStorage.getItem('iahub_pagamentos');if(pag)pagamentos=JSON.parse(pag);
   }catch(e){console.warn('loadData failed',e);}
 }
 
