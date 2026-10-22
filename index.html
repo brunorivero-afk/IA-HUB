@@ -1114,6 +1114,16 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
   </div>
 </div>
 
+<!-- Overlay clientes inativos -->
+<div class="overlay" id="ov-inativos">
+  <div class="modal" style="width:580px;max-height:88vh;display:flex;flex-direction:column">
+    <div id="ov-inativos-content" style="flex:1;overflow-y:auto;min-height:0"></div>
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid #f0f0f0;text-align:right;flex-shrink:0">
+      <button class="btn-sec" onclick="closeOv('ov-inativos')">Fechar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal pagamento de negócio -->
 <div class="overlay" id="ov-pag">
   <div class="modal" style="width:500px;max-height:90vh;overflow-y:auto">
@@ -2814,6 +2824,37 @@ function removePagamento(id){
   pagamentos=pagamentos.filter(p=>p.id!==id);
   saveData();renderFinanceiro();
 }
+function abrirInativos(){
+  const portFil=_pipFilter!=='all'?_pipFilter:null;
+  let lista=negocios.filter(n=>n.status==='Perdido');
+  if(portFil)lista=lista.filter(n=>n.portafolioId===portFil);
+  lista=lista.slice().sort((a,b)=>(b.id||0)-(a.id||0));
+  const html=`
+    <h2 style="margin:0 0 16px;font-size:17px;color:#0a1628">Clientes Inativos${portFil?` — ${esc(portfolio.find(p=>p.id===portFil)?.nome||'')}`:''}</h2>
+    ${lista.length?`<div style="display:flex;flex-direction:column;gap:8px">
+      ${lista.map(n=>{
+        const orig=n.originadorId?users.find(u=>u.id===n.originadorId):null;
+        const port=n.portafolioId?portfolio.find(p=>p.id===n.portafolioId):null;
+        return`<div style="background:#fff;border:1px solid #fee2e2;border-left:3px solid #991b1b;border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#0a1628">${esc(n.titulo)}</div>
+            ${n.cnpj?`<div style="font-size:11px;color:#9ca3af">${esc(n.cnpj)}</div>`:''}
+            ${port?`<div style="font-size:11px;color:#6b7280">${esc(port.nome)}</div>`:''}
+            ${n.notas?`<div style="font-size:12px;color:#6b7280;margin-top:4px">${esc(n.notas)}</div>`:''}
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+            ${orig?`<span style="font-size:11px;color:#9ca3af">✦ ${orig.nome.split(' ')[0]}</span>`:''}
+            <div style="display:flex;gap:6px">
+              <button class="btn-s btn-sm" onclick="openNegModal(${n.id});closeOv('ov-inativos')">Reativar</button>
+              <button class="btn-d btn-sm" onclick="removeNeg(${n.id});abrirInativos()">Excluir</button>
+            </div>
+          </div>
+        </div>`;}).join('')}
+    </div>`:`<div style="text-align:center;padding:30px;color:#9ca3af;font-size:14px">Nenhum cliente inativo.</div>`}`;
+  document.getElementById('ov-inativos-content').innerHTML=html;
+  document.getElementById('ov-inativos').classList.add('open');
+}
+
 function abrirExtratoPor(preUserId){
   // Monta lista de comissionados que aparecem em pagamentos
   const idsComiss=[...new Set(pagamentos.flatMap(pg=>(pg.comissoes||[]).map(c=>c.socioId)).filter(Boolean))];
@@ -3613,11 +3654,11 @@ function toggleSynWhy(id){
 }
 
 // ===================== PIPELINE DE NEGÓCIOS =====================
-const NEG_COLS=['Prospecção','Proposta','Negociação','Fechado','Pagamento Realizado','Perdido'];
+const NEG_COLS=['Prospecção','Proposta','Negociação','Fechado','Pagamento Realizado'];
 const NEG_COL_COLOR={
   'Prospecção':'#64748b','Proposta':'#854F0B',
   'Negociação':'#0059a9','Fechado':'#0F6E56',
-  'Pagamento Realizado':'#065f46','Perdido':'#991b1b'
+  'Pagamento Realizado':'#065f46'
 };
 const NEG_PAPEIS=['Originador','Comercial','Técnico','Curador','Sócio'];
 const PORT_TIPOS=['Próprio','Sócio','Rede'];
@@ -3731,6 +3772,7 @@ function _renderClientesView(){
           <span style="font-size:14px;font-weight:700;color:#0F6E56">${fechadosMes.length}</span>
         </div>
       </div>
+      <button class="btn-p" style="font-size:12px;padding:6px 14px;background:#fef2f2;color:#991b1b;border:1.5px solid #991b1b" onclick="abrirInativos()">📋 Inativos</button>
       <button class="btn-p" style="font-size:12px;padding:6px 14px;margin-left:auto;flex-shrink:0" onclick="openNegModal(null)">+ Novo cliente</button>
     </div>
     <div style="flex:1;display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;min-height:0;padding:0 16px 12px">
@@ -3821,7 +3863,7 @@ function openNegModal(id){
   document.getElementById('neg-ttl').textContent=n?'Editar Cliente':'Novo Cliente';
   document.getElementById('neg-del-btn').style.display=id?'':'none';
   const selStatus=document.getElementById('neg-status');
-  selStatus.innerHTML=NEG_COLS.map(c=>`<option>${c}</option>`).join('');
+  selStatus.innerHTML=[...NEG_COLS,'Perdido'].map(c=>`<option>${c}</option>`).join('');
   const selOrig=document.getElementById('neg-orig');
   selOrig.innerHTML=users.map(u=>`<option value="${u.id}">${u.nome}</option>`).join('');
   const selPort=document.getElementById('neg-port');
