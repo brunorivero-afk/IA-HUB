@@ -232,6 +232,13 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 #tab-rede-membros .table-wrap{overflow-x:hidden;}
 /* Pipeline: não rola verticalmente — kanban preenche o painel */
 #tab-pipeline.panel.active{overflow:hidden;}
+.pip-stab{padding:5px 16px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #e5e7eb;background:#fff;color:#6b7280;transition:all .15s;}
+.pip-stab.active{background:#0a1628;color:#fff;border-color:#0a1628;}
+.port-card{background:#fff;border:1px solid #eee;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:box-shadow .15s;}
+.port-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.09);}
+.port-tipo-proprio{background:#0a1628;color:#d4a017;}
+.port-tipo-socio{background:#1e40af;color:#bfdbfe;}
+.port-tipo-rede{background:#065f46;color:#a7f3d0;}
 #tab-rede-membros thead th{text-align:center;}
 #mbr-tbody td{text-align:center;}
 #mbr-tbody td:first-child{text-align:left;}
@@ -1116,6 +1123,38 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
   </div>
 </div>
 
+<!-- Modal portfólio -->
+<div class="overlay" id="ov-port">
+  <div class="modal" style="width:480px">
+    <h2 id="port-ttl">Novo Negócio</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="grid-column:1/-1"><label>Nome do negócio *</label><input id="port-nome" placeholder="Ex: Tributário BIDATX, Energia Solar…"></div>
+      <div>
+        <label>Tipo</label>
+        <select id="port-tipo" onchange="portTipoChange()" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px">
+          <option>Próprio</option>
+          <option>Sócio</option>
+          <option>Rede</option>
+        </select>
+        <div style="font-size:11px;color:#6b7280;margin-top:4px">
+          <b>Próprio</b> = IA Hub detém · <b>Sócio</b> = trouxe um sócio · <b>Rede</b> = veio da rede de um sócio
+        </div>
+      </div>
+      <div><label>Comissão padrão (%)</label><input id="port-comissao" type="number" min="0" max="100" placeholder="ex: 10"></div>
+      <div style="grid-column:1/-1"><label>Responsável principal</label><select id="port-resp" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px"></select></div>
+      <div style="grid-column:1/-1" id="port-via-row"><label>Via (sócio que trouxe)</label><select id="port-via" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px"></select></div>
+      <div style="grid-column:1/-1"><label>Descrição</label><textarea id="port-desc" placeholder="Produto, serviço, modelo de negócio…" style="width:100%;height:70px;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px;resize:vertical"></textarea></div>
+    </div>
+    <div class="modal-footer" style="display:flex;justify-content:space-between;margin-top:18px">
+      <button onclick="if(_portEditId)removePort(_portEditId)" id="port-del-btn" style="border:none;background:none;color:#ef4444;cursor:pointer;font-size:13px">Excluir</button>
+      <div style="display:flex;gap:10px">
+        <button class="btn-sec" onclick="closeOv('ov-port')">Cancelar</button>
+        <button class="btn-p" onclick="savePort()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Modal negócio -->
 <div class="overlay" id="ov-neg">
   <div class="modal" style="width:560px;max-height:90vh;overflow-y:auto">
@@ -1139,6 +1178,10 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <div>
         <label>Originador</label>
         <select id="neg-orig" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px"></select>
+      </div>
+      <div style="grid-column:1/-1">
+        <label>Negócio (portfólio)</label>
+        <select id="neg-port" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px"></select>
       </div>
       <div style="grid-column:1/-1"><label>Segmento</label><input id="neg-segmento" placeholder="Ex: Tributário, M&A, Crédito…"></div>
       <div style="grid-column:1/-1"><label>Notas</label><textarea id="neg-notas" placeholder="Contexto, próximos passos, decisor…" style="width:100%;height:70px;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px;resize:vertical"></textarea></div>
@@ -1622,6 +1665,7 @@ let convidadosExternos=[];
 let mbrPage=0;
 
 let negocios=[];
+let portfolio=[];
 
 let projetos=[
   {id:201,nome:'Estruturação societária – Cliente ABC',desc:'Reorganização societária com holding e planejamento tributário.',status:'Em andamento',valor:18000,inicio:'2025-03-01',fim:'2025-08-31',recorr:'',recorrAte:'',participantes:[1,2,4],dist:{1:20,2:50,4:30},sinergia:'Advocacia ↔ Contabilidade',criadorId:1,lastSeen:{},followups:[{texto:'Reunião inicial. Levantamento de documentos em andamento.',data:'2025-03-10',autor:'Sócio Demo',ts:1}]},
@@ -3245,9 +3289,14 @@ const NEG_COL_COLOR={
   'Negociação':'#0059a9','Fechado':'#0F6E56','Perdido':'#991b1b'
 };
 const NEG_PAPEIS=['Originador','Comercial','Técnico','Curador','Sócio'];
+const PORT_TIPOS=['Próprio','Sócio','Rede'];
+const PORT_TIPO_CLS={'Próprio':'port-tipo-proprio','Sócio':'port-tipo-socio','Rede':'port-tipo-rede'};
 let _negDragId=null;
 let _negEditId=null;
 let _negPartTemp=[];
+let _pipSubtab='portfolio';
+let _pipFilter='all';
+let _portEditId=null;
 
 function negDragStart(e,id){_negDragId=id;e.dataTransfer.effectAllowed='move';e.currentTarget.style.opacity='.45';}
 function negDragEnd(e){e.currentTarget.style.opacity='1';}
@@ -3265,85 +3314,194 @@ function negDrop(e,col){
 function renderPipeline(){
   if(!isSocio()){document.getElementById('tab-pipeline').innerHTML='<div class="blocked"><h2>Acesso restrito</h2></div>';return;}
   const el=document.getElementById('tab-pipeline');
+  el.innerHTML=`<div style="height:100%;display:flex;flex-direction:column;overflow:hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;padding:12px 16px 10px">
+      <div class="section-hdr" style="margin:0">Pipeline de Negócios</div>
+      <div style="display:flex;gap:8px">
+        <button class="pip-stab ${_pipSubtab==='portfolio'?'active':''}" onclick="_pipSubtab='portfolio';renderPipeline()">Portfólio</button>
+        <button class="pip-stab ${_pipSubtab==='clientes'?'active':''}" onclick="_pipSubtab='clientes';renderPipeline()">Clientes</button>
+      </div>
+    </div>
+    <div style="flex:1;overflow:hidden;min-height:0">
+      ${_pipSubtab==='portfolio'?_renderPortfolioView():_renderClientesView()}
+    </div>
+  </div>`;
+}
+
+function _portTipoCls(tipo){return PORT_TIPO_CLS[tipo]||'port-tipo-proprio';}
+
+function _renderPortfolioView(){
+  if(!portfolio.length)return`<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#6b7280">
+    <div style="font-size:40px">🗂</div>
+    <div style="font-size:16px;font-weight:600;color:#0a1628">Nenhum negócio cadastrado</div>
+    <div style="font-size:13px;text-align:center;max-width:320px;line-height:1.7">Cadastre os negócios que você representa — próprios, de sócios ou da rede — para organizar o pipeline de clientes.</div>
+    <button class="btn-p" onclick="openPortModal(null)">+ Cadastrar primeiro negócio</button>
+  </div>`;
+  return`<div style="height:100%;display:flex;flex-direction:column;overflow:hidden">
+    <div style="display:flex;justify-content:flex-end;padding:0 16px 10px;flex-shrink:0">
+      <button class="btn-p" style="font-size:12px;padding:6px 14px" onclick="openPortModal(null)">+ Novo negócio</button>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:0 16px 16px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px">
+        ${portfolio.map(p=>{
+          const resp=p.responsavelId?users.find(u=>u.id===p.responsavelId):null;
+          const via=p.viaId?users.find(u=>u.id===p.viaId):null;
+          const clientes=negocios.filter(n=>n.portafolioId===p.id);
+          const ativos=clientes.filter(n=>n.status!=='Fechado'&&n.status!=='Perdido').length;
+          return`<div class="port-card" onclick="openPortModal(${p.id})">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+              <div style="font-size:14px;font-weight:700;color:#0a1628;line-height:1.3">${esc(p.nome)}</div>
+              <span class="badge ${_portTipoCls(p.tipo)}" style="white-space:nowrap;flex-shrink:0">${p.tipo}</span>
+            </div>
+            ${p.descricao?`<div style="font-size:12px;color:#6b7280;line-height:1.5">${esc(p.descricao)}</div>`:''}
+            <div style="display:flex;gap:14px;font-size:12px;color:#888;flex-wrap:wrap;margin-top:4px">
+              ${resp?`<span>👤 ${resp.nome.split(' ')[0]}</span>`:''}
+              ${via?`<span>🔗 via ${via.nome.split(' ')[0]}</span>`:''}
+              ${p.comissaoPadrao?`<span>💰 ${p.comissaoPadrao}% comissão</span>`:''}
+            </div>
+            <div style="display:flex;gap:10px;font-size:12px;margin-top:6px;padding-top:8px;border-top:1px solid #f0f0f0">
+              <span style="color:#0059a9;font-weight:600">${ativos} ativo${ativos!==1?'s':''}</span>
+              <span style="color:#6b7280">${clientes.length} total</span>
+              <button onclick="event.stopPropagation();_pipFilter=${p.id};_pipSubtab='clientes';renderPipeline()" style="margin-left:auto;border:none;background:none;color:#854F0B;font-size:12px;cursor:pointer;font-weight:600">Ver clientes →</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function _renderClientesView(){
   const hoje=new Date();const mesAtual=hoje.getMonth(),anoAtual=hoje.getFullYear();
-  const ativos=negocios.filter(n=>n.status!=='Fechado'&&n.status!=='Perdido');
+  const negFilt=_pipFilter==='all'?negocios:negocios.filter(n=>n.portafolioId===_pipFilter);
+  const ativos=negFilt.filter(n=>n.status!=='Fechado'&&n.status!=='Perdido');
   const valPipeline=ativos.reduce((s,n)=>s+(n.valor||0),0);
-  const fechadosMes=negocios.filter(n=>{
+  const fechadosMes=negFilt.filter(n=>{
     if(n.status!=='Fechado')return false;
     if(!n.fechadoEm)return false;
     try{const d=new Date(n.fechadoEm);return d.getMonth()===mesAtual&&d.getFullYear()===anoAtual;}catch(e){return false;}
   });
   const valFechado=fechadosMes.reduce((s,n)=>s+(n.valor||0),0);
+  const portAtual=_pipFilter!=='all'?portfolio.find(p=>p.id===_pipFilter):null;
 
-  el.innerHTML=`<div style="height:100%;display:flex;flex-direction:column;overflow:hidden;gap:0">
-  <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;padding:12px 16px 8px">
-    <div class="section-hdr" style="margin:0">Pipeline de Negócios</div>
-    <button class="btn-p" style="font-size:12px;padding:6px 14px" onclick="openNegModal(null)">+ Novo negócio</button>
-  </div>
-  <div style="display:flex;gap:10px;flex-shrink:0;padding:0 16px 10px;overflow-x:auto">
-    <div style="background:#f0f4ff;border-radius:10px;padding:10px 16px;min-width:110px;flex-shrink:0">
-      <div style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Em pipeline</div>
-      <div style="font-size:20px;font-weight:700;color:#0a1628;margin-top:2px">${ativos.length}</div>
-      <div style="font-size:12px;color:#0059a9;font-weight:500">R$ ${valPipeline.toLocaleString('pt-BR',{maximumFractionDigits:0})}</div>
-    </div>
-    <div style="background:#f0faf4;border-radius:10px;padding:10px 16px;min-width:110px;flex-shrink:0">
-      <div style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Fechados (mês)</div>
-      <div style="font-size:20px;font-weight:700;color:#0F6E56;margin-top:2px">${fechadosMes.length}</div>
-      <div style="font-size:12px;color:#0F6E56;font-weight:500">R$ ${valFechado.toLocaleString('pt-BR',{maximumFractionDigits:0})}</div>
-    </div>
-    <div style="background:#fff7ed;border-radius:10px;padding:10px 16px;min-width:110px;flex-shrink:0">
-      <div style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Total negócios</div>
-      <div style="font-size:20px;font-weight:700;color:#854F0B;margin-top:2px">${negocios.length}</div>
-    </div>
-  </div>
-  <div style="flex:1;display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;min-height:0;padding:0 16px 12px">
-    ${NEG_COLS.map(col=>{
-      const cards=negocios.filter(n=>(n.status||'Prospecção')===col);
-      return`<div style="flex:0 0 210px;display:flex;flex-direction:column;min-height:0">
-        <div style="background:${NEG_COL_COLOR[col]};color:#fff;border-radius:8px 8px 0 0;padding:8px 12px;font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
-          <span>${col}</span><span style="background:rgba(255,255,255,.25);border-radius:10px;padding:1px 7px">${cards.length}</span>
+  return`<div style="height:100%;display:flex;flex-direction:column;overflow:hidden">
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;padding:0 16px 8px;flex-wrap:wrap">
+      <select onchange="_pipFilter=this.value==='all'?'all':+this.value;renderPipeline()"
+        style="padding:6px 10px;border:1.5px solid #e5e7eb;border-radius:20px;font-size:12px;font-weight:600;color:#0a1628;background:#fff;cursor:pointer">
+        <option value="all" ${_pipFilter==='all'?'selected':''}>Todos os negócios</option>
+        ${portfolio.map(p=>`<option value="${p.id}" ${_pipFilter===p.id?'selected':''}>${esc(p.nome)}</option>`).join('')}
+      </select>
+      <div style="display:flex;gap:8px;overflow-x:auto;flex-shrink:0">
+        <div style="background:#f0f4ff;border-radius:10px;padding:7px 12px;white-space:nowrap">
+          <span style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase">Em pipeline </span>
+          <span style="font-size:14px;font-weight:700;color:#0a1628">${ativos.length}</span>
+          <span style="font-size:11px;color:#0059a9"> · R$ ${valPipeline.toLocaleString('pt-BR',{maximumFractionDigits:0})}</span>
         </div>
-        <div style="background:#f9f9f7;border-radius:0 0 8px 8px;flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:8px;"
-             ondragover="negDragOver(event)" ondragleave="negDragLeave(event)" ondrop="negDrop(event,'${col}')">
-          ${cards.length?cards.map(n=>{
-            const orig=n.originadorId?users.find(u=>u.id===n.originadorId):null;
-            const partsNomes=(n.participantes||[]).slice(0,3).map(p=>{
-              const u=users.find(x=>x.id===p.userId);return u?u.nome.split(' ')[0]:'?';
-            });
-            const prob=n.probabilidade||0;
-            const probColor=prob>=70?'#0F6E56':prob>=40?'#854F0B':'#991b1b';
-            return`<div draggable="true" ondragstart="negDragStart(event,${n.id})" ondragend="negDragEnd(event)"
-                     class="pip-card" style="border-radius:8px;padding:10px;cursor:grab;flex-shrink:0;border-left:3px solid ${NEG_COL_COLOR[col]}"
-                     onclick="openNegModal(${n.id})">
-              <div style="font-size:13px;font-weight:600;color:#0a1628;margin-bottom:4px;line-height:1.3">${esc(n.titulo)}</div>
-              ${n.cliente?`<div style="font-size:11px;color:#6b7280;margin-bottom:4px">${esc(n.cliente)}</div>`:''}
-              ${n.valor?`<div style="font-size:12px;color:#0F6E56;font-weight:600;margin-bottom:4px">R$ ${n.valor.toLocaleString('pt-BR')}</div>`:''}
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
-                ${orig?`<div style="font-size:11px;color:#9ca3af">✦ ${orig.nome.split(' ')[0]}</div>`:'<div></div>'}
-                ${n.probabilidade!=null?`<div style="font-size:10px;font-weight:700;color:${probColor};background:${probColor}1a;border-radius:6px;padding:1px 6px">${prob}%</div>`:''}
-              </div>
-              ${partsNomes.length?`<div style="font-size:10px;color:#9ca3af;margin-top:3px">${partsNomes.join(' · ')}</div>`:''}
-            </div>`;
-          }).join(''):`<div style="color:#9ca3af;font-size:12px;text-align:center;padding:24px 8px;line-height:1.6">Arraste aqui</div>`}
+        <div style="background:#f0faf4;border-radius:10px;padding:7px 12px;white-space:nowrap">
+          <span style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase">Fechados mês </span>
+          <span style="font-size:14px;font-weight:700;color:#0F6E56">${fechadosMes.length}</span>
+          <span style="font-size:11px;color:#0F6E56"> · R$ ${valFechado.toLocaleString('pt-BR',{maximumFractionDigits:0})}</span>
         </div>
-      </div>`;
-    }).join('')}
-  </div>
+      </div>
+      <button class="btn-p" style="font-size:12px;padding:6px 14px;margin-left:auto;flex-shrink:0" onclick="openNegModal(null)">+ Novo cliente</button>
+    </div>
+    <div style="flex:1;display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;min-height:0;padding:0 16px 12px">
+      ${NEG_COLS.map(col=>{
+        const cards=negFilt.filter(n=>(n.status||'Prospecção')===col);
+        return`<div style="flex:0 0 210px;display:flex;flex-direction:column;min-height:0">
+          <div style="background:${NEG_COL_COLOR[col]};color:#fff;border-radius:8px 8px 0 0;padding:8px 12px;font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
+            <span>${col}</span><span style="background:rgba(255,255,255,.25);border-radius:10px;padding:1px 7px">${cards.length}</span>
+          </div>
+          <div style="background:#f9f9f7;border-radius:0 0 8px 8px;flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:8px"
+               ondragover="negDragOver(event)" ondragleave="negDragLeave(event)" ondrop="negDrop(event,'${col}')">
+            ${cards.length?cards.map(n=>{
+              const orig=n.originadorId?users.find(u=>u.id===n.originadorId):null;
+              const port=n.portafolioId?portfolio.find(p=>p.id===n.portafolioId):null;
+              const prob=n.probabilidade||0;
+              const probColor=prob>=70?'#0F6E56':prob>=40?'#854F0B':'#991b1b';
+              return`<div draggable="true" ondragstart="negDragStart(event,${n.id})" ondragend="negDragEnd(event)"
+                       class="pip-card" style="border-radius:8px;padding:10px;cursor:grab;flex-shrink:0;border-left:3px solid ${NEG_COL_COLOR[col]}"
+                       onclick="openNegModal(${n.id})">
+                <div style="font-size:13px;font-weight:600;color:#0a1628;margin-bottom:3px;line-height:1.3">${esc(n.titulo)}</div>
+                ${n.cliente?`<div style="font-size:11px;color:#6b7280;margin-bottom:3px">${esc(n.cliente)}</div>`:''}
+                ${port?`<span class="badge ${_portTipoCls(port.tipo)}" style="font-size:10px;padding:1px 7px;margin-bottom:4px;display:inline-block">${esc(port.nome)}</span>`:''}
+                ${n.valor?`<div style="font-size:12px;color:#0F6E56;font-weight:600;margin-bottom:3px">R$ ${n.valor.toLocaleString('pt-BR')}</div>`:''}
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
+                  ${orig?`<div style="font-size:11px;color:#9ca3af">✦ ${orig.nome.split(' ')[0]}</div>`:'<div></div>'}
+                  ${n.probabilidade!=null?`<div style="font-size:10px;font-weight:700;color:${probColor};background:${probColor}1a;border-radius:6px;padding:1px 6px">${prob}%</div>`:''}
+                </div>
+              </div>`;
+            }).join(''):`<div style="color:#9ca3af;font-size:12px;text-align:center;padding:24px 8px">Arraste aqui</div>`}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
   </div>`;
 }
 
-// --- Modal Negócio ---
+// --- Modal Portfólio ---
+function openPortModal(id){
+  _portEditId=id;
+  const p=id?portfolio.find(x=>x.id===id):null;
+  document.getElementById('port-ttl').textContent=p?'Editar Negócio':'Novo Negócio';
+  document.getElementById('port-del-btn').style.display=id?'':'none';
+  document.getElementById('port-nome').value=p?p.nome:'';
+  document.getElementById('port-tipo').value=p?p.tipo:'Próprio';
+  // Popula selects de responsável e via
+  const userOpts=users.map(u=>`<option value="${u.id}">${u.nome}</option>`).join('');
+  document.getElementById('port-resp').innerHTML='<option value="">— Nenhum —</option>'+userOpts;
+  document.getElementById('port-via').innerHTML='<option value="">— Nenhum —</option>'+userOpts;
+  document.getElementById('port-resp').value=p?p.responsavelId||'':'';
+  document.getElementById('port-via').value=p?p.viaId||'':'';
+  document.getElementById('port-comissao').value=p?p.comissaoPadrao||'':'';
+  document.getElementById('port-desc').value=p?p.descricao||'':'';
+  portTipoChange();
+  document.getElementById('ov-port').classList.add('open');
+}
+function portTipoChange(){
+  const tipo=document.getElementById('port-tipo').value;
+  document.getElementById('port-via-row').style.display=tipo==='Rede'?'':'none';
+}
+function savePort(){
+  const nome=document.getElementById('port-nome').value.trim();
+  if(!nome){alert('Informe o nome do negócio.');return;}
+  const obj={
+    nome,
+    tipo:document.getElementById('port-tipo').value,
+    responsavelId:parseInt(document.getElementById('port-resp').value)||null,
+    viaId:parseInt(document.getElementById('port-via').value)||null,
+    comissaoPadrao:parseFloat(document.getElementById('port-comissao').value)||0,
+    descricao:document.getElementById('port-desc').value.trim(),
+  };
+  if(_portEditId){
+    const i=portfolio.findIndex(x=>x.id===_portEditId);
+    portfolio[i]={...portfolio[i],...obj};
+  } else {
+    portfolio.push({...obj,id:Date.now(),criado:new Date().toLocaleDateString('pt-BR')});
+  }
+  closeOv('ov-port');saveData();renderPipeline();
+}
+function removePort(id){
+  const tem=negocios.some(n=>n.portafolioId===id);
+  if(tem&&!confirm('Este negócio tem clientes vinculados. Remover mesmo assim?'))return;
+  if(!tem&&!confirm('Remover este negócio do portfólio?'))return;
+  portfolio=portfolio.filter(p=>p.id!==id);
+  closeOv('ov-port');saveData();renderPipeline();
+}
+
+// --- Modal Cliente/Negócio ---
 function openNegModal(id){
   _negEditId=id;
   const n=id?negocios.find(x=>x.id===id):null;
   _negPartTemp=n?JSON.parse(JSON.stringify(n.participantes||[])):[{userId:currentUser.id,papel:'Originador',comissao:0}];
-  document.getElementById('neg-ttl').textContent=n?'Editar Negócio':'Novo Negócio';
+  document.getElementById('neg-ttl').textContent=n?'Editar Cliente':'Novo Cliente';
   document.getElementById('neg-del-btn').style.display=id?'':'none';
-  // Popula selects dinamicamente
   const selStatus=document.getElementById('neg-status');
   selStatus.innerHTML=NEG_COLS.map(c=>`<option>${c}</option>`).join('');
   const selOrig=document.getElementById('neg-orig');
   selOrig.innerHTML=users.map(u=>`<option value="${u.id}">${u.nome}</option>`).join('');
+  const selPort=document.getElementById('neg-port');
+  selPort.innerHTML='<option value="">— Nenhum —</option>'+portfolio.map(p=>`<option value="${p.id}">${esc(p.nome)}</option>`).join('');
   document.getElementById('neg-titulo').value=n?n.titulo:'';
   document.getElementById('neg-cliente').value=n?n.cliente||'':'';
   document.getElementById('neg-valor').value=n?n.valor||'':'';
@@ -3352,10 +3510,12 @@ function openNegModal(id){
   document.getElementById('neg-prob-val').textContent=prob+'%';
   document.getElementById('neg-status').value=n?n.status||'Prospecção':'Prospecção';
   document.getElementById('neg-orig').value=n?n.originadorId||currentUser.id:currentUser.id;
+  // Pre-fill portfólio com o filtro atual se for novo
+  const portVal=n?n.portafolioId||'':(_pipFilter!=='all'?_pipFilter:'');
+  document.getElementById('neg-port').value=portVal;
   document.getElementById('neg-segmento').value=n?n.segmento||'':'';
   document.getElementById('neg-notas').value=n?n.notas||'':'';
   renderNegParts();
-  // followups
   const fus=n?n.followups||[]:[];
   document.getElementById('neg-fu-list').innerHTML=fus.length?fus.map((f,i)=>`
     <div style="border:1px solid #eee;border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:13px">
@@ -3410,7 +3570,7 @@ function negAddFu(){
 function isSocioUser(u){return u&&(u.perfil==='Sócio'||u.perfil==='Sócio-Fundador');}
 function saveNeg(){
   const titulo=document.getElementById('neg-titulo').value.trim();
-  if(!titulo){alert('Informe o título do negócio.');return;}
+  if(!titulo){alert('Informe o nome do cliente/oportunidade.');return;}
   const obj={
     titulo,
     cliente:document.getElementById('neg-cliente').value.trim(),
@@ -3418,6 +3578,7 @@ function saveNeg(){
     probabilidade:parseInt(document.getElementById('neg-prob').value)||0,
     status:document.getElementById('neg-status').value,
     originadorId:parseInt(document.getElementById('neg-orig').value)||currentUser.id,
+    portafolioId:parseInt(document.getElementById('neg-port').value)||null,
     segmento:document.getElementById('neg-segmento').value.trim(),
     notas:document.getElementById('neg-notas').value.trim(),
     participantes:_negPartTemp,
@@ -4845,7 +5006,7 @@ function getStateSnapshot(){
     users,projetos,lancamentos,sinergias,conexoes,
     notificacoes,oportunidadesPendentes,
     convidadosExternos,customGroups,interessesPendentes,
-    projetosVitrine,negocios
+    projetosVitrine,negocios,portfolio
   };
 }
 
@@ -4863,6 +5024,7 @@ function applyStateSnapshot(d){
   if(d.interessesPendentes)interessesPendentes=d.interessesPendentes;
   if(d.projetosVitrine)projetosVitrine=d.projetosVitrine;
   if(d.negocios)negocios=d.negocios;
+  if(d.portfolio)portfolio=d.portfolio;
 }
 
 let _syncTimer=null;
@@ -4899,6 +5061,7 @@ function saveData(){
     localStorage.setItem('iahub_customGroups',JSON.stringify(customGroups));
     localStorage.setItem('iahub_interesses',JSON.stringify(interessesPendentes));
     localStorage.setItem('iahub_negocios',JSON.stringify(negocios));
+    localStorage.setItem('iahub_portfolio',JSON.stringify(portfolio));
   }catch(e){console.warn('saveData failed',e);}
   syncToSupabase();
 }
@@ -4915,6 +5078,7 @@ function loadData(){
     const cg=localStorage.getItem('iahub_customGroups');if(cg)customGroups=JSON.parse(cg);
     const int=localStorage.getItem('iahub_interesses');if(int)interessesPendentes=JSON.parse(int);
     const neg=localStorage.getItem('iahub_negocios');if(neg)negocios=JSON.parse(neg);
+    const prt=localStorage.getItem('iahub_portfolio');if(prt)portfolio=JSON.parse(prt);
   }catch(e){console.warn('loadData failed',e);}
 }
 
