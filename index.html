@@ -2834,6 +2834,55 @@ function removePagamento(id){
   pagamentos=pagamentos.filter(p=>p.id!==id);
   saveData();renderFinanceiro();
 }
+function exportarPortfolioPDF(){
+  const mn=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const hoje=new Date();const dataHoje=`${hoje.getDate().toString().padStart(2,'0')}/${mn[hoje.getMonth()]}/${hoje.getFullYear()}`;
+  const rows=portfolio.map(p=>{
+    const resp=p.responsavelId?users.find(u=>u.id===p.responsavelId):null;
+    const ativos=negocios.filter(n=>n.portafolioId===p.id&&n.status!=='Perdido').length;
+    const tipoCor={'Próprio':'#0a1628','Sócio':'#1e40af','Rede':'#065f46'}[p.tipo]||'#64748b';
+    return`<tr>
+      <td style="font-weight:600;color:#0a1628">${p.nome||'—'}</td>
+      <td><span style="background:${tipoCor};color:#fff;border-radius:4px;padding:2px 8px;font-size:11px;white-space:nowrap">${p.tipo||'—'}</span></td>
+      <td style="color:#6b7280">${p.cnpj||'—'}</td>
+      <td style="color:#6b7280">${p.razaoSocial||'—'}</td>
+      <td style="color:#6b7280">${p.nomeContato||'—'}</td>
+      <td style="text-align:center">${p.comissaoNegociada?p.comissaoNegociada+'%':'—'}</td>
+      <td>${resp?resp.nome:'—'}</td>
+      <td style="color:#854F0B;font-size:11px">${p.clienteIdeal||'—'}</td>
+      <td style="text-align:center;font-weight:600;color:#0059a9">${ativos}</td>
+    </tr>`;
+  }).join('');
+  const win=window.open('','_blank','width=1000,height=800');
+  win.document.write(`<!doctype html><html><head>
+    <meta charset="utf-8">
+    <title>Portfólio de Negócios — IA Hub</title>
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#fff;padding:32px;color:#111;font-size:13px}
+      h1{font-size:20px;color:#0a1628;margin-bottom:4px}
+      .sub{font-size:12px;color:#9ca3af;margin-bottom:20px}
+      table{width:100%;border-collapse:collapse}
+      th{background:#0a1628;color:#fff;padding:8px 10px;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+      td{padding:8px 10px;border-bottom:1px solid #f0f0f0;vertical-align:top}
+      tr:last-child td{border-bottom:none}
+      @media print{body{padding:0}@page{margin:15mm;size:A4 landscape}}
+    </style>
+  </head><body>
+    <h1>Portfólio de Negócios</h1>
+    <div class="sub">IA Hub Connect · Gerado em ${dataHoje} · ${portfolio.length} negócio${portfolio.length!==1?'s':''}</div>
+    <table>
+      <thead><tr>
+        <th>Empresa</th><th>Tipo</th><th>CNPJ</th><th>Razão Social</th>
+        <th>Contato</th><th>Comissão</th><th>Responsável</th><th>Cliente Ideal</th><th>Clientes ativos</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <script>window.onload=function(){window.print();}<\/script>
+  </body></html>`);
+  win.document.close();
+}
+
 function abrirFichaCliente(negId){
   const ref=negocios.find(n=>n.id===negId);if(!ref)return;
   // Agrupa por CNPJ (se preenchido) ou por titulo
@@ -3760,7 +3809,8 @@ function _renderPortfolioView(){
     <button class="btn-p" onclick="openPortModal(null)">+ Cadastrar primeiro negócio</button>
   </div>`;
   return`<div style="height:100%;display:flex;flex-direction:column;overflow:hidden">
-    <div style="display:flex;justify-content:flex-end;padding:0 16px 10px;flex-shrink:0">
+    <div style="display:flex;justify-content:flex-end;gap:8px;padding:0 16px 10px;flex-shrink:0">
+      <button class="btn-p" style="font-size:12px;padding:6px 14px;background:#f0faf4;color:#0F6E56;border:1.5px solid #0F6E56" onclick="exportarPortfolioPDF()">📄 Exportar PDF</button>
       <button class="btn-p" style="font-size:12px;padding:6px 14px" onclick="openPortModal(null)">+ Novo negócio</button>
     </div>
     <div style="flex:1;overflow-y:auto;padding:0 16px 16px">
