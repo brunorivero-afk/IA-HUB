@@ -1222,47 +1222,65 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
   </div>
 </div>
 
-<!-- Modal cliente -->
+<!-- Modal negócio -->
 <div class="overlay" id="ov-neg">
-  <div class="modal" style="width:520px;max-height:90vh;overflow-y:auto">
-    <h2 id="neg-ttl">Novo Cliente</h2>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div style="grid-column:1/-1">
-        <label>Negócio *</label>
-        <select id="neg-port" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px"></select>
+  <div class="modal" style="width:540px;max-height:92vh;overflow-y:auto">
+    <h2 id="neg-ttl" style="font-size:16px;font-weight:700;margin-bottom:14px">Novo Negócio</h2>
+
+    <!-- 1. Produto — destaque -->
+    <div style="margin-bottom:16px">
+      <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#0a1628;display:block;margin-bottom:8px">Produto / Serviço BIdaTX *</label>
+      <div id="neg-prod-chips" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+      <!-- Outro tipo -->
+      <div id="neg-outro-wrap" style="display:none;margin-top:10px">
+        <input id="neg-outro-desc" placeholder="Descreva o tipo de negócio / serviço…"
+          style="width:100%;padding:8px;border:1px solid #d97706;border-radius:8px;font-size:13px;outline:none">
       </div>
-      <div style="grid-column:1/-1"><label>Cliente</label><input id="neg-titulo" placeholder="Nome do cliente ou oportunidade"></div>
-      <div><label>CNPJ</label><input id="neg-cnpj" placeholder="00.000.000/0001-00"></div>
-      <div><label>Razão Social</label><input id="neg-razao" placeholder="Razão social completa"></div>
-      <div style="grid-column:1/-1">
-        <label>Perfil Tributário</label>
-        <select id="neg-perfil-trib" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px">
-          <option value="">— Selecione —</option>
-          <option>Simples Nacional</option>
-          <option>Lucro Presumido</option>
-          <option>Lucro Real</option>
-          <option>MEI</option>
-          <option>Imune / Isento</option>
-          <option>Pessoa Física</option>
-          <option>Não identificado</option>
-        </select>
-      </div>
+    </div>
+
+    <!-- info empresa/comissão (aparece ao selecionar) -->
+    <div id="neg-taxa-base" style="margin-bottom:14px;min-height:20px"></div>
+
+    <!-- 2. Cliente / Empresa -->
+    <div style="margin-bottom:12px">
+      <label style="font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:4px">Cliente / Empresa *</label>
+      <input id="neg-titulo" placeholder="Nome do cliente ou empresa"
+        style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px">
+    </div>
+
+    <!-- 3. Etapa + Originador -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
       <div>
-        <label>Etapa</label>
+        <label style="font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:4px">Etapa</label>
         <select id="neg-status" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px"></select>
       </div>
       <div>
-        <label>Originador</label>
+        <label style="font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:4px">Originador</label>
         <select id="neg-orig" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px"></select>
       </div>
-      <div>
-        <label>Comissão da Rede (%)</label>
-        <input id="neg-taxa" type="number" min="0" max="100" placeholder="auto" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px">
-      </div>
-      <div style="grid-column:1/-1;padding-top:4px" id="neg-taxa-base"></div>
-      <div style="grid-column:1/-1"><label>Segmento</label><input id="neg-segmento" placeholder="Ex: Indústria, Varejo, Saúde…"></div>
-      <div style="grid-column:1/-1"><label>Notas</label><textarea id="neg-notas" placeholder="Contexto, necessidade, próximos passos…" style="width:100%;height:70px;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px;resize:vertical"></textarea></div>
     </div>
+
+    <!-- 4. Comissão da rede -->
+    <div style="margin-bottom:12px">
+      <label style="font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:4px">Comissão da Rede (%)</label>
+      <input id="neg-taxa" type="number" min="0" max="100" placeholder="auto (da matriz)"
+        style="width:140px;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px">
+    </div>
+
+    <!-- 5. Notas -->
+    <div style="margin-bottom:4px">
+      <label style="font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:4px">Notas</label>
+      <textarea id="neg-notas" placeholder="Contexto, necessidade, próximos passos…"
+        style="width:100%;height:70px;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px;resize:vertical"></textarea>
+    </div>
+
+    <!-- campos ocultos mantidos para compatibilidade -->
+    <input type="hidden" id="neg-cnpj">
+    <input type="hidden" id="neg-razao">
+    <input type="hidden" id="neg-perfil-trib">
+    <input type="hidden" id="neg-segmento">
+    <input type="hidden" id="neg-port">
+
     <div class="modal-footer" style="display:flex;gap:10px;justify-content:space-between;margin-top:18px">
       <button onclick="if(_negEditId)removeNeg(_negEditId)" style="border:none;background:none;color:#ef4444;cursor:pointer;font-size:13px;padding:6px 0" id="neg-del-btn">Excluir</button>
       <div style="display:flex;gap:10px">
@@ -1932,7 +1950,7 @@ function buildTabs(){
     {id:'rede',label:'Dashboard',icon:'📊',socio:true},
     {id:'receitas',label:'Receitas',icon:'💵',socio:true},
     {id:'pipeline',label:'Pipeline',icon:'🎯',socio:true},
-    {id:'projetos',label:'Negócios',icon:'🤝',socio:true},
+    {id:'projetos',label:'Novos Negócios',icon:'🤝',socio:true},
     {id:'vitrine',label:'Projetos',icon:'📁',all:true},
     {id:'rede-membros',label:'Conexões',icon:'🔗',all:true},
     {id:'financeiro',label:'Financeiro',icon:'💰',socio:true},
@@ -2032,7 +2050,7 @@ function renderDashboard(){
   if(kpisEl)kpisEl.innerHTML=`
     <div class="stat"><div class="stat-label">Receita Registrada</div><div class="stat-value" style="font-size:16px">R$ ${totalRec.toLocaleString('pt-BR',{minimumFractionDigits:0})}</div></div>
     <div class="stat"><div class="stat-label">Faturamento (Negócios)</div><div class="stat-value" style="font-size:16px">R$ ${totalFat.toLocaleString('pt-BR',{minimumFractionDigits:0})}</div></div>
-    <div class="stat"><div class="stat-label">Pipeline Ativo</div><div class="stat-value">${pipAtivos} oportunidades</div></div>
+    <div class="stat"><div class="stat-label">Pipeline Ativo</div><div class="stat-value" style="font-size:15px">${pipAtivos} oportunidades</div></div>
     <div class="stat"><div class="stat-label">Conexões na Rede</div><div class="stat-value">${conexoes.length}</div></div>`;
   // Receita por frente
   const frentes=[
@@ -2905,31 +2923,25 @@ function exportarPortfolioPDF(){
 
 function abrirFichaCliente(negId){
   const ref=negocios.find(n=>n.id===negId);if(!ref)return;
-  // Agrupa por CNPJ (se preenchido) ou por titulo
-  const chave=ref.cnpj?ref.cnpj.replace(/\D/g,''):null;
-  const todos=negocios.filter(n=>{
-    if(chave&&n.cnpj)return n.cnpj.replace(/\D/g,'')===chave;
-    return n.titulo===ref.titulo;
-  });
+  const todos=[ref];
   const etapaColor=e=>NEG_COL_COLOR[e]||'#64748b';
   const html=`
     <div style="margin-bottom:16px">
       <div style="font-size:18px;font-weight:700;color:#0a1628">${esc(ref.titulo)}</div>
-      ${ref.razaoSocial?`<div style="font-size:12px;color:#6b7280">${esc(ref.razaoSocial)}</div>`:''}
-      ${ref.cnpj?`<div style="font-size:12px;color:#9ca3af">CNPJ: ${esc(ref.cnpj)}</div>`:''}
-      ${ref.perfilTributario?`<div style="font-size:12px;color:#854F0B;margin-top:2px">📋 ${esc(ref.perfilTributario)}</div>`:''}
     </div>
     <div style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">
       ${todos.length} serviço${todos.length!==1?'s':''}
     </div>
     <div style="display:flex;flex-direction:column;gap:8px">
       ${todos.map(n=>{
-        const port=n.portafolioId?portfolio.find(p=>p.id===n.portafolioId):null;
+        const cfgP=n.configProdutoId?config.comissoes.find(c=>c.id===n.configProdutoId):null;
+        const empP=cfgP?_cfgEmpresa(cfgP.empresaId):null;
+        const prodLabel=cfgP?cfgP.produto:(n.produtoOutro||null);
         const orig=n.originadorId?users.find(u=>u.id===n.originadorId):null;
         const cor=etapaColor(n.status||'Prospecção');
         return`<div style="background:#fff;border:1px solid #eee;border-left:3px solid ${cor};border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
           <div>
-            ${port?`<span class="badge ${_portTipoCls(port.tipo)}" style="font-size:10px;padding:1px 7px;margin-bottom:4px;display:inline-block">${esc(port.nome)}</span>`:''}
+            ${prodLabel?`<span style="display:inline-flex;align-items:center;background:${empP?empP.cor+'15':'#f3f4f6'};border:1px solid ${empP?empP.cor+'44':'#d1d5db'};border-radius:12px;padding:2px 8px;font-size:10px;font-weight:700;color:${empP?empP.cor:'#374151'};margin-bottom:4px">${esc(prodLabel)}</span>`:''}
             ${n.notas?`<div style="font-size:12px;color:#6b7280;margin-top:4px">${esc(n.notas)}</div>`:''}
             ${orig?`<div style="font-size:11px;color:#9ca3af;margin-top:4px">✦ ${orig.nome.split(' ')[0]}</div>`:''}
           </div>
@@ -2953,12 +2965,10 @@ function abrirInativos(){
     ${lista.length?`<div style="display:flex;flex-direction:column;gap:8px">
       ${lista.map(n=>{
         const orig=n.originadorId?users.find(u=>u.id===n.originadorId):null;
-        const port=n.portafolioId?portfolio.find(p=>p.id===n.portafolioId):null;
         return`<div style="background:#fff;border:1px solid #fee2e2;border-left:3px solid #991b1b;border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
           <div>
             <div style="font-size:13px;font-weight:600;color:#0a1628">${esc(n.titulo)}</div>
-            ${n.cnpj?`<div style="font-size:11px;color:#9ca3af">${esc(n.cnpj)}</div>`:''}
-            ${port?`<div style="font-size:11px;color:#6b7280">${esc(port.nome)}</div>`:''}
+            ${(()=>{const cp=n.configProdutoId?config.comissoes.find(c=>c.id===n.configProdutoId):null;const lbl=cp?cp.produto:(n.produtoOutro||null);return lbl?`<div style="font-size:11px;color:#6b7280">${esc(lbl)}</div>`:''})()}
             ${n.notas?`<div style="font-size:12px;color:#6b7280;margin-top:4px">${esc(n.notas)}</div>`:''}
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
@@ -3840,6 +3850,7 @@ const PORT_TIPO_CLS={'Próprio':'port-tipo-proprio','Sócio':'port-tipo-socio','
 let _negDragId=null;
 let _negEditId=null;
 let _negPartTemp=[];
+let _negProdSelecionado=null;
 let _pipSubtab='portfolio';
 let _pipFilter='all';
 let _portEditId=null;
@@ -3948,7 +3959,7 @@ function _renderClientesView(){
         </div>
       </div>
       <button class="btn-p" style="font-size:12px;padding:6px 14px;background:#fef2f2;color:#991b1b;border:1.5px solid #991b1b" onclick="abrirInativos()">📋 Inativos</button>
-      <button class="btn-p" style="font-size:12px;padding:6px 14px;margin-left:auto;flex-shrink:0" onclick="openNegModal(null)">+ Novo cliente</button>
+      <button class="btn-p" style="font-size:12px;padding:6px 14px;margin-left:auto;flex-shrink:0" onclick="openNegModal(null)">+ Novo negócio</button>
     </div>
     <div style="flex:1;display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;min-height:0;padding:0 16px 12px">
       ${NEG_COLS.map(col=>{
@@ -3961,17 +3972,17 @@ function _renderClientesView(){
                ondragover="negDragOver(event)" ondragleave="negDragLeave(event)" ondrop="negDrop(event,'${col}')">
             ${cards.length?cards.map(n=>{
               const orig=n.originadorId?users.find(u=>u.id===n.originadorId):null;
-              const port=n.portafolioId?portfolio.find(p=>p.id===n.portafolioId):null;
+              const cfgProd=n.configProdutoId?config.comissoes.find(c=>c.id===n.configProdutoId):null;
+              const empProd=cfgProd?_cfgEmpresa(cfgProd.empresaId):null;
+              const prodLabel=cfgProd?cfgProd.produto:(n.produtoOutro||null);
               return`<div draggable="true" ondragstart="negDragStart(event,${n.id})" ondragend="negDragEnd(event)"
                        class="pip-card" style="border-radius:8px;padding:10px;cursor:grab;flex-shrink:0;border-left:3px solid ${NEG_COL_COLOR[col]}"
                        onclick="openNegModal(${n.id})">
-                <div style="font-size:13px;font-weight:600;color:#0a1628;margin-bottom:3px;line-height:1.3">${esc(n.titulo)}</div>
-                ${n.cnpj?`<div style="font-size:10px;color:#9ca3af;margin-bottom:2px">${esc(n.cnpj)}</div>`:''}
-                ${port?`<span class="badge ${_portTipoCls(port.tipo)}" style="font-size:10px;padding:1px 7px;margin-bottom:4px;display:inline-block">${esc(port.nome)}</span>`:''}
-                ${n.perfilTributario?`<div style="font-size:11px;color:#854F0B;margin-bottom:3px">📋 ${esc(n.perfilTributario)}</div>`:''}
+                <div style="font-size:13px;font-weight:600;color:#0a1628;margin-bottom:4px;line-height:1.3">${esc(n.titulo)}</div>
+                ${prodLabel?`<div style="margin-bottom:5px"><span style="display:inline-flex;align-items:center;gap:4px;background:${empProd?empProd.cor+'15':'#f3f4f6'};border:1px solid ${empProd?empProd.cor+'44':'#d1d5db'};border-radius:12px;padding:2px 8px;font-size:10px;font-weight:700;color:${empProd?empProd.cor:'#374151'}">${esc(prodLabel)}</span></div>`:''}
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
                   ${orig?`<div style="font-size:11px;color:#9ca3af">✦ ${orig.nome.split(' ')[0]}</div>`:'<div></div>'}
-                  ${n.segmento?`<div style="font-size:10px;color:#6b7280;background:#f3f4f6;border-radius:6px;padding:1px 6px">${esc(n.segmento)}</div>`:''}
+                  ${n.taxaRede?`<div style="font-size:10px;color:#6b7280;background:#f3f4f6;border-radius:6px;padding:1px 6px">${n.taxaRede}%</div>`:''}
                 </div>
                 <div style="margin-top:6px;padding-top:6px;border-top:1px solid #f0f0f0;text-align:right">
                   <button onclick="event.stopPropagation();abrirFichaCliente(${n.id})" style="font-size:10px;color:#0059a9;background:none;border:none;cursor:pointer;padding:0;font-weight:600">👤 Ver cliente</button>
@@ -4034,56 +4045,98 @@ function removePort(id){
   closeOv('ov-port');saveData();renderPipeline();
 }
 
-// --- Modal Cliente ---
+// --- Chips de produto no modal negócio ---
+function _renderNegProdChips(selectedId){
+  const wrap=document.getElementById('neg-prod-chips');
+  if(!wrap)return;
+  const chips=config.comissoes.map(p=>{
+    const emp=_cfgEmpresa(p.empresaId);
+    const sel=selectedId===p.id;
+    return `<button type="button" onclick="selectNegProd(${p.id})"
+      style="padding:7px 13px;border-radius:20px;border:2px solid ${sel?emp.cor:'#d1d5db'};
+      background:${sel?emp.cor+'18':'transparent'};color:${sel?emp.cor:'#374151'};
+      font-size:12px;font-weight:${sel?700:500};cursor:pointer;transition:all .15s;white-space:nowrap">
+      ${esc(p.produto)}</button>`;
+  });
+  chips.push(`<button type="button" onclick="selectNegProd('outro')"
+    style="padding:7px 13px;border-radius:20px;border:2px solid ${selectedId==='outro'?'#d97706':'#d1d5db'};
+    background:${selectedId==='outro'?'#fef3c7':'transparent'};color:${selectedId==='outro'?'#92400e':'#374151'};
+    font-size:12px;font-weight:${selectedId==='outro'?700:500};cursor:pointer;transition:all .15s">
+    + Outro tipo</button>`);
+  wrap.innerHTML=chips.join('');
+}
+function selectNegProd(id){
+  _negProdSelecionado=id;
+  _renderNegProdChips(id);
+  const outroWrap=document.getElementById('neg-outro-wrap');
+  outroWrap.style.display=id==='outro'?'block':'none';
+  const infoEl=document.getElementById('neg-taxa-base');
+  if(id&&id!=='outro'){
+    const prod=config.comissoes.find(c=>c.id===id);
+    if(prod){
+      document.getElementById('neg-taxa').value=prod.taxa!=null?prod.taxa:'';
+      const emp=_cfgEmpresa(prod.empresaId);
+      const base=prod.taxaBase||'—';
+      const split=prod.splitInterno?` · ${prod.splitInterno}`:'';
+      infoEl.innerHTML=`<span style="display:inline-flex;align-items:center;gap:4px;background:${emp.cor}18;border:1px solid ${emp.cor}44;border-radius:5px;padding:3px 9px;font-size:11px;font-weight:700;color:${emp.cor}">${emp.nome}</span> <span style="font-size:11px;color:#888">${base}${split}</span>`;
+    }
+  } else {
+    infoEl.innerHTML='';
+    if(id!=='outro')document.getElementById('neg-taxa').value='';
+  }
+}
+
+// --- Modal Negócio ---
 function openNegModal(id){
   _negEditId=id;
   const n=id?negocios.find(x=>x.id===id):null;
-  document.getElementById('neg-ttl').textContent=n?'Editar Cliente':'Novo Cliente';
+  document.getElementById('neg-ttl').textContent=n?'Editar Negócio':'Novo Negócio';
   document.getElementById('neg-del-btn').style.display=id?'':'none';
   const selStatus=document.getElementById('neg-status');
   selStatus.innerHTML=[...NEG_COLS,'Perdido'].map(c=>`<option>${c}</option>`).join('');
   const selOrig=document.getElementById('neg-orig');
   selOrig.innerHTML=users.map(u=>`<option value="${u.id}">${u.nome}</option>`).join('');
-  const selPort=document.getElementById('neg-port');
-  selPort.innerHTML='<option value="">— Selecione o produto —</option>'+config.comissoes.map(p=>`<option value="${p.id}">${esc(p.produto)}</option>`).join('');
-  selPort.onchange=function(){
-    const pid=parseInt(this.value)||null;
-    const prod=pid?config.comissoes.find(c=>c.id===pid):null;
-    document.getElementById('neg-taxa').value=prod&&prod.taxa!=null?prod.taxa:'';
-    const emp=prod?_cfgEmpresa(prod.empresaId):{nome:'—',cor:'#aaa'};
-    const base=prod?prod.taxaBase:'—';
-    const split=prod&&prod.splitInterno?` · ${prod.splitInterno}`:'';
-    document.getElementById('neg-taxa-base').innerHTML=`<span style="display:inline-flex;align-items:center;gap:4px;background:${emp.cor}18;border:1px solid ${emp.cor}44;border-radius:5px;padding:2px 7px;font-size:11px;font-weight:700;color:${emp.cor}">${emp.nome}</span> <span style="font-size:11px;color:#888">${base}${split}</span>`;
-  };
+  // chips de produto
+  const prodId=n?(n.configProdutoId||n.portafolioId||null):null;
+  const outroDesc=n&&!prodId&&n.produtoOutro?n.produtoOutro:null;
+  _negProdSelecionado=outroDesc?'outro':(prodId||null);
+  _renderNegProdChips(_negProdSelecionado);
+  document.getElementById('neg-outro-wrap').style.display=outroDesc?'block':'none';
+  document.getElementById('neg-outro-desc').value=outroDesc||'';
+  // auto-fill taxa e info
+  if(prodId){
+    selectNegProd(prodId);
+    if(n&&n.taxaRede!=null)document.getElementById('neg-taxa').value=n.taxaRede;
+  } else {
+    document.getElementById('neg-taxa-base').innerHTML='';
+    document.getElementById('neg-taxa').value=n?n.taxaRede||'':'';
+  }
   document.getElementById('neg-titulo').value=n?n.titulo:'';
-  document.getElementById('neg-cnpj').value=n?n.cnpj||'':'';
-  document.getElementById('neg-razao').value=n?n.razaoSocial||'':'';
-  document.getElementById('neg-perfil-trib').value=n?n.perfilTributario||'':'';
   document.getElementById('neg-status').value=n?n.status||'Prospecção':'Prospecção';
   document.getElementById('neg-orig').value=n?n.originadorId||currentUser.id:currentUser.id;
-  const portVal=n?n.portafolioId||n.configProdutoId||'':'';
-  document.getElementById('neg-port').value=portVal;
-  if(portVal)selPort.onchange.call(selPort);
-  else{document.getElementById('neg-taxa').value=n?n.taxaRede||'':'';document.getElementById('neg-taxa-base').textContent=n?n.taxaBase||'—':'—';}
-  document.getElementById('neg-segmento').value=n?n.segmento||'':'';
   document.getElementById('neg-notas').value=n?n.notas||'':'';
   document.getElementById('ov-neg').classList.add('open');
 }
 function isSocioUser(u){return u&&(u.perfil==='Sócio'||u.perfil==='Sócio-Fundador');}
 function saveNeg(){
   const titulo=document.getElementById('neg-titulo').value.trim();
-  if(!titulo){alert('Informe o nome do cliente.');return;}
+  if(!titulo){alert('Informe o nome do cliente / empresa.');return;}
+  if(!_negProdSelecionado){alert('Selecione o produto ou serviço.');return;}
+  const isProdOutro=_negProdSelecionado==='outro';
+  const produtoOutro=isProdOutro?document.getElementById('neg-outro-desc').value.trim():'';
+  if(isProdOutro&&!produtoOutro){alert('Descreva o tipo de negócio.');return;}
   const obj={
     titulo,
-    cnpj:document.getElementById('neg-cnpj').value.trim(),
-    razaoSocial:document.getElementById('neg-razao').value.trim(),
-    perfilTributario:document.getElementById('neg-perfil-trib').value,
+    cnpj:'',
+    razaoSocial:'',
+    perfilTributario:'',
     status:document.getElementById('neg-status').value,
     originadorId:parseInt(document.getElementById('neg-orig').value)||currentUser.id,
-    configProdutoId:parseInt(document.getElementById('neg-port').value)||null,
+    configProdutoId:isProdOutro?null:(_negProdSelecionado||null),
+    produtoOutro:isProdOutro?produtoOutro:null,
     taxaRede:parseFloat(document.getElementById('neg-taxa').value)||null,
-    taxaBase:document.getElementById('neg-taxa-base').textContent||null,
-    segmento:document.getElementById('neg-segmento').value.trim(),
+    taxaBase:document.getElementById('neg-taxa-base').innerText||null,
+    segmento:'',
     notas:document.getElementById('neg-notas').value.trim(),
   };
   if(obj.status==='Fechado'&&!(_negEditId&&negocios.find(x=>x.id===_negEditId)?.fechadoEm)){
