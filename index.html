@@ -230,8 +230,10 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 #tab-rede-membros table{font-size:12px;}
 #tab-rede-membros.panel.active{overflow-x:hidden;}
 #tab-rede-membros .table-wrap{overflow-x:hidden;}
-/* Pipeline: não rola verticalmente — kanban preenche o painel */
-#tab-pipeline.panel.active{overflow:hidden;}
+/* Negócios: não rola — sub-painéis gerenciam o próprio scroll */
+#tab-negocios.panel.active{overflow:hidden;display:flex;flex-direction:column;}
+#neg-pnl-negocios{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;}
+#tab-pipeline{flex:1;overflow:hidden;min-height:0;}
 .pip-stab{padding:5px 16px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #e5e7eb;background:#fff;color:#6b7280;transition:all .15s;}
 .pip-stab.active{background:#0a1628;color:#fff;border-color:#0a1628;}
 .port-card{background:#fff;border:1px solid #eee;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:box-shadow .15s;}
@@ -632,7 +634,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
         <div class="section-hdr" style="margin-top:0;border-bottom:none;margin-bottom:0">Dashboard BIdaTX</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn-p" style="background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="showTab('receitas')">💵 Ver Receitas</button>
-          <button class="btn-p" style="background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="showTab('pipeline')">🎯 Ver Pipeline</button>
+          <button class="btn-p" style="background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="showTab('negocios')">🎯 Ver Pipeline</button>
         </div>
       </div>
       <div id="dashboard-moderacao"></div>
@@ -714,18 +716,28 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <div id="cfg-inner"></div>
     </div>
     <!-- PROJETOS -->
-    <div class="panel" id="tab-projetos">
-      <div id="prj-notif-bar" style="display:none"></div>
-      <div class="stats" id="prj-stats"></div>
-      <div class="controls">
-        <input id="prj-q" placeholder="Buscar projeto..." oninput="renderProjetos()">
-        <select id="prj-fs" onchange="renderProjetos()">
-          <option value="">Todos os status</option>
-          <option>Em andamento</option><option>Concluído</option><option>Pausado</option>
-        </select>
-        <button class="btn-p" id="btn-novo-proj" style="display:none" onclick="openAddProj()">+ Novo projeto</button>
+    <!-- NEGÓCIOS (unifica Pipeline + Projetos) -->
+    <div class="panel" id="tab-negocios">
+      <div style="display:flex;gap:8px;padding:12px 16px 8px;border-bottom:1px solid #f0ede8;flex-shrink:0">
+        <button id="neg-sub-negocios" class="pip-stab active" onclick="switchNegSub('negocios')">Negócios</button>
+        <button id="neg-sub-projetos" class="pip-stab" onclick="switchNegSub('projetos')">Projetos para investidores</button>
       </div>
-      <div id="prj-list"></div>
+      <div id="neg-pnl-negocios">
+        <div id="tab-pipeline"></div>
+      </div>
+      <div id="neg-pnl-projetos" style="display:none;flex:1;overflow-y:auto;padding:16px;min-height:0">
+        <div id="prj-notif-bar" style="display:none"></div>
+        <div class="stats" id="prj-stats"></div>
+        <div class="controls">
+          <input id="prj-q" placeholder="Buscar projeto..." oninput="renderProjetos()">
+          <select id="prj-fs" onchange="renderProjetos()">
+            <option value="">Todos os status</option>
+            <option>Em andamento</option><option>Concluído</option><option>Pausado</option>
+          </select>
+          <button class="btn-p" id="btn-novo-proj" style="display:none" onclick="openAddProj()">+ Novo projeto</button>
+        </div>
+        <div id="prj-list"></div>
+      </div>
     </div>
     <!-- CONEXÕES -->
     <div class="panel" id="tab-conexoes">
@@ -733,8 +745,6 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     </div>
     <!-- SINERGIAS -->
     <div class="panel" id="tab-sinergias"></div>
-    <!-- PIPELINE -->
-    <div class="panel" id="tab-pipeline"></div>
     <!-- MEUS RENDIMENTOS -->
     <div class="panel" id="tab-meus-rendimentos"></div>
     <!-- RELATÓRIO DA REDE -->
@@ -1893,8 +1903,7 @@ function buildTabs(){
   const tabDefs=[
     {id:'rede',label:'Dashboard',icon:'📊',socio:true},
     {id:'receitas',label:'Receitas',icon:'💵',socio:true},
-    {id:'pipeline',label:'Pipeline',icon:'🎯',socio:true},
-    {id:'projetos',label:'Novos Negócios',icon:'🤝',socio:true},
+    {id:'negocios',label:'Negócios',icon:'🎯',socio:true},
     {id:'vitrine',label:'Projetos',icon:'📁',all:true},
     {id:'rede-membros',label:'Conexões',icon:'🔗',all:true},
     {id:'financeiro',label:'Financeiro',icon:'💰',socio:true},
@@ -1938,8 +1947,7 @@ function showTab(name){
   if(name==='receitas')renderReceitas();
   if(name==='rede-membros'){renderSocios();renderParceiros();renderRedeMembros();}
   if(name==='financeiro')renderFinanceiro();
-  if(name==='projetos')renderProjetos();
-  if(name==='pipeline')renderPipeline();
+  if(name==='negocios')renderNegocios();
   if(name==='vitrine')renderVitrine();
   if(name==='config')renderConfig();
   setTimeout(sizeActivePanel,0);
@@ -3667,8 +3675,29 @@ let _negEditId=null;
 let _negPartTemp=[];
 let _negProdSelecionado=null;
 let _negTipo='proprio';
+let _negSubtab='negocios';
 let _pipSubtab='portfolio';
 let _pipFilter='all';
+
+function switchNegSub(sub){
+  _negSubtab=sub;
+  document.getElementById('neg-sub-negocios').classList.toggle('active',sub==='negocios');
+  document.getElementById('neg-sub-projetos').classList.toggle('active',sub==='projetos');
+  const pnlN=document.getElementById('neg-pnl-negocios');
+  const pnlP=document.getElementById('neg-pnl-projetos');
+  pnlN.style.display=sub==='negocios'?'flex':'none';
+  pnlP.style.display=sub==='projetos'?'block':'none';
+  if(sub==='negocios')renderPipeline();
+  else renderProjetos();
+}
+function renderNegocios(){
+  if(!isSocio()){
+    const el=document.getElementById('tab-pipeline');
+    if(el)el.innerHTML='<div class="blocked"><h2>Acesso restrito</h2></div>';
+    return;
+  }
+  switchNegSub(_negSubtab||'negocios');
+}
 let _portEditId=null;
 
 function negDragStart(e,id){_negDragId=id;e.dataTransfer.effectAllowed='move';e.currentTarget.style.opacity='.45';}
