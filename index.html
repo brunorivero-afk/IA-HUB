@@ -2394,7 +2394,7 @@ function openAddUsr(){
   updateSpecFields();
   document.getElementById('u-perfil').value='Parceiro';
   document.getElementById('u-tipo').value='PJ';
-  document.getElementById('u-status').value='Em prospecção';
+  document.getElementById('u-status').value='Ativo';
   fillVinculoSelect(null);
   const showAccess=isSocio();
   ['u-sec-acesso','u-perfil-wrap','u-vinculo-wrap'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=showAccess?'':'none';});
@@ -4225,7 +4225,7 @@ function renderSocios(){
 
 function renderParceiros(){
   const el=document.getElementById('con-parceiros');if(!el)return;
-  const parceiros=users.filter(u=>u.perfil==='Parceiro'&&u.status==='Ativo');
+  const parceiros=users.filter(u=>u.perfil==='Parceiro');
   if(!parceiros.length){el.innerHTML=`<div style="color:#aaa;font-size:13px">Nenhum parceiro ativo ainda.</div>`;return;}
   const socios=users.filter(u=>u.perfil==='Sócio');
   el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">${parceiros.map(u=>{
@@ -4357,11 +4357,8 @@ function converterParaMembro(id){
 
 function renderRedeMembros(){
   const el=document.getElementById('con-inner-mbr');if(!el)return;
-  const rede=users.filter(u=>u.perfil==='Rede'&&u.status==='Ativo');
-  const header=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-    <div style="font-size:13px;color:#888">${rede.length} membro${rede.length!==1?'s':''} na rede</div>
-    <button class="btn-p btn-sm" onclick="openAddCon()">+ Novo membro</button>
-  </div>`;
+  const rede=users.filter(u=>u.perfil==='Rede');
+  const header=`<div style="font-size:13px;color:#888;margin-bottom:12px">${rede.length} membro${rede.length!==1?'s':''} na rede</div>`;
   if(!rede.length){el.innerHTML=header+`<div class="empty-msg">Nenhum membro de rede ainda.</div>`;return;}
   const cards=rede.map(u=>{
     const chain=_buildOrigemChain(u.id);
