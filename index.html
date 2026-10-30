@@ -799,7 +799,9 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <div class="full"><label>Descrição das atividades</label><textarea id="u-ativ" placeholder="Serviços, público-alvo, proposta de valor..."></textarea></div>
       <div class="fg-sec" id="u-sec-acesso">Perfil e acesso</div>
       <div id="u-perfil-wrap"><label>Perfil</label>
-        <select id="u-perfil"><option>Sócio</option><option selected>Associado</option><option>Parceiro</option></select></div>
+        <select id="u-perfil" onchange="onUsrPerfilChange()"><option>Sócio</option><option selected>Associado</option><option>Parceiro</option><option>Rede</option><option>Contato</option></select>
+        <div id="u-perfil-hint" style="display:none;font-size:11px;color:#d97706;margin-top:4px;padding:4px 8px;background:#fef3c7;border-radius:6px">Ao salvar, este membro será movido para a aba Contatos.</div>
+      </div>
       <div><label>Status do membro</label>
         <select id="u-status">
           <option value="Ativo">Ativo</option>
@@ -815,20 +817,6 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
           <option value="">— Nenhum —</option>
         </select>
         <div style="font-size:11px;color:#aaa;margin-top:3px" id="u-vinculo-hint">Define quem comissiona e acompanha este membro</div>
-      </div>
-      <div id="u-comissao-sec" class="full" style="display:none">
-        <div class="fg-sec">Comissionamento (só sócios)</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div><label>% Comissão padrão</label><input id="u-comissao" type="number" min="0" max="100" placeholder="Ex: 20" style="padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;width:100%"></div>
-          <div><label>Modelo de comissão</label>
-            <select id="u-comissao-modelo" style="padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;width:100%">
-              <option value="por_projeto">Por projeto</option>
-              <option value="recorrente">Recorrente mensal</option>
-              <option value="hibrido">Híbrido</option>
-            </select></div>
-        </div>
-        <div style="margin-top:8px"><label>Observação sobre comissão</label>
-          <input id="u-comissao-obs" placeholder="Ex: 20% sobre projetos trazidos por ele..." style="padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;width:100%;margin-top:4px"></div>
       </div>
       <div class="full"><label>Observações internas</label><textarea id="u-obs" placeholder="Visível apenas para sócios..."></textarea></div>
     </div>
@@ -2424,7 +2412,7 @@ function renderMembros(){
     }
     const editBtn=`<div style="display:flex;gap:3px;justify-content:center">${socio?`<button class="btn-s btn-sm" onclick="openEditUsr(${u.id})" title="Editar" style="padding:3px 7px">✏</button><button class="btn-d btn-sm" onclick="removeUsr(${u.id})" title="Remover" style="padding:3px 7px">✕</button>`:''}</div>`;
     const vinculoNome=u.vinculoId?(users.find(x=>x.id===u.vinculoId)||{}).nome||'—':'—';
-    const comissaoTxt=u.comissao?`${u.comissao}% (${(u.comissaoModelo||'').replace('por_projeto','por projeto')||'—'})`:'—';
+    const comissaoTxt=u.comissao?`${u.comissao}%`:'—';
     const ts=(() => { try { return calcTrustScore(u.id); } catch(e){ return {score:0,detalhes:[]}; } })();
     const tl=trustLabel(ts.score);
     const TAG_ICONS={investidor:'💰',inv_potencial:'🌱',superconector:'🌐',autoridade:'🏆',decisor:'🎯',influenciador:'📣',indicador:'🤝',serial:'🏗',nacional:'🌍',mentor:'🤲',captador:'💼'};
@@ -2492,17 +2480,15 @@ function updateSpecFields(){
 function openAddUsr(){
   editUsrId=null;
   document.getElementById('usr-modal-ttl').textContent='Novo membro';
-  ['u-nome','u-emp','u-email','u-tel','u-seg','u-ativ','u-obs','u-comissao','u-comissao-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['u-nome','u-emp','u-email','u-tel','u-seg','u-ativ','u-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
   ['u-spec-medico-val','u-spec-adv-val','u-spec-cont-val','u-spec-eng-val','u-spec-corr-val','u-spec-consul-val','u-spec-dent-val','u-spec-psico-val'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   updateSpecFields();
   document.getElementById('u-perfil').value='Associado';
   document.getElementById('u-tipo').value='PJ';
   document.getElementById('u-status').value='Em prospecção';
-  if(document.getElementById('u-comissao-modelo'))document.getElementById('u-comissao-modelo').value='por_projeto';
   fillVinculoSelect(null);
   const showAccess=isSocio();
   ['u-sec-acesso','u-perfil-wrap','u-vinculo-wrap'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=showAccess?'':'none';});
-  if(document.getElementById('u-comissao-sec'))document.getElementById('u-comissao-sec').style.display=showAccess?'block':'none';
   document.getElementById('ov-usr').classList.add('open');
 }
 function openEditUsr(id){
@@ -2518,13 +2504,9 @@ function openEditUsr(id){
   document.getElementById('u-tipo').value=u.tipo||'PJ';
   document.getElementById('u-status').value=u.status||'Ativo';
   document.getElementById('u-obs').value=u.obs||'';
-  if(document.getElementById('u-comissao'))document.getElementById('u-comissao').value=u.comissao||'';
-  if(document.getElementById('u-comissao-modelo'))document.getElementById('u-comissao-modelo').value=u.comissaoModelo||'por_projeto';
-  if(document.getElementById('u-comissao-obs'))document.getElementById('u-comissao-obs').value=u.comissaoObs||'';
   fillVinculoSelect(u.vinculoId||null);
   const showAccess=isSocio();
   ['u-sec-acesso','u-perfil-wrap','u-vinculo-wrap'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=showAccess?'':'none';});
-  if(document.getElementById('u-comissao-sec'))document.getElementById('u-comissao-sec').style.display=showAccess?'block':'none';
   const sm=document.getElementById('u-spec-medico-val');if(sm)sm.value=u.especMedico||'';
   const sa=document.getElementById('u-spec-adv-val');if(sa)sa.value=u.especAdv||'';
   const sc2=document.getElementById('u-spec-cont-val');if(sc2)sc2.value=u.especCont||'';
@@ -2533,12 +2515,40 @@ function openEditUsr(id){
   updateSpecFields();
   document.getElementById('ov-usr').classList.add('open');
 }
+function onUsrPerfilChange(){
+  // Se Contato selecionado: avisa que ao salvar irá para contatos[]
+  const p=document.getElementById('u-perfil').value;
+  const hint=document.getElementById('u-perfil-hint');
+  if(hint)hint.style.display=p==='Contato'?'block':'none';
+}
 function saveUsr(){
   const nome=document.getElementById('u-nome').value.trim();
-  const email=document.getElementById('u-email').value.trim();
-  if(!nome||!email){alert('Nome e email são obrigatórios.');return;}
+  if(!nome){alert('Informe o nome.');return;}
   const today=new Date().toLocaleDateString('pt-BR');
   const perfil=isSocio()?document.getElementById('u-perfil').value:(editUsrId?users.find(x=>x.id===editUsrId).perfil:'Associado');
+  // Se Contato → salva em contatos[] e vai para sub-aba Contatos
+  if(perfil==='Contato'){
+    const ct={
+      id:editUsrId||Date.now(),
+      nome,
+      empresa:document.getElementById('u-emp').value.trim(),
+      segmento:document.getElementById('u-seg').value.trim(),
+      telefone:document.getElementById('u-tel').value.trim(),
+      email:document.getElementById('u-email').value.trim(),
+      obs:document.getElementById('u-obs').value.trim(),
+      criado:today,
+    };
+    if(editUsrId){
+      // era um membro — migra para contatos[]
+      users=users.filter(u=>u.id!==editUsrId);
+      contatos=contatos.filter(c=>c.id!==editUsrId);
+    }
+    contatos.push(ct);
+    closeOv('ov-usr');saveData();showToast('✅ Movido para Contatos!');
+    showTab('rede-membros');setTimeout(()=>switchConSub('contatos'),150);
+    return;
+  }
+  const email=document.getElementById('u-email').value.trim();
   const vinculoSel=document.getElementById('u-vinculo');
   const vinculoId=vinculoSel?parseInt(vinculoSel.value)||null:null;
   const vinculoNome=vinculoId?(users.find(u=>u.id===vinculoId)||{}).nome||'':'';
@@ -2555,9 +2565,6 @@ function saveUsr(){
     ativ:document.getElementById('u-ativ').value.trim(),
     obs:document.getElementById('u-obs').value.trim(),
     vinculoId, vinculoNome,
-    comissao:isSocio()?parseFloat(document.getElementById('u-comissao').value)||0:undefined,
-    comissaoModelo:isSocio()?document.getElementById('u-comissao-modelo').value:'',
-    comissaoObs:isSocio()?document.getElementById('u-comissao-obs').value.trim():'',
     especMedico:(document.getElementById('u-spec-medico-val')||{value:''}).value.trim()||undefined,
     especAdv:(document.getElementById('u-spec-adv-val')||{value:''}).value.trim()||undefined,
     especCont:(document.getElementById('u-spec-cont-val')||{value:''}).value.trim()||undefined,
@@ -4259,7 +4266,7 @@ function openMeuPerfil(){
   document.getElementById('usr-modal-ttl').textContent='Meu perfil';
   // Non-socio: hide sensitive fields, allow editing own info
   if(!isSocio()){
-    ['u-sec-acesso','u-perfil-wrap','u-senha-wrap','u-vinculo-wrap','u-comissao-sec'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+    ['u-sec-acesso','u-perfil-wrap','u-vinculo-wrap'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
   }
 }
 
