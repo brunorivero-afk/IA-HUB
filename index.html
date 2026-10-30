@@ -583,7 +583,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <label>Descrição das suas atividades *</label>
       <textarea id="cad-ativ" placeholder="Descreva seus serviços, público-alvo e como pode gerar valor para outros membros do HUB..."></textarea>
       <label>Perfil desejado</label>
-      <select id="cad-perfil"><option>Associado</option><option>Parceiro</option></select>
+      <select id="cad-perfil"><option>Parceiro</option><option>Rede</option></select>
       <button class="btn-auth" onclick="doPublicCad()">Enviar solicitação</button>
       <div class="auth-err" id="cad-err"></div>
       <span class="auth-link" onclick="showScreen('login')">← Voltar ao login</span>
@@ -691,10 +691,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <div id="con-pnl-rede">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
           <div style="font-size:13px;color:#888">Sócios, parceiros e rede BIdaTX</div>
-          <div style="display:flex;gap:8px">
-            <button class="btn-p" style="background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="abrirNovaConexao()">🔗 Nova Conexão</button>
-            <button class="btn-p" id="btn-novo-membro" onclick="openAddUsr()" style="display:none">+ Membro</button>
-          </div>
+          <button class="btn-p" id="btn-novo-membro" onclick="openAddUsr()">+ Adicionar</button>
         </div>
         <div class="section-hdr" style="margin-top:0">Sócios</div>
         <div id="con-socios" style="margin-bottom:20px"></div>
@@ -799,7 +796,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <div class="full"><label>Descrição das atividades</label><textarea id="u-ativ" placeholder="Serviços, público-alvo, proposta de valor..."></textarea></div>
       <div class="fg-sec" id="u-sec-acesso">Perfil e acesso</div>
       <div id="u-perfil-wrap"><label>Perfil</label>
-        <select id="u-perfil" onchange="onUsrPerfilChange()"><option>Sócio</option><option selected>Associado</option><option>Parceiro</option><option>Rede</option><option>Contato</option></select>
+        <select id="u-perfil" onchange="onUsrPerfilChange()"><option>Sócio</option><option selected>Parceiro</option><option>Rede</option><option>Contato</option></select>
         <div id="u-perfil-hint" style="display:none;font-size:11px;color:#d97706;margin-top:4px;padding:4px 8px;background:#fef3c7;border-radius:6px">Ao salvar, este membro será movido para a aba Contatos.</div>
       </div>
       <div><label>Status do membro</label>
@@ -1651,30 +1648,30 @@ const SEG_C={
   'Pessoa Física':{bg:'#fef3c7',tx:'#92400e',dot:'#d97706'},
 };
 function sc(s){return SEG_C[s]||{bg:'#F1EFE8',tx:'#444441',dot:'#888780'};}
-const PS={Sócio:{bg:'#FAEEDA',tx:'#633806'},Associado:{bg:'#E1F5EE',tx:'#085041'},Parceiro:{bg:'#f0ede8',tx:'#5a4a3a'},Operador:{bg:'#1e3a5f',tx:'#fff'}};
+const PS={Sócio:{bg:'#FAEEDA',tx:'#633806'},Parceiro:{bg:'#f0ede8',tx:'#5a4a3a'},Rede:{bg:'#E1F5EE',tx:'#085041'},Contato:{bg:'#f5f5f5',tx:'#888'},Operador:{bg:'#1e3a5f',tx:'#fff'}};
 const FUNIL_CLS={Prospect:'f-prospect','Contato feito':'f-contato','Proposta enviada':'f-proposta',Fechado:'f-fechado'};
 const PROJ_CLS={'Em andamento':'proj-and',Concluído:'proj-conc',Pausado:'proj-paus'};
 
 let users=[
   {id:1,nome:'Sócio Demo',emp:'IA Hub',email:'socio@hub.com',senha:'1234',tel:'',perfil:'Sócio',status:'Ativo',funil:'Fechado',seg:'Gestão',ativ:'Gestão geral do IA Hub.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
-  {id:2,nome:'Eduardo Santos',emp:'Plan Contabilidade',email:'assoc@hub.com',senha:'1234',tel:'(21) 99000-0001',perfil:'Associado',status:'Ativo',funil:'Contato feito',seg:'Contabilidade',ativ:'BPO financeiro, abertura de empresas, planejamento tributário e compliance fiscal para PMEs.',obs:'',desde:'15/03/2025',dataEntrada:'2025-03-15T00:00:00.000Z',aprovadoPor:1},
+  {id:2,nome:'Eduardo Santos',emp:'Plan Contabilidade',email:'assoc@hub.com',senha:'1234',tel:'(21) 99000-0001',perfil:'Parceiro',status:'Ativo',funil:'Contato feito',seg:'Contabilidade',ativ:'BPO financeiro, abertura de empresas, planejamento tributário e compliance fiscal para PMEs.',obs:'',desde:'15/03/2025',dataEntrada:'2025-03-15T00:00:00.000Z',aprovadoPor:1},
   {id:3,nome:'Diego Braga',emp:'Aliança',email:'parceiro@hub.com',senha:'1234',tel:'(21) 99000-0002',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Produtos de Limpeza,Lar de Idosos,Home Care',ativ:'Distribuidora de produtos de limpeza e higiene para empresas, hospitais e restaurantes.',obs:'',desde:'20/05/2025',dataEntrada:'2025-05-20T00:00:00.000Z',aprovadoPor:1},
-  {id:4,nome:'Alex Salles',emp:'Alex Salles Adv.',email:'alex@hub.com',senha:'1234',tel:'',perfil:'Associado',status:'Ativo',funil:'Prospect',seg:'Advocacia',ativ:'Escritório de advocacia empresarial.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
-  {id:5,nome:'Lipe de Biase',emp:'Taurus Investimento',email:'lipe@hub.com',senha:'1234',tel:'',perfil:'Associado',status:'Ativo',funil:'Prospect',seg:'Mercado Financeiro',ativ:'Gestão de investimentos e consultoria financeira para empresas e pessoas físicas.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:4,nome:'Alex Salles',emp:'Alex Salles Adv.',email:'alex@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Advocacia',ativ:'Escritório de advocacia empresarial.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:5,nome:'Lipe de Biase',emp:'Taurus Investimento',email:'lipe@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Mercado Financeiro',ativ:'Gestão de investimentos e consultoria financeira para empresas e pessoas físicas.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
   {id:6,nome:'Ricardo Savino',emp:'?',email:'rsavino@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Blindagem de Veículos,Restaurante',ativ:'Blindagem de veículos e restaurante.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
-  {id:7,nome:'Marcus Soares',emp:'Marcus Soares Adv',email:'marcus@hub.com',senha:'1234',tel:'',perfil:'Associado',status:'Ativo',funil:'Prospect',seg:'Advocacia',ativ:'Advocacia cível e empresarial.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
-  {id:8,nome:'André Reis',emp:'Mastermax',email:'andre.reis@hub.com',senha:'1234',tel:'',perfil:'Associado',status:'Ativo',funil:'Prospect',seg:'Contabilidade',ativ:'Contabilidade empresarial e fiscal.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:7,nome:'Marcus Soares',emp:'Marcus Soares Adv',email:'marcus@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Advocacia',ativ:'Advocacia cível e empresarial.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:8,nome:'André Reis',emp:'Mastermax',email:'andre.reis@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Contabilidade',ativ:'Contabilidade empresarial e fiscal.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
   {id:9,nome:'Fabio Sampaio',emp:'Mundo das Cores',email:'fabio@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Loja de Tintas,Consultoria Financeira',ativ:'Loja de tintas e consultoria financeira.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
   {id:10,nome:'Anselmo',emp:'Lasant',email:'anselmo@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Construção,Loja de Tintas',ativ:'Construção civil e fornecimento de tintas.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
   {id:11,nome:'Edgard Romero',emp:'?',email:'edgard@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Locação de Veículos',ativ:'Locação de veículos para empresas.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
   {id:12,nome:'Rafael Matias',emp:'?',email:'rafael@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Corretagem de Imóveis',ativ:'Corretagem e intermediação imobiliária.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
   {id:13,nome:'Juninho',emp:'LM Veículos',email:'juninho@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Venda de Veículos',ativ:'Compra e venda de veículos novos e seminovos.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
-  {id:14,nome:'Marcelo Montenegro',emp:'213 Sports',email:'marcelo.m@hub.com',senha:'1234',tel:'',perfil:'Associado',status:'Ativo',funil:'Prospect',seg:'Mercado Esportivo,Eventos Corporativos',ativ:'Eventos esportivos corporativos e patrocínios.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
-  {id:15,nome:'Pedro Dau',emp:'V3A',email:'pedro.dau@hub.com',senha:'1234',tel:'',perfil:'Associado',status:'Ativo',funil:'Prospect',seg:'Eventos Corporativos',ativ:'Produção de eventos corporativos.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:14,nome:'Marcelo Montenegro',emp:'213 Sports',email:'marcelo.m@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Mercado Esportivo,Eventos Corporativos',ativ:'Eventos esportivos corporativos e patrocínios.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:15,nome:'Pedro Dau',emp:'V3A',email:'pedro.dau@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Eventos Corporativos',ativ:'Produção de eventos corporativos.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
   {id:16,nome:'André Barbosa',emp:'?',email:'andre.b@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Lobista',ativ:'Atuação política e lobby legislativo.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
   {id:17,nome:'Alexandre Almeida',emp:'?',email:'alexandre@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Corretora de Seguros',ativ:'Corretagem de seguros pessoais e empresariais.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
   {id:18,nome:'Paulo BH',emp:'?',email:'paulo@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Imobiliária',ativ:'Incorporação e venda imobiliária.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
-  {id:19,nome:'Gustavo Kalife',emp:'?',email:'gustavo@hub.com',senha:'1234',tel:'',perfil:'Associado',status:'Ativo',funil:'Prospect',seg:'Advocacia,Contabilidade',ativ:'Advocacia e consultoria contábil.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
+  {id:19,nome:'Gustavo Kalife',emp:'?',email:'gustavo@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Advocacia,Contabilidade',ativ:'Advocacia e consultoria contábil.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
   {id:20,nome:'Nonato',emp:'?',email:'nonato@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Tributarista,Lobista',ativ:'Tributarista e lobista.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
   {id:21,nome:'Daniel Sá',emp:'?',tipo:'PF',email:'daniel@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Agro',ativ:'Agronegócio e sustentabilidade.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
   {id:22,nome:'Pedro de Biase',emp:'?',email:'pedro.b@hub.com',senha:'1234',tel:'',perfil:'Parceiro',status:'Ativo',funil:'Prospect',seg:'Mercado Financeiro',ativ:'Mercado financeiro e investimentos.',obs:'',desde:'01/01/2025',dataEntrada:'2025-01-15T00:00:00.000Z',aprovadoPor:1},
@@ -1827,7 +1824,7 @@ function toggleDarkMode(){
 function isSocio(){return currentUser&&currentUser.perfil==='Sócio';}
 function sanitizeForParceiro(txt){
   const p=currentUser?.perfil;
-  if(!txt||!(p==='Parceiro'||p==='Associado'))return txt;
+  if(!txt||!(p==='Parceiro'||p==='Rede'))return txt;
   let r=txt;
   const tokens=users.flatMap(u=>{
     const t=[];
@@ -2228,21 +2225,21 @@ function renderCharts(){
 function fillVinculoSelect(selectedId){
   const sel=document.getElementById('u-vinculo');if(!sel)return;
   const perfilSel=document.getElementById('u-perfil');
-  const perfil=perfilSel?perfilSel.value:'Associado';
+  const perfil=perfilSel?perfilSel.value:'Parceiro';
   sel.innerHTML='';
   let allowed=[];
   let label='';
-  if(perfil==='Associado'){
+  if(perfil==='Parceiro'){
     allowed=users.filter(u=>u.perfil==='Sócio');
-    label='Associados devem estar vinculados a um sócio.';
+    label='Parceiros devem estar vinculados a um sócio.';
     sel.innerHTML='<option value="">— Selecione um sócio —</option>';
-  } else if(perfil==='Parceiro'){
-    allowed=users.filter(u=>u.perfil==='Sócio'||u.perfil==='Associado');
-    label='Parceiros devem estar vinculados a um associado ou sócio.';
-    sel.innerHTML='<option value="">— Selecione um associado ou sócio —</option>';
+  } else if(perfil==='Rede'){
+    allowed=users.filter(u=>u.perfil==='Sócio'||u.perfil==='Parceiro');
+    label='Rede deve estar vinculada a um sócio ou parceiro.';
+    sel.innerHTML='<option value="">— Selecione quem trouxe —</option>';
   } else {
     allowed=[];
-    label='Sócios não precisam de vínculo.';
+    label=perfil==='Sócio'?'Sócios não precisam de vínculo.':'Contatos não precisam de vínculo.';
     sel.innerHTML='<option value="">— Nenhum —</option>';
   }
   // Coloca o usuário logado primeiro
@@ -2262,7 +2259,7 @@ function fillVinculoSelect(selectedId){
   const hint=document.getElementById('u-vinculo-hint');
   if(hint)hint.textContent=label;
   const wrap=document.getElementById('u-vinculo-wrap');
-  if(wrap)wrap.style.display=(perfil==='Sócio')?'none':'';
+  if(wrap)wrap.style.display=(perfil==='Sócio'||perfil==='Contato')?'none':'';
 }
 document.addEventListener('change',e=>{if(e.target.id==='u-perfil')fillVinculoSelect(null);});
 
@@ -2357,130 +2354,11 @@ function fillLcPart(){
 
 // ===================== MEMBROS (unificado) =====================
 function renderMembros(){
-  const socio=isSocio();
-  const bNM=document.getElementById('btn-novo-membro');if(bNM)bNM.style.display=isSocio()?'inline-block':'none';
-
-  // Parceiro / Associado: tabela limitada (sem nome, sem empresa)
-  if(currentUser&&(currentUser.perfil==='Parceiro'||currentUser.perfil==='Associado')){
-    const pcEl=document.getElementById('mbr-perfil-cards');if(pcEl)pcEl.style.display='none';
-    document.getElementById('stats-mbr').innerHTML='';
-    const bNM=document.getElementById('btn-novo-membro');if(bNM)bNM.style.display='none';
-    const oldGrid=document.getElementById('parceiro-seg-grid');if(oldGrid)oldGrid.remove();
-    const tableWrap2=document.getElementById('mbr-tbody')?.closest('.table-wrap');if(tableWrap2)tableWrap2.style.display='';
-    const controlsEl2=document.querySelector('#sub-tab-membros .controls');if(controlsEl2)controlsEl2.style.display='';
-    const theadTr=document.querySelector('#tab-rede-membros thead tr');
-    if(theadTr)theadTr.innerHTML=`<th style="width:8%">Tipo</th><th style="width:12%">Perfil</th><th style="width:28%">Segmento(s)</th><th style="width:37%">Qualificações</th><th style="width:15%">Vinculado a</th>`;
-    const q2=(document.getElementById('mbr-q').value||'').toLowerCase();
-    const ativos=users.filter(u=>u.status==='Ativo'&&(!q2||((u.seg||'').toLowerCase().includes(q2)||(u.perfil||'').toLowerCase().includes(q2)||(u.tagsRede||[]).join(' ').toLowerCase().includes(q2))));
-    const TI={investidor:'💰',inv_potencial:'🌱',superconector:'🌐',autoridade:'🏆',decisor:'🎯',influenciador:'📣',indicador:'🤝',serial:'🏗',nacional:'🌍',mentor:'🤲',captador:'💼'};
-    const TL={investidor:'Investidor ativo',inv_potencial:'Investidor potencial',superconector:'Superconector',autoridade:'Autoridade',decisor:'Decisor',influenciador:'Influenciador',indicador:'Indicador ativo',serial:'Empreendedor serial',nacional:'Alcance nacional',mentor:'Mentor',captador:'Captador'};
-    const tb=document.getElementById('mbr-tbody');
-    tb.innerHTML=ativos.length?ativos.map(u=>{
-      const ps=PS[u.perfil||'Parceiro']||{bg:'#eee',tx:'#555'};
-      const segs=(u.seg||'').split(',').map(s=>s.trim()).filter(Boolean);
-      const tipoTag=u.tipo==='PF'?`<span class="badge" style="background:#fef3c7;color:#92400e">PF</span>`:`<span class="badge" style="background:#f0f0ee;color:#666">PJ</span>`;
-      const tagsHtml=u.tagsRede&&u.tagsRede.length?u.tagsRede.map(t=>`<span style="background:#ede9fe;color:#5b21b6;border-radius:20px;font-size:10px;padding:2px 7px;font-weight:600;display:inline-block;margin:1px">${TI[t]||'•'} ${TL[t]||t}</span>`).join(''):'—';
-      const vinculoNome=u.vinculoId?(users.find(x=>x.id===u.vinculoId)||{}).nome||'—':'—';
-      return`<tr><td>${tipoTag}</td><td><span class="badge" style="background:${ps.bg};color:${ps.tx}">${u.perfil}</span></td><td>${segs.map(s=>`<span class="badge" style="background:${sc(s).bg};color:${sc(s).tx}">${s}</span>`).join('')||'—'}</td><td>${tagsHtml}</td><td style="font-size:12px;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(vinculoNome)}</td></tr>`;
-    }).join(''):`<tr><td colspan="5" class="empty-msg">Nenhum membro ativo encontrado.</td></tr>`;
-    return;
-  }
-
-  // Restaura tabela completa para sócios
-  const tableWrap=document.getElementById('mbr-tbody')?.closest('.table-wrap');if(tableWrap)tableWrap.style.display='';
-  const controlsEl=document.querySelector('#sub-tab-membros .controls');if(controlsEl)controlsEl.style.display='';
-  const segGrid=document.getElementById('parceiro-seg-grid');if(segGrid)segGrid.remove();
-  const theadTrFull=document.querySelector('#tab-rede-membros thead tr');
-  if(theadTrFull&&!theadTrFull.querySelector('th[style*="24%"]'))theadTrFull.innerHTML=`<th style="width:24%">Nome</th><th style="width:7%">Tipo</th><th style="width:20%">Empresa</th><th style="width:21%">Segmento(s)</th><th style="width:13%">Perfil</th><th id="th-vinculo-col" style="width:8%">Vinculado a</th><th style="width:7%"></th>`;
-  // Perfil cards (só sócios)
-  const pcEl=document.getElementById('mbr-perfil-cards');
-  if(pcEl)pcEl.style.display=socio?'block':'none';
-  const statsMbrEl=document.getElementById('stats-mbr');
-  if(statsMbrEl)statsMbrEl.style.display=socio?'none':'';
-  if(socio){
-    document.getElementById('cnt-socio').textContent=users.filter(u=>u.perfil==='Sócio').length;
-    document.getElementById('cnt-assoc').textContent=users.filter(u=>u.perfil==='Associado').length;
-    document.getElementById('cnt-parc').textContent=users.filter(u=>u.perfil==='Parceiro').length;
-    document.getElementById('cnt-pend').textContent=users.filter(u=>u.status==='Pendente').length;
-  }
-  const thVinculo=document.getElementById('th-vinculo-col');if(thVinculo)thVinculo.style.display=socio?'':'none';
-
-  const q=(document.getElementById('mbr-q').value||'').toLowerCase();
-  const fseg=document.getElementById('mbr-fseg').value;
-  const fperf=document.getElementById('mbr-fperfil').value;
-  const fstat=document.getElementById('mbr-fstatus').value;
-  const ftipo=document.getElementById('mbr-ftipo').value;
-  const data=users.filter(u=>{
-    const segs=(u.seg||'').split(',').map(s=>s.trim());
-    const m=!q||(u.nome.toLowerCase().includes(q)||(u.emp||'').toLowerCase().includes(q)||segs.join(' ').toLowerCase().includes(q)||(u.email||'').toLowerCase().includes(q));
-    return m&&(!fseg||segs.includes(fseg))&&(!fperf||u.perfil===fperf)&&(!fstat||u.status===fstat)&&(!ftipo||(u.tipo||'PJ')===ftipo);
-  });
-  document.getElementById('stats-mbr').innerHTML=`
-    <div class="stat"><div class="stat-label">Total membros</div><div class="stat-value">${users.length}</div></div>
-    <div class="stat"><div class="stat-label">Ativos</div><div class="stat-value">${users.filter(u=>u.status==='Ativo').length}</div></div>
-    <div class="stat"><div class="stat-label">Pendentes</div><div class="stat-value">${users.filter(u=>u.status==='Pendente').length}</div></div>
-    <div class="stat"><div class="stat-label">Pessoa Física</div><div class="stat-value">${users.filter(u=>u.tipo==='PF').length}</div></div>`;
-  const SS={Ativo:{bg:'#E1F5EE',tx:'#085041'},Pendente:{bg:'#FAEEDA',tx:'#633806'},Inativo:{bg:'#F1EFE8',tx:'#888'}};
-  const fsecao=document.getElementById('mbr-fsecao').value;
-  const tb=document.getElementById('mbr-tbody');
-  const buildRow=(u,isExterno)=>{
-    const ps=PS[u.perfil||'Parceiro']||{bg:'#eee',tx:'#555'};
-    const ss=SS[u.status]||{bg:'#f0f0ee',tx:'#888'};
-    const segs=(u.seg||'').split(',').map(s=>s.trim()).filter(Boolean);
-    const tipoTag=u.tipo==='PF'?'<span class="badge" style="background:#fef3c7;color:#92400e">PF</span>':'<span class="badge" style="background:#f0f0ee;color:#666">PJ</span>';
-    if(isExterno){
-      return`<tr style="background:#fffbf0">
-        <td><span class="avatar" style="background:#fef3c7;color:#92400e">${initials(u.nome)}</span><strong>${u.nome}</strong></td>
-        <td><span class="badge" style="background:#fef3c7;color:#92400e">Externo</span></td>
-        <td style="color:#666">${u.emp||'—'}</td>
-        <td style="color:#666;font-size:12px">—</td>
-        <td>${segs.map(s=>`<span class="badge" style="background:${sc(s).bg};color:${sc(s).tx}">${s}</span>`).join('')||'—'}</td>
-        <td><span class="badge" style="background:#fef3c7;color:#92400e">Convidado</span></td>
-        <td style="font-size:12px;color:#555">${u.interesse||'—'}</td>
-        <td style="color:#aaa;font-size:12px">${u.desde||'—'}</td>
-        <td>${socio?`<button class="btn-d btn-sm" onclick="removeExterno(${u.id})">✕</button>`:''}</td>
-      </tr>`;
-    }
-    const editBtn=`<div style="display:flex;gap:3px;justify-content:center">${socio?`<button class="btn-s btn-sm" onclick="openEditUsr(${u.id})" title="Editar" style="padding:3px 7px">✏</button><button class="btn-d btn-sm" onclick="removeUsr(${u.id})" title="Remover" style="padding:3px 7px">✕</button>`:''}</div>`;
-    const vinculoNome=u.vinculoId?(users.find(x=>x.id===u.vinculoId)||{}).nome||'—':'—';
-    const comissaoTxt=u.comissao?`${u.comissao}%`:'—';
-    const ts=(() => { try { return calcTrustScore(u.id); } catch(e){ return {score:0,detalhes:[]}; } })();
-    const tl=trustLabel(ts.score);
-    const TAG_ICONS={investidor:'💰',inv_potencial:'🌱',superconector:'🌐',autoridade:'🏆',decisor:'🎯',influenciador:'📣',indicador:'🤝',serial:'🏗',nacional:'🌍',mentor:'🤲',captador:'💼'};
-    const TAG_LABELS={investidor:'Investidor ativo',inv_potencial:'Investidor potencial',superconector:'Superconector',autoridade:'Autoridade',decisor:'Decisor',influenciador:'Influenciador',indicador:'Indicador ativo',serial:'Empreendedor serial',nacional:'Alcance nacional',mentor:'Mentor',captador:'Captador'};
-    const tagsHtml=socio&&u.tagsRede&&u.tagsRede.length?u.tagsRede.map(t=>`<span style="background:#ede9fe;color:#5b21b6;border-radius:20px;font-size:10px;padding:2px 7px;font-weight:600;flex-shrink:0;white-space:nowrap">${TAG_ICONS[t]||'•'} ${TAG_LABELS[t]||t}</span>`).join(''):'';
-    const pesoHtml=socio&&u.pesoRede?`<span style="font-size:11px;flex-shrink:0;white-space:nowrap">${'⭐'.repeat(u.pesoRede)}</span>`:'';
-    const aprovadorNome=u.aprovadoPor?(users.find(x=>x.id===u.aprovadoPor)||{}).nome||'IA Hub':'IA Hub';
-    const dataEntradaFmt=u.dataEntrada?new Date(u.dataEntrada).toLocaleDateString('pt-BR'):'—';
-    const seloVerificado=u.dataEntrada?`<span title="Aprovado por: ${aprovadorNome} | Membro desde: ${dataEntradaFmt}" style="display:inline-flex;align-items:center;gap:3px;background:#E1F5EE;color:#085041;border-radius:20px;padding:2px 7px;font-size:10px;font-weight:600;flex-shrink:0;cursor:help">✓</span>`:'';
-    return`<tr>
-      <td><div style="display:flex;align-items:center;gap:7px;overflow:hidden"><span class="avatar" style="background:${ps.bg};color:${ps.tx};flex-shrink:0">${initials(u.nome)}</span><span style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(u.nome)}</span></div></td>
-      <td>${tipoTag}</td>
-      <td style="color:#666;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.emp||'—'}</td>
-      <td>${segs.map(s=>`<span class="badge" style="background:${sc(s).bg};color:${sc(s).tx}">${s}</span>`).join('')||'—'}</td>
-      <td><span class="badge" style="background:${ps.bg};color:${ps.tx}">${u.perfil}</span></td>
-      <td style="display:${socio?'table-cell':'none'};font-size:12px;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${vinculoNome}</td>
-      <td>${editBtn}</td>
-    </tr>`;
-  };
-
-  // MEMBROS DA REDE — com paginação
-  const showMembros=!fsecao||fsecao==='membros'||fsecao==='parceiros';
-  const showExternos=!fsecao||fsecao==='externos';
-  const listData=fsecao==='parceiros'?data.filter(u=>u.perfil==='Parceiro'):data;
-  let rowsHtml='';
-  if(showMembros){
-    if(!listData.length)rowsHtml+=`<tr><td colspan="7" class="empty-msg">Nenhum membro encontrado.</td></tr>`;
-    else rowsHtml+=listData.map(u=>buildRow(u,false)).join('');
-  }
-  if(showExternos&&convidadosExternos.length){
-    rowsHtml+=`<tr><td colspan="7" style="background:#fef9ee;font-size:11px;font-weight:700;color:#92400e;padding:6px 14px;text-transform:uppercase;letter-spacing:.06em">Convidados externos (${convidadosExternos.length})</td></tr>`;
-    rowsHtml+=convidadosExternos.map(c=>buildRow(c,true)).join('');
-  } else if(showExternos&&fsecao==='externos'){
-    rowsHtml+=`<tr><td colspan="7" class="empty-msg" style="padding:20px">Nenhum convidado externo ainda.</td></tr>`;
-  }
-  if(!rowsHtml)rowsHtml=`<tr><td colspan="7" class="empty-msg">Nenhum registro encontrado.</td></tr>`;
-  tb.innerHTML=rowsHtml;
+  const bNM=document.getElementById('btn-novo-membro');
+  if(bNM)bNM.style.display=isSocio()?'inline-block':'none';
+  if(typeof renderSocios==='function')renderSocios();
+  if(typeof renderParceiros==='function')renderParceiros();
+  if(typeof renderRedeMembros==='function')renderRedeMembros();
 }
 
 function removeExterno(id){
@@ -2514,7 +2392,7 @@ function openAddUsr(){
   ['u-nome','u-emp','u-email','u-tel','u-seg','u-ativ','u-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
   ['u-spec-medico-val','u-spec-adv-val','u-spec-cont-val','u-spec-eng-val','u-spec-corr-val','u-spec-consul-val','u-spec-dent-val','u-spec-psico-val'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   updateSpecFields();
-  document.getElementById('u-perfil').value='Associado';
+  document.getElementById('u-perfil').value='Parceiro';
   document.getElementById('u-tipo').value='PJ';
   document.getElementById('u-status').value='Em prospecção';
   fillVinculoSelect(null);
@@ -2556,7 +2434,7 @@ function saveUsr(){
   const nome=document.getElementById('u-nome').value.trim();
   if(!nome){alert('Informe o nome.');return;}
   const today=new Date().toLocaleDateString('pt-BR');
-  const perfil=isSocio()?document.getElementById('u-perfil').value:(editUsrId?users.find(x=>x.id===editUsrId).perfil:'Associado');
+  const perfil=isSocio()?document.getElementById('u-perfil').value:(editUsrId?users.find(x=>x.id===editUsrId).perfil:'Parceiro');
   // Se Contato → salva em contatos[] e vai para sub-aba Contatos
   if(perfil==='Contato'){
     const ct={
@@ -2585,8 +2463,7 @@ function saveUsr(){
   const vinculoNome=vinculoId?(users.find(u=>u.id===vinculoId)||{}).nome||'':'';
   // Validação de vínculo obrigatório
   if(isSocio()){
-    if(perfil==='Associado'&&!vinculoId){alert('Associados devem estar vinculados a um sócio.');return;}
-    if(perfil==='Parceiro'&&!vinculoId){alert('Parceiros devem estar vinculados a um associado ou sócio.');return;}
+    if((perfil==='Parceiro'||perfil==='Rede')&&!vinculoId){alert(`${perfil} deve estar vinculado a um sócio${perfil==='Rede'?' ou parceiro':''}.`);return;}
   }
   const obj={nome,tipo:document.getElementById('u-tipo').value,emp:document.getElementById('u-emp').value.trim(),email,
     tel:document.getElementById('u-tel').value.trim(),
@@ -3357,7 +3234,7 @@ function projCard(p){
 }
 
 function abrirNovaConexao(){
-  openAddCon();
+  openAddUsr();
 }
 
 function abrirNovoNegocio(){
@@ -4279,8 +4156,8 @@ function showToast(msg){
 // Convidados temporários (vinculados ao evento sendo criado/editado)
 
 function switchMbrTab(tab){
-  const parcAssoc=currentUser&&(currentUser.perfil==='Parceiro'||currentUser.perfil==='Associado');
-  // Operador e outros sem perfil específico só veem conexões; Parceiro/Associado veem as duas abas
+  const parcAssoc=currentUser&&(currentUser.perfil==='Parceiro'||currentUser.perfil==='Rede');
+  // Operador e outros sem perfil específico só veem conexões; Parceiro/Rede veem as duas abas
   if(!isSocio()&&!parcAssoc) tab='conexoes';
   const subBar=document.getElementById('sub-tabs-bar');
   if(subBar) subBar.style.display=(isSocio()||parcAssoc)?'flex':'none';
@@ -4497,7 +4374,7 @@ function renderRedeMembros(){
         ${u.telefone||u.email?`<div style="font-size:11px;color:#aaa;margin-top:4px">${[u.telefone,u.email].filter(Boolean).join(' · ')}</div>`:''}
       </div>
       ${isSocio()?`<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
-        <button class="btn-s btn-sm" onclick="openEditCon(${u.id})">Editar</button>
+        <button class="btn-s btn-sm" onclick="openEditUsr(${u.id})">Editar</button>
         <button class="btn-s btn-sm" onclick="moverParaContatos(${u.id})" title="Mover de volta para Contatos" style="font-size:11px;white-space:nowrap;color:#888;border-color:#ddd">→ Contatos</button>
         <button onclick="excluirMembro(${u.id})" title="Excluir membro" style="border:none;background:none;cursor:pointer;color:#c0392b;font-size:16px;padding:2px 0;line-height:1">🗑</button>
       </div>`:''}
@@ -4839,21 +4716,7 @@ function onConPerfilChange(){
 }
 
 function openAddCon(){
-  editConId=null;
-  ['con-nome','con-empresa','con-seg','con-tel','con-email'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('con-perfil').value='Rede';
-  onConPerfilChange();
-  const sel=document.getElementById('con-orig1');
-  sel.innerHTML='<option value="">— Direto pelo sócio / já era conhecido —</option>';
-  const uAtivos=[...users.filter(u=>u.status==='Ativo')].sort((a,b)=>a.id===currentUser?.id?-1:b.id===currentUser?.id?1:0);
-  uAtivos.forEach(u=>{
-    const o=document.createElement('option');o.value=u.id;
-    o.text=u.id===currentUser?.id?`${u.nome} — você (${u.perfil})`:`${u.nome} (${u.perfil})`;
-    sel.appendChild(o);
-  });
-  document.getElementById('btn-del-con').style.display='none';
-  document.getElementById('con-cadeia-display').style.display='none';
-  document.getElementById('ov-con').classList.add('open');
+  openAddUsr();
 }
 
 function openEditCon(id){
@@ -5108,7 +4971,7 @@ function openAprovacaoPanel(){
   else{
     el.innerHTML=pend.map(u=>{
       const segs=(u.seg||'').split(',').map(s=>s.trim()).filter(Boolean);
-      const rawVinculos=u.perfil==='Associado'?users.filter(x=>x.perfil==='Sócio'):users.filter(x=>x.perfil==='Sócio'||x.perfil==='Associado');
+      const rawVinculos=u.perfil==='Rede'?users.filter(x=>x.perfil==='Sócio'||x.perfil==='Parceiro'):users.filter(x=>x.perfil==='Sócio');
       const possiveisVinculos=[...rawVinculos].sort((a,b)=>a.id===currentUser?.id?-1:b.id===currentUser?.id?1:0);
       return`<div class="con-card" style="margin-bottom:12px">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
@@ -5116,7 +4979,7 @@ function openAprovacaoPanel(){
             <div style="font-size:14px;font-weight:600">${u.nome}</div>
             <div style="font-size:12px;color:#888">${u.emp||'—'} · ${u.email} · ${u.tel||'sem tel'}</div>
           </div>
-          <span class="badge p-${u.perfil==='Associado'?'assoc':'parc'}">${u.perfil}</span>
+          <span class="badge p-${u.perfil==='Rede'?'rede':'parc'}">${u.perfil}</span>
         </div>
         <div style="margin-bottom:8px">${segs.map(s=>`<span class="badge" style="background:${sc(s).bg};color:${sc(s).tx}">${s}</span>`).join('')}</div>
         <div style="font-size:13px;color:#555;margin-bottom:10px">${u.ativ||'—'}</div>
@@ -6975,7 +6838,7 @@ injectLogos();
 })();
 
 // ===================== CREDENCIAIS =====================
-const _PC={Sócio:{bg:'#FAEEDA',tx:'#633806'},Associado:{bg:'#E1F5EE',tx:'#085041'},Parceiro:{bg:'#EEEDFE',tx:'#3C3489'},Operador:{bg:'#f0f0ee',tx:'#555'}};
+const _PC={Sócio:{bg:'#FAEEDA',tx:'#633806'},Parceiro:{bg:'#EEEDFE',tx:'#3C3489'},Rede:{bg:'#E1F5EE',tx:'#085041'},Contato:{bg:'#f5f5f5',tx:'#888'},Operador:{bg:'#f0f0ee',tx:'#555'}};
 function openCred(){
   if(!isSocio())return;
   const tb=document.getElementById('cred-tbody');
