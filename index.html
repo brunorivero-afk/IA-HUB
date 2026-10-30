@@ -4776,9 +4776,7 @@ function saveCon(){
     showToast(`✅ ${perfil} adicionado à rede!`);
   }
   closeOv('ov-con');
-  if(typeof renderSocios==='function')renderSocios();
-  if(typeof renderParceiros==='function')renderParceiros();
-  if(typeof renderConexoes==='function')renderConexoes(document.getElementById('con-inner-mbr'));
+  renderMembros();
   saveData();
 }
 
@@ -4786,9 +4784,7 @@ function deleteConMembro(){
   if(!editConId||!confirm('Remover este membro da rede?'))return;
   users=users.filter(u=>u.id!==editConId);
   closeOv('ov-con');
-  if(typeof renderSocios==='function')renderSocios();
-  if(typeof renderParceiros==='function')renderParceiros();
-  if(typeof renderConexoes==='function')renderConexoes(document.getElementById('con-inner-mbr'));
+  renderMembros();
   saveData();
   showToast('Membro removido.');
 }
@@ -4798,7 +4794,7 @@ function deleteCon(id){
   if(!targetId||!confirm('Remover esta conexão?'))return;
   conexoes=conexoes.filter(c=>c.id!==targetId);
   if(!id)closeOv('ov-con');
-  renderConexoes(document.getElementById('con-inner-mbr'));saveData();
+  renderConexoes();saveData();
 }
 
 
