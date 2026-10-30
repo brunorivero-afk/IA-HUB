@@ -680,22 +680,33 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     </div>
     <!-- CONEXÕES -->
     <div class="panel" id="tab-rede-membros">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
-        <div class="section-hdr" style="margin-top:0;border-bottom:none;margin-bottom:0">Conexões da Rede</div>
-        <div style="display:flex;gap:8px">
-          <button class="btn-p" style="background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="abrirNovaConexao()">🔗 Nova Conexão</button>
-          <button class="btn-p" id="btn-novo-membro" onclick="openAddUsr()" style="display:none">+ Membro</button>
-        </div>
+      <!-- Sub-abas -->
+      <div style="display:flex;gap:0;border-bottom:2px solid #e5e7eb;margin-bottom:18px">
+        <button id="con-sub-rede" onclick="switchConSub('rede')"
+          style="padding:8px 18px;font-size:13px;font-weight:600;border:none;background:none;cursor:pointer;border-bottom:2px solid #0a1628;color:#0a1628;margin-bottom:-2px">Rede</button>
+        <button id="con-sub-contatos" onclick="switchConSub('contatos')"
+          style="padding:8px 18px;font-size:13px;font-weight:600;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:#888;margin-bottom:-2px">Contatos</button>
       </div>
-      <!-- Sócios -->
-      <div class="section-hdr" style="margin-top:0">Sócios</div>
-      <div id="con-socios" style="margin-bottom:20px"></div>
-      <!-- Parceiros (vinculados a sócios) -->
-      <div class="section-hdr" style="margin-top:0">Parceiros</div>
-      <div id="con-parceiros" style="margin-bottom:20px"></div>
-      <!-- Rede (oportunidades de negócio) -->
-      <div class="section-hdr" style="margin-top:0">Rede — Oportunidades</div>
-      <div id="con-inner-mbr"></div>
+      <!-- Painel Rede -->
+      <div id="con-pnl-rede">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+          <div style="font-size:13px;color:#888">Sócios, parceiros e rede BIdaTX</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn-p" style="background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="abrirNovaConexao()">🔗 Nova Conexão</button>
+            <button class="btn-p" id="btn-novo-membro" onclick="openAddUsr()" style="display:none">+ Membro</button>
+          </div>
+        </div>
+        <div class="section-hdr" style="margin-top:0">Sócios</div>
+        <div id="con-socios" style="margin-bottom:20px"></div>
+        <div class="section-hdr" style="margin-top:0">Parceiros</div>
+        <div id="con-parceiros" style="margin-bottom:20px"></div>
+        <div class="section-hdr" style="margin-top:0">Rede</div>
+        <div id="con-inner-mbr"></div>
+      </div>
+      <!-- Painel Contatos -->
+      <div id="con-pnl-contatos" style="display:none">
+        <div id="contatos-inner"></div>
+      </div>
     </div>
     <!-- FINANCEIRO (só sócios) -->
     <div class="panel" id="tab-financeiro">
@@ -940,6 +951,26 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <div class="modal-btns">
       <button class="btn-s" onclick="closeOv('ov-proj')">Cancelar</button>
       <button class="btn-p" onclick="saveProj()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal contato (pré-membro) -->
+<div class="overlay" id="ov-contato">
+  <div class="modal" style="width:460px">
+    <h2 id="ctto-modal-ttl">Novo Contato</h2>
+    <div class="fg">
+      <div class="full"><label>Nome *</label><input id="ctto-nome" placeholder="Nome completo"></div>
+      <div><label>Empresa</label><input id="ctto-empresa" placeholder="Empresa ou organização"></div>
+      <div><label>Segmento / Área</label><input id="ctto-seg" placeholder="Ex: Contabilidade, TI"></div>
+      <div><label>Telefone</label><input id="ctto-tel" placeholder="(21) 99999-9999"></div>
+      <div><label>E-mail</label><input id="ctto-email" type="email" placeholder="email@exemplo.com"></div>
+      <div class="full"><label>Observação</label><textarea id="ctto-obs" style="height:70px" placeholder="Contexto, como conheceu, interesse, próximos passos..."></textarea></div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-s" id="btn-del-ctto" style="display:none;margin-right:auto;color:#c0392b;border-color:#fecaca" onclick="removeContato()">Remover</button>
+      <button class="btn-s" onclick="closeOv('ov-contato')">Cancelar</button>
+      <button class="btn-p" onclick="saveContato()">Salvar</button>
     </div>
   </div>
 </div>
@@ -1727,6 +1758,8 @@ let chartInstances={};
 let receitas=[];
 let comissoes=[];
 let currentRecTab='geral';
+let contatos=[];
+let _conSubAtiva='rede';
 
 let config={
   empresas:[
@@ -1983,7 +2016,7 @@ window.addEventListener('click',e=>{
 });
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
-    ['ov-usr','ov-proj','ov-fu','ov-lanc','ov-sin','ov-notif','ov-con','ov-relatorio','ov-propor','ov-moderacao','ov-aprovacao','ov-revelar','ov-onboarding','ov-vit-detalhe','ov-vit-int','ov-vit-int-rapido','ov-vit-manifesto','ov-cred'].forEach(id=>{
+    ['ov-usr','ov-proj','ov-fu','ov-lanc','ov-sin','ov-notif','ov-con','ov-relatorio','ov-propor','ov-moderacao','ov-aprovacao','ov-revelar','ov-onboarding','ov-vit-detalhe','ov-vit-int','ov-vit-int-rapido','ov-vit-manifesto','ov-cred','ov-contato'].forEach(id=>{
       const el=document.getElementById(id);if(el&&el.classList.contains('open'))closeOv(id);
     });
   }
@@ -4319,6 +4352,98 @@ function renderParceiros(){
   }).join('')}</div>`;
 }
 
+function switchConSub(sub){
+  _conSubAtiva=sub;
+  document.getElementById('con-pnl-rede').style.display=sub==='rede'?'':'none';
+  document.getElementById('con-pnl-contatos').style.display=sub==='contatos'?'':'none';
+  const btnRede=document.getElementById('con-sub-rede');
+  const btnCon=document.getElementById('con-sub-contatos');
+  if(btnRede){btnRede.style.borderBottomColor=sub==='rede'?'#0a1628':'transparent';btnRede.style.color=sub==='rede'?'#0a1628':'#888';}
+  if(btnCon){btnCon.style.borderBottomColor=sub==='contatos'?'#0a1628':'transparent';btnCon.style.color=sub==='contatos'?'#0a1628':'#888';}
+  if(sub==='contatos')renderContatos();
+}
+
+let _editContatoId=null;
+
+function renderContatos(){
+  const el=document.getElementById('contatos-inner');if(!el)return;
+  const header=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <div style="font-size:13px;color:#888">${contatos.length} contato${contatos.length!==1?'s':''} — lista de potenciais membros</div>
+    <button class="btn-p" onclick="openAddContato()">+ Adicionar Contato</button>
+  </div>`;
+  if(!contatos.length){el.innerHTML=header+`<div class="empty-msg">Nenhum contato ainda. Adicione pessoas que podem entrar na rede.</div>`;return;}
+  const cards=contatos.map(c=>`
+    <div style="border:1.5px solid #e5e7eb;border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:12px">
+      <div style="width:34px;height:34px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#888;flex-shrink:0">${(c.nome||'?').charAt(0).toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:600;color:#0a1628">${c.nome}</div>
+        <div style="font-size:12px;color:#888;margin-top:2px">${[c.empresa,c.segmento].filter(Boolean).join(' · ')||'—'}</div>
+        ${c.telefone||c.email?`<div style="font-size:11px;color:#aaa;margin-top:3px">${[c.telefone,c.email].filter(Boolean).join(' · ')}</div>`:''}
+        ${c.obs?`<div style="font-size:12px;color:#666;margin-top:6px;padding:6px 8px;background:#f9f9f7;border-radius:6px">${c.obs}</div>`:''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+        <button class="btn-s btn-sm" onclick="editContato(${c.id})">Editar</button>
+        <button class="btn-p btn-sm" onclick="converterParaMembro(${c.id})" style="font-size:11px;white-space:nowrap">→ Rede</button>
+      </div>
+    </div>`).join('');
+  el.innerHTML=header+`<div style="display:flex;flex-direction:column;gap:8px">${cards}</div>`;
+}
+
+function openAddContato(){
+  _editContatoId=null;
+  document.getElementById('ctto-modal-ttl').textContent='Novo Contato';
+  ['ctto-nome','ctto-empresa','ctto-seg','ctto-tel','ctto-email','ctto-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('btn-del-ctto').style.display='none';
+  document.getElementById('ov-contato').classList.add('open');
+}
+
+function editContato(id){
+  const c=contatos.find(x=>x.id===id);if(!c)return;
+  _editContatoId=id;
+  document.getElementById('ctto-modal-ttl').textContent='Editar Contato';
+  document.getElementById('ctto-nome').value=c.nome||'';
+  document.getElementById('ctto-empresa').value=c.empresa||'';
+  document.getElementById('ctto-seg').value=c.segmento||'';
+  document.getElementById('ctto-tel').value=c.telefone||'';
+  document.getElementById('ctto-email').value=c.email||'';
+  document.getElementById('ctto-obs').value=c.obs||'';
+  document.getElementById('btn-del-ctto').style.display='inline-block';
+  document.getElementById('ov-contato').classList.add('open');
+}
+
+function saveContato(){
+  const nome=document.getElementById('ctto-nome').value.trim();
+  if(!nome){alert('Informe o nome.');return;}
+  const obj={nome,empresa:document.getElementById('ctto-empresa').value.trim(),segmento:document.getElementById('ctto-seg').value.trim(),telefone:document.getElementById('ctto-tel').value.trim(),email:document.getElementById('ctto-email').value.trim(),obs:document.getElementById('ctto-obs').value.trim()};
+  if(_editContatoId){const i=contatos.findIndex(c=>c.id===_editContatoId);contatos[i]={...contatos[i],...obj};}
+  else contatos.push({...obj,id:Date.now(),desde:new Date().toLocaleDateString('pt-BR')});
+  closeOv('ov-contato');saveData();renderContatos();
+  showToast('Contato salvo!');
+}
+
+function removeContato(){
+  if(!_editContatoId||!confirm('Remover este contato?'))return;
+  contatos=contatos.filter(c=>c.id!==_editContatoId);
+  closeOv('ov-contato');saveData();renderContatos();
+}
+
+function converterParaMembro(id){
+  const c=contatos.find(x=>x.id===id);if(!c)return;
+  // Pre-fill the ov-con form and switch to rede sub
+  switchConSub('rede');
+  setTimeout(()=>{
+    openAddCon();
+    setTimeout(()=>{
+      document.getElementById('con-nome').value=c.nome||'';
+      document.getElementById('con-empresa').value=c.empresa||'';
+      document.getElementById('con-seg').value=c.segmento||'';
+      document.getElementById('con-tel').value=c.telefone||'';
+      document.getElementById('con-email').value=c.email||'';
+      showToast('Dados preenchidos — confirme o originador e salve.');
+    },100);
+  },100);
+}
+
 function renderRedeMembros(){
   const el=document.getElementById('con-inner-mbr');if(!el)return;
   const rede=users.filter(u=>u.perfil==='Rede'&&u.status==='Ativo');
@@ -5642,6 +5767,7 @@ function saveData(){
     localStorage.setItem('iahub_receitas',JSON.stringify(receitas));
     localStorage.setItem('iahub_comissoes',JSON.stringify(comissoes));
     localStorage.setItem('iahub_config',JSON.stringify(config));
+    localStorage.setItem('iahub_contatos',JSON.stringify(contatos));
   }catch(e){console.warn('saveData failed',e);}
   syncToSupabase();
 }
@@ -5663,6 +5789,7 @@ function loadData(){
     const rec=localStorage.getItem('iahub_receitas');if(rec)receitas=JSON.parse(rec);
     const com=localStorage.getItem('iahub_comissoes');if(com)comissoes=JSON.parse(com);
     const cfg=localStorage.getItem('iahub_config');if(cfg){const parsed=JSON.parse(cfg);config={...config,...parsed};}
+    const ctts=localStorage.getItem('iahub_contatos');if(ctts)contatos=JSON.parse(ctts);
   }catch(e){console.warn('loadData failed',e);}
 }
 
