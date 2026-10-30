@@ -2245,9 +2245,18 @@ function fillVinculoSelect(selectedId){
     label='Sócios não precisam de vínculo.';
     sel.innerHTML='<option value="">— Nenhum —</option>';
   }
-  allowed.forEach(u=>{
-    const o=document.createElement('option');o.value=u.id;o.text=`${u.nome} (${u.perfil})`;
-    if(u.id===selectedId)o.selected=true;
+  // Coloca o usuário logado primeiro
+  const sorted=[...allowed].sort((a,b)=>{
+    if(a.id===currentUser?.id)return -1;
+    if(b.id===currentUser?.id)return 1;
+    return 0;
+  });
+  sorted.forEach(u=>{
+    const o=document.createElement('option');
+    o.value=u.id;
+    const label_=u.id===currentUser?.id?`${u.nome} — você (${u.perfil})`:`${u.nome} (${u.perfil})`;
+    o.text=label_;
+    if(u.id===selectedId||(selectedId===null&&u.id===currentUser?.id))o.selected=true;
     sel.appendChild(o);
   });
   const hint=document.getElementById('u-vinculo-hint');
@@ -4040,7 +4049,8 @@ function openNegModal(id){
   const selStatus=document.getElementById('neg-status');
   selStatus.innerHTML=[...NEG_COLS,'Perdido'].map(c=>`<option>${c}</option>`).join('');
   const selOrig=document.getElementById('neg-orig');
-  selOrig.innerHTML=users.map(u=>`<option value="${u.id}">${u.nome}</option>`).join('');
+  const origSorted=[...users].sort((a,b)=>a.id===currentUser?.id?-1:b.id===currentUser?.id?1:0);
+  selOrig.innerHTML=origSorted.map(u=>`<option value="${u.id}">${u.nome}${u.id===currentUser?.id?' (você)':''}</option>`).join('');
   // chips de produto
   const prodId=n?(n.configProdutoId||n.portafolioId||null):null;
   const outroDesc=n&&!prodId&&n.produtoOutro?n.produtoOutro:null;
@@ -4835,8 +4845,10 @@ function openAddCon(){
   onConPerfilChange();
   const sel=document.getElementById('con-orig1');
   sel.innerHTML='<option value="">— Direto pelo sócio / já era conhecido —</option>';
-  users.filter(u=>u.status==='Ativo').forEach(u=>{
-    const o=document.createElement('option');o.value=u.id;o.text=`${u.nome} (${u.perfil})`;
+  const uAtivos=[...users.filter(u=>u.status==='Ativo')].sort((a,b)=>a.id===currentUser?.id?-1:b.id===currentUser?.id?1:0);
+  uAtivos.forEach(u=>{
+    const o=document.createElement('option');o.value=u.id;
+    o.text=u.id===currentUser?.id?`${u.nome} — você (${u.perfil})`:`${u.nome} (${u.perfil})`;
     sel.appendChild(o);
   });
   document.getElementById('btn-del-con').style.display='none';
@@ -5096,7 +5108,8 @@ function openAprovacaoPanel(){
   else{
     el.innerHTML=pend.map(u=>{
       const segs=(u.seg||'').split(',').map(s=>s.trim()).filter(Boolean);
-      const possiveisVinculos=u.perfil==='Associado'?users.filter(x=>x.perfil==='Sócio'):users.filter(x=>x.perfil==='Sócio'||x.perfil==='Associado');
+      const rawVinculos=u.perfil==='Associado'?users.filter(x=>x.perfil==='Sócio'):users.filter(x=>x.perfil==='Sócio'||x.perfil==='Associado');
+      const possiveisVinculos=[...rawVinculos].sort((a,b)=>a.id===currentUser?.id?-1:b.id===currentUser?.id?1:0);
       return`<div class="con-card" style="margin-bottom:12px">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
           <div>
@@ -5111,7 +5124,7 @@ function openAprovacaoPanel(){
           <label style="font-size:12px;font-weight:500;color:#555">Vincular a:</label>
           <select id="vinc-apr-${u.id}" style="width:100%;margin-top:4px;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px">
             <option value="">— Selecione —</option>
-            ${possiveisVinculos.map(v=>`<option value="${v.id}">${v.nome} (${v.perfil})</option>`).join('')}
+            ${possiveisVinculos.map(v=>`<option value="${v.id}"${v.id===currentUser?.id?' selected':''}>${v.nome}${v.id===currentUser?.id?' — você':''} (${v.perfil})</option>`).join('')}
           </select>
         </div>
         <div style="display:flex;gap:8px">
