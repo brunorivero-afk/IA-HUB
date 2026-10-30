@@ -628,100 +628,75 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
   <div class="app">
     <!-- MAPA DE REDE -->
     <div class="panel" id="tab-rede">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:4px">
-        <div class="section-hdr" style="margin-top:0;border-bottom:none;margin-bottom:0">Mapa de Sinergias da Rede</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+        <div class="section-hdr" style="margin-top:0;border-bottom:none;margin-bottom:0">Dashboard BIdaTX</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn-p" style="background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="abrirNovaConexao()">🔗 Nova Conexão</button>
+          <button class="btn-p" style="background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="showTab('receitas')">💵 Ver Receitas</button>
+          <button class="btn-p" style="background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="showTab('pipeline')">🎯 Ver Pipeline</button>
         </div>
       </div>
       <div id="dashboard-moderacao"></div>
-      <div id="net-box"><svg id="net-svg" viewBox="0 0 900 500"></svg></div>
-      <div class="info-box" id="info-box"><p style="color:#aaa;font-size:13px">Clique em um segmento para ver detalhes e conexões.</p></div>
-      <div style="margin-top:20px">
-        <div class="section-hdr">Indicadores da Rede</div>
-        <div class="stats" id="rede-stats"></div>
-        <div class="chart-row">
-          <div class="chart-box"><h3>Negócios por segmento</h3><canvas id="chart-segs"></canvas></div>
-          <div class="chart-box"><h3>Status dos projetos</h3><canvas id="chart-proj-status"></canvas></div>
-        </div>
-        <div class="chart-row">
-          <div class="chart-box"><h3>Membros por perfil</h3><canvas id="chart-perfis"></canvas></div>
-          <div class="chart-box"><h3>Faturamento mensal (projetos)</h3><canvas id="chart-fat"></canvas></div>
-        </div>
-        <!-- Lembrete de inatividade em Conexões -->
-        <div id="dashboard-lembrete-conexao"></div>
-        <!-- Conexão em destaque da semana -->
-        <div id="dashboard-conexao-destaque"></div>
-        <!-- Oportunidades em destaque -->
-        <div class="section-hdr" style="margin-top:20px">🔥 Oportunidades de negócio em destaque</div>
-        <div id="dashboard-conexoes" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:8px"></div>
+      <!-- KPIs gerais -->
+      <div class="stats" id="dash-kpis" style="margin-bottom:20px"></div>
+      <!-- Receita por frente de negócio -->
+      <div class="section-hdr" style="margin-top:0">Receita por Frente de Negócio</div>
+      <div class="stats" id="dash-receita-frentes" style="margin-bottom:20px"></div>
+      <!-- Pipeline resumo -->
+      <div class="section-hdr" style="margin-top:0">Pipeline — Próximas Oportunidades</div>
+      <div id="dash-pipeline-resumo" style="margin-bottom:20px"></div>
+      <!-- Comissionamentos da rede -->
+      <div class="section-hdr" style="margin-top:0">Comissionamentos da Rede</div>
+      <div id="dash-comissoes" style="margin-bottom:20px"></div>
+      <!-- Charts -->
+      <div class="chart-row">
+        <div class="chart-box"><h3>Status dos Negócios</h3><canvas id="chart-proj-status"></canvas></div>
+        <div class="chart-box"><h3>Faturamento Mensal</h3><canvas id="chart-fat"></canvas></div>
       </div>
     </div>
-    <!-- MEMBROS (unificado) -->
-    <div class="panel" id="tab-rede-membros">
-      <!-- Sub-abas internas (Membros só para sócios) -->
-      <div id="sub-tabs-bar" style="display:flex;gap:8px;margin-bottom:20px">
-        <button id="sub-btn-membros" class="btn-p" style="flex:1;min-width:0" onclick="switchMbrTab('membros')">👥 Membros</button>
-        <button id="sub-btn-conexoes" class="btn-p" style="flex:1;min-width:0;background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="switchMbrTab('conexoes')">🔗 Conexões</button>
-        <button id="sub-btn-cred" class="btn-p" onclick="openCred()" style="flex:0 0 auto;white-space:nowrap;background:#5b21b6;display:none">🔑 Credenciais</button>
+    <!-- RECEITAS -->
+    <div class="panel" id="tab-receitas">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+        <div class="section-hdr" style="margin-top:0;border-bottom:none;margin-bottom:0">Receitas</div>
+        <button class="btn-p" onclick="abrirLancarReceita()">+ Lançar Receita</button>
       </div>
-      <div id="sub-tab-membros">
-      <!-- Cards perfil (só sócios) -->
-      <div id="mbr-perfil-cards" style="display:none;margin-bottom:16px">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:10px">
-          <div class="stat"><div class="stat-label">Sócios</div><div class="stat-value" id="cnt-socio" style="color:#854F0B">0</div></div>
-          <div class="stat"><div class="stat-label">Associados</div><div class="stat-value" id="cnt-assoc" style="color:#0F6E56">0</div></div>
-          <div class="stat"><div class="stat-label">Parceiros</div><div class="stat-value" id="cnt-parc" style="color:#0a1628">0</div></div>
-          <div class="stat"><div class="stat-label">Pendentes</div><div class="stat-value" id="cnt-pend" style="color:#633806">0</div></div>
+      <!-- Sub-abas de frente -->
+      <div id="rec-subtabs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <button class="btn-p" id="rec-tab-geral" onclick="switchRecTab('geral')">Geral</button>
+        <button class="btn-p" id="rec-tab-sicoob" style="background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="switchRecTab('sicoob')">Sicoob</button>
+        <button class="btn-p" id="rec-tab-grupag" style="background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="switchRecTab('grupag')">GruPag</button>
+        <button class="btn-p" id="rec-tab-trib" style="background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="switchRecTab('trib')">Tributário</button>
+        <button class="btn-p" id="rec-tab-hub" style="background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="switchRecTab('hub')">Deals IA Hub</button>
+      </div>
+      <!-- KPIs de receita -->
+      <div class="stats" id="rec-kpis" style="margin-bottom:20px"></div>
+      <!-- Tabela / conteúdo -->
+      <div id="rec-conteudo"></div>
+      <!-- Importar extrato -->
+      <div style="margin-top:20px;padding:16px;border:1.5px dashed #ccc;border-radius:8px;text-align:center">
+        <div style="font-size:13px;color:#888;margin-bottom:10px">Importar extrato (Sicoob / GruPag) — Excel ou CSV</div>
+        <input type="file" id="rec-import-file" accept=".xlsx,.xls,.csv" style="display:none" onchange="importarExtrato(this)">
+        <button class="btn-p" style="background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="document.getElementById('rec-import-file').click()">📂 Selecionar arquivo</button>
+      </div>
+    </div>
+    <!-- CONEXÕES -->
+    <div class="panel" id="tab-rede-membros">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+        <div class="section-hdr" style="margin-top:0;border-bottom:none;margin-bottom:0">Conexões da Rede</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-p" style="background:#5b21b6" onclick="openCred()">🔑 Credenciais</button>
+          <button class="btn-p" style="background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="abrirNovaConexao()">🔗 Nova Conexão</button>
+          <button class="btn-p" id="btn-novo-membro" onclick="openAddUsr()" style="display:none">+ Membro</button>
         </div>
       </div>
-      <div class="stats" id="stats-mbr"></div>
-      <div class="controls">
-        <input id="mbr-q" placeholder="Buscar nome, empresa ou segmento..." oninput="renderMembros()">
-        <select id="mbr-fseg" onchange="renderMembros()"><option value="">Todos os segmentos</option></select>
-        <select id="mbr-fperfil" onchange="renderMembros()">
-          <option value="">Todos os perfis</option>
-          <option>Sócio</option><option>Associado</option><option>Parceiro</option>
-        </select>
-        <select id="mbr-fstatus" onchange="renderMembros()">
-          <option value="">Todos os status</option>
-          <option value="Ativo">Ativo</option>
-          <option value="Em prospecção">Em prospecção</option>
-          <option value="Em negociação">Em negociação</option>
-          <option value="Proposta enviada">Proposta enviada</option>
-          <option value="Aguardando aprovação">Aguardando aprovação</option>
-          <option value="Inativo">Inativo</option>
-          <option value="Pendente">Pendente</option>
-        </select>
-        <select id="mbr-ftipo" onchange="renderMembros()">
-          <option value="">PF e PJ</option>
-          <option value="PJ">Pessoa Jurídica</option>
-          <option value="PF">Pessoa Física</option>
-        </select>
-        <select id="mbr-fsecao" onchange="renderMembros()">
-          <option value="">Todos</option>
-          <option value="membros">Membros da rede</option>
-          <option value="parceiros">Parceiros</option>
-          <option value="externos">Convidados externos</option>
-        </select>
-        <button class="btn-p" id="btn-novo-membro" onclick="openAddUsr()">+ Novo membro</button>
-      </div>
-      <div class="table-wrap">
-        <table style="table-layout:fixed;width:100%">
-          <thead><tr>
-            <th style="width:24%">Nome</th><th style="width:7%">Tipo</th><th style="width:20%">Empresa</th>
-            <th style="width:21%">Segmento(s)</th>
-            <th style="width:13%">Perfil</th>
-            <th id="th-vinculo-col" style="width:8%">Vinculado a</th>
-            <th style="width:7%"></th>
-          </tr></thead>
-          <tbody id="mbr-tbody"></tbody>
-        </table>
-      </div>
-      </div><!-- end sub-tab-membros -->
-      <div id="sub-tab-conexoes" style="display:none">
-        <div id="con-inner-mbr"></div>
-      </div>
+      <!-- Sócios -->
+      <div class="section-hdr" style="margin-top:0">Sócios</div>
+      <div id="con-socios" style="margin-bottom:20px"></div>
+      <!-- Parceiros (vinculados a sócios) -->
+      <div class="section-hdr" style="margin-top:0">Parceiros</div>
+      <div id="con-parceiros" style="margin-bottom:20px"></div>
+      <!-- Rede (oportunidades de negócio) -->
+      <div class="section-hdr" style="margin-top:0">Rede — Oportunidades</div>
+      <div id="con-inner-mbr"></div>
     </div>
     <!-- FINANCEIRO (só sócios) -->
     <div class="panel" id="tab-financeiro">
@@ -1749,6 +1724,9 @@ let notificacoes=[];
 let currentUser=null;
 let editUsrId=null,editProjId=null,editLancId=null,editSinId=null;
 let chartInstances={};
+let receitas=[];
+let comissoes=[];
+let currentRecTab='geral';
 
 // ===================== TELAS =====================
 function showScreen(name){
@@ -1790,10 +1768,11 @@ function doLogin(){
   showScreen('main');
   if(isOperador()){
     showTab('conexoes');
-  } else {
+  } else if(isSocio()){
     showTab('rede');
-    // Item 14: Onboarding para novos membros (não Sócios)
-    if(u.perfil!=='Sócio'&&!u.onboardingConcluido){
+  } else {
+    showTab('rede-membros');
+    if(!u.onboardingConcluido){
       setTimeout(()=>mostrarOnboarding(),600);
     }
   }
@@ -1899,15 +1878,13 @@ function buildTabs(){
     return;
   }
   const tabDefs=[
-    {id:'rede',label:'Mapa da Rede',icon:'🕸',all:true},
+    {id:'rede',label:'Dashboard',icon:'📊',socio:true},
+    {id:'receitas',label:'Receitas',icon:'💵',socio:true},
+    {id:'pipeline',label:'Pipeline',icon:'🎯',socio:true},
+    {id:'projetos',label:'Negócios',icon:'🤝',socio:true},
+    {id:'vitrine',label:'Projetos',icon:'📁',all:true},
     {id:'rede-membros',label:'Conexões',icon:'🔗',all:true},
     {id:'financeiro',label:'Financeiro',icon:'💰',socio:true},
-    {id:'projetos',label:'Projetos',icon:'📁',all:true},
-    {id:'sinergias',label:'Sinergias',icon:'⚡',socioAssoc:true},
-    {id:'pipeline',label:'Pipeline',icon:'🎯',socio:true},
-    {id:'meus-rendimentos',label:'Meus Rendimentos',icon:'💵',notSocio:true},
-    {id:'relatorio-rede',label:'Relatório da Rede',icon:'📋',socio:true},
-    {id:'vitrine',label:'Investimentos',icon:'📈',all:true},
   ];
   const bar=document.getElementById('tabs-bar');
   bar.innerHTML='';
@@ -1943,21 +1920,14 @@ function showTab(name){
   const tbtn=document.getElementById('tbtn-'+name);
   if(panel)panel.classList.add('active');
   if(tbtn)tbtn.classList.add('active');
-  if(name==='rede')renderRede();
-  if(name==='rede-membros'){renderMembros();renderConexoes();switchMbrTab((isSocio()||(currentUser&&(currentUser.perfil==='Parceiro'||currentUser.perfil==='Associado')))?'membros':'conexoes');}
+  if(name==='rede')renderDashboard();
+  if(name==='receitas')renderReceitas();
+  if(name==='rede-membros'){renderSocios();renderParceiros();renderConexoes(document.getElementById('con-inner-mbr'));}
   if(name==='financeiro')renderFinanceiro();
   if(name==='projetos')renderProjetos();
-  if(name==='sinergias')renderSin();
   if(name==='pipeline')renderPipeline();
-  if(name==='meus-rendimentos')renderMeusRendimentos();
-  if(name==='relatorio-rede')renderRelatorioRede();
   if(name==='vitrine')renderVitrine();
   setTimeout(sizeActivePanel,0);
-  // Rastrear abas visitadas (para onboarding)
-  if(name==='sinergias'){
-    const idx=users.findIndex(u=>u.id===currentUser.id);
-    if(idx>=0&&!users[idx].viuSinergias){users[idx].viuSinergias=true;currentUser.viuSinergias=true;saveData();}
-  }
 }
 
 function sizeActivePanel(){}
@@ -1999,112 +1969,124 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-// ===================== REDE / CHARTS =====================
-function renderRede(){
-  // SVG rede
-  const svg=document.getElementById('net-svg');svg.innerHTML='';
-  const allSegs=[...new Set(users.flatMap(u=>(u.seg||'').split(',').map(s=>s.trim()).filter(Boolean)))];
-  // "PESSOA FÍSICA" é um nó fixo/genérico — todo membro do HUB pode vender para pessoa física
-  if(!allSegs.includes('PESSOA FÍSICA'))allSegs.push('PESSOA FÍSICA');
-  const N=allSegs.length;const CX=450,CY=250,R=195;const pos={};
-  allSegs.filter(s=>s!=='PESSOA FÍSICA').forEach((s,i)=>{
-    const segsNoCenter=allSegs.filter(x=>x!=='PESSOA FÍSICA');
-    const idx=segsNoCenter.indexOf(s);
-    const total=segsNoCenter.length;
-    const a=(2*Math.PI*idx/total)-Math.PI/2;
-    pos[s]={x:CX+R*Math.cos(a),y:CY+R*Math.sin(a)};
-  });
-  // PESSOA FÍSICA fica fixo no centro
-  pos['PESSOA FÍSICA']={x:CX,y:CY};
-  // Sinergias cadastradas
-  sinergias.forEach(syn=>{
-    const pa=pos[syn.a],pb=pos[syn.b];if(!pa||!pb)return;
-    const l=document.createElementNS('http://www.w3.org/2000/svg','line');
-    l.setAttribute('x1',pa.x);l.setAttribute('y1',pa.y);l.setAttribute('x2',pb.x);l.setAttribute('y2',pb.y);
-    l.setAttribute('stroke',syn.p==='alta'?'#0a1628':'#bbb');
-    l.setAttribute('stroke-width',syn.p==='alta'?2:1);l.setAttribute('opacity',syn.p==='alta'?.4:.18);
-    l.dataset.a=syn.a;l.dataset.b=syn.b;svg.appendChild(l);
-  });
-  // PESSOA FÍSICA (centro) conecta-se a TODOS os segmentos
-  const pbPF=pos['PESSOA FÍSICA'];
-  allSegs.forEach(s=>{
-    if(s==='PESSOA FÍSICA')return;
-    const pa=pos[s];if(!pa||!pbPF)return;
-    const l=document.createElementNS('http://www.w3.org/2000/svg','line');
-    l.setAttribute('x1',pa.x);l.setAttribute('y1',pa.y);l.setAttribute('x2',pbPF.x);l.setAttribute('y2',pbPF.y);
-    l.setAttribute('stroke','#d97706');l.setAttribute('stroke-width',1.5);l.setAttribute('stroke-dasharray','5,3');l.setAttribute('opacity',.22);
-    l.dataset.a=s;l.dataset.b='PESSOA FÍSICA';svg.appendChild(l);
-  });
-  allSegs.forEach(seg=>{
-    const p=pos[seg];if(!p)return;
-    let people;
-    if(seg==='PESSOA FÍSICA'){
-      people=[...new Set(users.filter(u=>u.status==='Ativo').map(u=>u.nome))];
-    } else {
-      people=[...new Set(users.filter(u=>u.status==='Ativo'&&(u.seg||'').split(',').map(s=>s.trim()).includes(seg)).map(u=>u.nome))];
-    }
-    const avgTrust=people.length?Math.round(people.reduce((s,nome)=>{const u=users.find(x=>x.nome===nome);return s+(u?calcTrustScore(u.id).score:0);},0)/people.length):0;
-    const r=seg==='PESSOA FÍSICA'?38:(14+Math.min(people.length*2,8)+Math.round(avgTrust/20));const c=seg==='PESSOA FÍSICA'?{bg:'#fef3c7',tx:'#92400e',dot:'#d97706'}:sc(seg);
-    const g=document.createElementNS('http://www.w3.org/2000/svg','g');g.style.cursor='pointer';
-    const circle=document.createElementNS('http://www.w3.org/2000/svg','circle');
-    circle.setAttribute('cx',p.x);circle.setAttribute('cy',p.y);circle.setAttribute('r',r);
-    circle.setAttribute('fill',c.bg);circle.setAttribute('stroke',c.dot);circle.setAttribute('stroke-width',1.5);
-    const cnt=document.createElementNS('http://www.w3.org/2000/svg','text');
-    cnt.setAttribute('x',p.x);cnt.setAttribute('y',p.y+4);cnt.setAttribute('text-anchor','middle');
-    cnt.setAttribute('font-size','12');cnt.setAttribute('font-weight','600');cnt.setAttribute('fill',c.tx);cnt.textContent=people.length;
-    const lbl=document.createElementNS('http://www.w3.org/2000/svg','text');
-    if(seg==='PESSOA FÍSICA'){
-      lbl.setAttribute('x',p.x);lbl.setAttribute('y',p.y+14);
-      lbl.setAttribute('text-anchor','middle');lbl.setAttribute('font-size','9');
-      lbl.setAttribute('font-weight','700');lbl.setAttribute('fill','#92400e');
-      lbl.textContent='PESSOA FÍSICA';
-      // linha adicional "PF" grande no centro
-      const pfBig=document.createElementNS('http://www.w3.org/2000/svg','text');
-      pfBig.setAttribute('x',p.x);pfBig.setAttribute('y',p.y+4);
-      pfBig.setAttribute('text-anchor','middle');pfBig.setAttribute('font-size','14');
-      pfBig.setAttribute('font-weight','800');pfBig.setAttribute('fill','#92400e');
-      pfBig.textContent='👤';
-      g.appendChild(pfBig);
-    } else {
-      lbl.setAttribute('x',p.x);lbl.setAttribute('y',p.y>CY?p.y+r+14:p.y-r-5);
-      lbl.setAttribute('text-anchor','middle');lbl.setAttribute('font-size','10');
-      lbl.setAttribute('font-weight','400');lbl.setAttribute('fill','#888');
-      lbl.textContent=seg.length>14?seg.substring(0,13)+'…':seg;
-    }
-    g.appendChild(circle);g.appendChild(cnt);g.appendChild(lbl);
-    g.addEventListener('click',()=>{
-      svg.querySelectorAll('line').forEach(l=>{const rel=l.dataset.a===seg||l.dataset.b===seg;l.setAttribute('opacity',rel?.85:.03);if(rel)l.setAttribute('stroke-width',3);});
-      if(seg==='PESSOA FÍSICA'){
-        document.getElementById('info-box').innerHTML=`<strong style="font-size:14px">👤 PESSOA FÍSICA</strong> <span style="color:#888;font-size:12px">${people.length} membro(s) do HUB</span><br><div style="margin-top:8px">${people.map(p=>`<span class="chip">${p}</span>`).join('')}</div><div style="margin-top:8px;font-size:12px;color:#888">Nó genérico: qualquer membro do HUB pode vender seus produtos ou serviços diretamente para pessoas físicas (clientes finais). Representa a sinergia B2C disponível para todos os segmentos.</div>`;
-        return;
-      }
-      const syns=sinergias.filter(s=>s.a===seg||s.b===seg);
-      document.getElementById('info-box').innerHTML=`<strong style="font-size:14px">${seg}</strong> <span style="color:#888;font-size:12px">${people.length} membro(s)</span><br><div style="margin-top:8px">${people.map(p=>`<span class="chip">${p}</span>`).join('')}</div><div style="margin-top:8px;font-size:12px;color:#888">${syns.length} sinergias: ${syns.map(s=>{const o=s.a===seg?s.b:s.a;const c=sc(o);return`<span class="badge" style="background:${c.bg};color:${c.tx};margin:2px">${o}</span>`;}).join('')}</div>`;
-    });
-    svg.appendChild(g);
-  });
-
-
-  // Stats rede
-  const ativos=users.filter(u=>u.status==='Ativo');
-  const totalFat=projetos.reduce((s,p)=>s+(p.valor||0),0);
-  const comRenda=users.filter(u=>projetos.some(p=>p.participantes.includes(u.id)&&(p.dist&&p.dist[u.id]||0)>0)).length;
-  document.getElementById('rede-stats').innerHTML=`
-    <div class="stat"><div class="stat-label">Membros ativos</div><div class="stat-value">${ativos.length}</div></div>
-    <div class="stat"><div class="stat-label">Projetos ativos</div><div class="stat-value">${projetos.filter(p=>p.status==='Em andamento').length}</div></div>
-    <div class="stat"><div class="stat-label">Faturamento total</div><div class="stat-value" style="font-size:17px">R$ ${totalFat.toLocaleString('pt-BR')}</div></div>
-    <div class="stat"><div class="stat-label">Já receberam</div><div class="stat-value">${comRenda}</div></div>
-    <div class="stat"><div class="stat-label">Sinergias mapeadas</div><div class="stat-value">${sinergias.length}</div></div>
-    <div class="stat"><div class="stat-label">Conexões na rede</div><div class="stat-value">${conexoes.length}</div></div>
-    <div class="stat"><div class="stat-label">Convidados externos</div><div class="stat-value">${convidadosExternos.length}</div></div>`;
-
-  // Charts
-  renderCharts();
-  renderDashboardConexoes();
+// ===================== DASHBOARD =====================
+function renderDashboard(){
   renderDashboardModeracao();
+  const totalRec=receitas.reduce((s,r)=>s+(r.valor||0),0);
+  const totalFat=projetos.reduce((s,p)=>s+(p.valor||0),0);
+  const pipAtivos=negocios.filter(n=>n.status!=='Fechado'&&n.status!=='Pagamento Realizado').length;
+  const kpisEl=document.getElementById('dash-kpis');
+  if(kpisEl)kpisEl.innerHTML=`
+    <div class="stat"><div class="stat-label">Receita Registrada</div><div class="stat-value" style="font-size:16px">R$ ${totalRec.toLocaleString('pt-BR',{minimumFractionDigits:0})}</div></div>
+    <div class="stat"><div class="stat-label">Faturamento (Negócios)</div><div class="stat-value" style="font-size:16px">R$ ${totalFat.toLocaleString('pt-BR',{minimumFractionDigits:0})}</div></div>
+    <div class="stat"><div class="stat-label">Pipeline Ativo</div><div class="stat-value">${pipAtivos} oportunidades</div></div>
+    <div class="stat"><div class="stat-label">Conexões na Rede</div><div class="stat-value">${conexoes.length}</div></div>`;
+  // Receita por frente
+  const frentes=[
+    {key:'sicoob',label:'Sicoob',color:'#0a1628'},
+    {key:'grupag',label:'GruPag',color:'#d97706'},
+    {key:'trib',label:'Tributário',color:'#0F6E56'},
+    {key:'hub',label:'Deals IA Hub',color:'#5b21b6'},
+  ];
+  const frentesEl=document.getElementById('dash-receita-frentes');
+  if(frentesEl)frentesEl.innerHTML=frentes.map(f=>{
+    const total=receitas.filter(r=>r.frente===f.key).reduce((s,r)=>s+(r.valor||0),0);
+    return`<div class="stat"><div class="stat-label">${f.label}</div><div class="stat-value" style="font-size:15px;color:${f.color}">R$ ${total.toLocaleString('pt-BR',{minimumFractionDigits:0})}</div></div>`;
+  }).join('');
+  // Pipeline resumo
+  const pipEl=document.getElementById('dash-pipeline-resumo');
+  if(pipEl){
+    const prox=negocios.filter(n=>n.status!=='Fechado'&&n.status!=='Pagamento Realizado').sort((a,b)=>(b.vlrEst||0)-(a.vlrEst||0)).slice(0,4);
+    if(!prox.length){pipEl.innerHTML=`<div style="color:#aaa;font-size:13px">Nenhuma oportunidade ativa. Vá em Pipeline para adicionar.</div>`;}
+    else{pipEl.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">${prox.map(n=>`<div style="border:1.5px solid #e5e7eb;border-radius:8px;padding:12px"><div style="font-size:13px;font-weight:600;color:#0a1628;margin-bottom:4px">${n.titulo||'Sem nome'}</div><div style="font-size:12px;color:#888;margin-bottom:6px">${n.status||'—'}</div><div style="font-size:14px;font-weight:600;color:#0F6E56">R$ ${(n.vlrEst||0).toLocaleString('pt-BR',{minimumFractionDigits:0})}</div></div>`).join('')}</div>`;}
+  }
+  // Comissões da rede
+  const comEl=document.getElementById('dash-comissoes');
+  if(comEl){
+    const rede=comissoes.filter(c=>c.tipo==='rede');
+    if(!rede.length){comEl.innerHTML=`<div style="color:#aaa;font-size:13px">Nenhum comissionamento registrado.</div>`;}
+    else{
+      const totalCom=rede.reduce((s,c)=>s+(c.valor||0),0);
+      comEl.innerHTML=`<div class="stats" style="margin-bottom:12px"><div class="stat"><div class="stat-label">Total pago à rede</div><div class="stat-value" style="color:#d97706">R$ ${totalCom.toLocaleString('pt-BR',{minimumFractionDigits:0})}</div></div><div class="stat"><div class="stat-label">Registros</div><div class="stat-value">${rede.length}</div></div></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px">${rede.slice(0,6).map(c=>`<div style="border:1.5px solid #e5e7eb;border-radius:8px;padding:12px"><div style="font-size:13px;font-weight:600;color:#0a1628;margin-bottom:4px">${c.nome||'Indicador'}</div><div style="font-size:12px;color:#888;margin-bottom:4px">${c.mes||'—'} · ${c.frente||'—'}</div><div style="font-size:14px;font-weight:600;color:#d97706">R$ ${(c.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:0})}</div></div>`).join('')}</div>`;
+    }
+  }
+  renderCharts();
 }
 
 function destroyChart(id){if(chartInstances[id]){chartInstances[id].destroy();delete chartInstances[id];}}
+
+// ===================== RECEITAS =====================
+function switchRecTab(tab){
+  currentRecTab=tab;
+  ['geral','sicoob','grupag','trib','hub'].forEach(t=>{
+    const btn=document.getElementById('rec-tab-'+t);
+    if(!btn)return;
+    btn.style.background=t===tab?'#0a1628':'#fff';
+    btn.style.color=t===tab?'#fff':'#0a1628';
+    btn.style.border=t===tab?'none':'1.5px solid #0a1628';
+  });
+  renderReceitas();
+}
+
+function renderReceitas(){
+  const kpisEl=document.getElementById('rec-kpis');
+  const contEl=document.getElementById('rec-conteudo');
+  const tab=currentRecTab;
+  const lista=tab==='geral'?receitas:receitas.filter(r=>r.frente===tab);
+  const total=lista.reduce((s,r)=>s+(r.valor||0),0);
+  const qtd=lista.length;
+  if(kpisEl)kpisEl.innerHTML=`
+    <div class="stat"><div class="stat-label">Total</div><div class="stat-value" style="color:#0F6E56">R$ ${total.toLocaleString('pt-BR',{minimumFractionDigits:0})}</div></div>
+    <div class="stat"><div class="stat-label">Lançamentos</div><div class="stat-value">${qtd}</div></div>`;
+  if(!contEl)return;
+  if(!lista.length){
+    contEl.innerHTML=`<div style="color:#aaa;font-size:13px;padding:16px">Nenhuma receita registrada${tab!=='geral'?' para esta frente':''}.${tab!=='geral'?' Você pode importar um extrato abaixo.':''}</div>`;
+    return;
+  }
+  const byMes={};
+  lista.forEach(r=>{
+    const mes=r.mes||(r.data?r.data.substring(0,7):'s/d');
+    if(!byMes[mes])byMes[mes]={total:0,itens:[]};
+    byMes[mes].total+=(r.valor||0);
+    byMes[mes].itens.push(r);
+  });
+  const meses=Object.keys(byMes).sort().reverse();
+  contEl.innerHTML=meses.map(mes=>{
+    const g=byMes[mes];
+    return`<div style="margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-size:13px;font-weight:600;color:#0a1628">${mes}</div>
+        <div style="font-size:13px;font-weight:600;color:#0F6E56">R$ ${g.total.toLocaleString('pt-BR',{minimumFractionDigits:0})}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px">
+        ${g.itens.map(r=>`<div style="border:1.5px solid #e5e7eb;border-radius:8px;padding:10px 12px">
+          <div style="font-size:13px;font-weight:600;color:#0a1628;margin-bottom:2px">${r.desc||'Receita'}</div>
+          <div style="font-size:11px;color:#888;margin-bottom:6px">${r.frente||'—'} · ${r.data||mes}</div>
+          <div style="font-size:14px;font-weight:600;color:#0F6E56">R$ ${(r.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function abrirLancarReceita(){
+  const frente=currentRecTab==='geral'?'sicoob':currentRecTab;
+  const desc=prompt('Descrição da receita:');if(!desc)return;
+  const valorStr=prompt('Valor (R$):');const valor=parseFloat((valorStr||'').replace(',','.'));
+  if(isNaN(valor)||valor<=0){alert('Valor inválido.');return;}
+  const hoje=new Date().toISOString().slice(0,10);
+  receitas.push({id:Date.now(),desc,frente,valor,data:hoje,mes:hoje.slice(0,7)});
+  saveData();
+  renderReceitas();
+  renderDashboard();
+  toast('✅ Receita registrada');
+}
+
+function importarExtrato(input){
+  const file=input.files[0];if(!file)return;
+  toast('📂 Importação via planilha em breve. Por enquanto, use "+ Lançar Receita".');
+  input.value='';
+}
 
 function renderDashboardConexoes(){
   const el=document.getElementById('dashboard-conexoes');if(!el)return;
@@ -2115,7 +2097,7 @@ function renderDashboardConexoes(){
     if(destaque){
       const dono=users.find(u=>u.id===destaque.c.criadorId);
       const topMatch=destaque.matches[0];
-      destaqueEl.innerHTML=`<div style="background:linear-gradient(135deg,#0a1628,#d4a017);border-radius:12px;padding:16px 18px;margin-bottom:16px;color:#fff;cursor:pointer" onclick="showTab('rede-membros');setTimeout(()=>switchMbrTab('conexoes'),100)">
+      destaqueEl.innerHTML=`<div style="background:linear-gradient(135deg,#0a1628,#d4a017);border-radius:12px;padding:16px 18px;margin-bottom:16px;color:#fff;cursor:pointer" onclick="showTab('rede-membros')">
         <div style="font-size:11px;opacity:.85;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">⭐ Conexão em destaque da semana</div>
         <div style="font-size:15px;font-weight:600;margin-bottom:4px">${destaque.c.seg}</div>
         <div style="font-size:12px;opacity:.9;margin-bottom:8px">${isSocio()?'por '+(dono?dono.nome:'?')+' · ':''}${topMatch.score}% de match com ${isSocio()?topMatch.user.nome:topMatch.user.perfil||'Membro'}</div>
@@ -2135,7 +2117,7 @@ function renderDashboardConexoes(){
     const nivelNum=parseInt(c.nivel)||1;
     const nivelColor=nivelNum>=4?'#16a34a':nivelNum===3?'#ca8a04':'#dc2626';
     const porteCls=({'Startup':'porte-startup','Pequena empresa':'porte-pequena','Média empresa':'porte-media','Grande empresa':'porte-grande','Multinacional':'porte-multi'})[c.porte]||'';
-    return`<div class="con-card" style="cursor:pointer" onclick="showTab('rede-membros');setTimeout(()=>switchMbrTab('conexoes'),100)">
+    return`<div class="con-card" style="cursor:pointer" onclick="showTab('rede-membros')">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
         <div>
           <div style="font-size:14px;font-weight:600;color:#0a1628">${c.seg}</div>
@@ -2209,32 +2191,17 @@ function renderLembreteConexao(){
 }
 
 function renderCharts(){
-  // Negócios por segmento
-  destroyChart('chart-segs');
-  const segCount={};
-  users.forEach(u=>(u.seg||'').split(',').map(s=>s.trim()).filter(Boolean).forEach(s=>segCount[s]=(segCount[s]||0)+1));
-  const segsTop=Object.entries(segCount).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  const ctx1=document.getElementById('chart-segs').getContext('2d');
-  chartInstances['chart-segs']=new Chart(ctx1,{type:'bar',data:{labels:segsTop.map(x=>x[0]),datasets:[{data:segsTop.map(x=>x[1]),backgroundColor:'#0a1628',borderRadius:6}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}});
-
-  // Status projetos
+  // Status projetos (Dashboard)
   destroyChart('chart-proj-status');
   const pstatus={'Em andamento':0,'Concluído':0,'Pausado':0};
   projetos.forEach(p=>pstatus[p.status]=(pstatus[p.status]||0)+1);
-  const ctx2=document.getElementById('chart-proj-status').getContext('2d');
-  chartInstances['chart-proj-status']=new Chart(ctx2,{type:'doughnut',data:{labels:Object.keys(pstatus),datasets:[{data:Object.values(pstatus),backgroundColor:['#0a1628','#0F6E56','#888']}]},options:{plugins:{legend:{position:'bottom'}}}});
-
-  // Perfis
-  destroyChart('chart-perfis');
-  const perfis={Sócio:0,Associado:0,Parceiro:0};
-  users.forEach(u=>perfis[u.perfil]=(perfis[u.perfil]||0)+1);
-  const ctx3=document.getElementById('chart-perfis').getContext('2d');
-  chartInstances['chart-perfis']=new Chart(ctx3,{type:'doughnut',data:{labels:Object.keys(perfis),datasets:[{data:Object.values(perfis),backgroundColor:['#854F0B','#0F6E56','#0a1628']}]},options:{plugins:{legend:{position:'bottom'}}}});
+  const c2el=document.getElementById('chart-proj-status');
+  if(c2el){const ctx2=c2el.getContext('2d');chartInstances['chart-proj-status']=new Chart(ctx2,{type:'doughnut',data:{labels:Object.keys(pstatus),datasets:[{data:Object.values(pstatus),backgroundColor:['#0a1628','#0F6E56','#888']}]},options:{plugins:{legend:{position:'bottom'}}}});}
 
   // Faturamento (por projeto)
   destroyChart('chart-fat');
-  const ctx4=document.getElementById('chart-fat').getContext('2d');
-  chartInstances['chart-fat']=new Chart(ctx4,{type:'bar',data:{labels:projetos.map(p=>p.nome.length>18?p.nome.substring(0,17)+'…':p.nome),datasets:[{data:projetos.map(p=>p.valor||0),backgroundColor:'#d4a017',borderRadius:6}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'R$'+v.toLocaleString('pt-BR')}}}}});
+  const c4el=document.getElementById('chart-fat');
+  if(c4el){const ctx4=c4el.getContext('2d');chartInstances['chart-fat']=new Chart(ctx4,{type:'bar',data:{labels:projetos.map(p=>p.nome.length>18?p.nome.substring(0,17)+'…':p.nome),datasets:[{data:projetos.map(p=>p.valor||0),backgroundColor:'#d4a017',borderRadius:6}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'R$'+v.toLocaleString('pt-BR')}}}}});}
 }
 
 // ===================== HELPERS =====================
@@ -3345,7 +3312,7 @@ function abrirNovoNegocio(){
     openAddProj();
   } else {
     showTab('rede-membros');
-    setTimeout(()=>{ switchMbrTab('conexoes'); setTimeout(()=>openAddCon(),150); },150);
+    setTimeout(()=>openAddCon(),200);
   }
 }
 
@@ -4236,6 +4203,33 @@ const PORTE_CLS={'Startup':'porte-startup','Pequena empresa':'porte-pequena','M�
 const NIVEL_ICON={'Forte':'🟢','Médio':'🟡','Fraco':'🔴'};
 // Peso do índice numérico no match score
 function nivelWeight(n){const v=parseInt(n)||1;return v>=4?1.5:v===3?1.2:v<=2?0.8:1;}
+
+function renderSocios(){
+  const el=document.getElementById('con-socios');if(!el)return;
+  const socios=users.filter(u=>u.perfil==='Sócio'&&u.status==='Ativo');
+  if(!socios.length){el.innerHTML=`<div style="color:#aaa;font-size:13px">Nenhum sócio ativo.</div>`;return;}
+  el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">${socios.map(u=>`
+    <div style="border:1.5px solid #0a1628;border-radius:10px;padding:12px 14px;cursor:pointer" onclick="openEditUsr(${u.id})">
+      <div style="font-size:13px;font-weight:700;color:#0a1628;margin-bottom:4px">${u.nome}</div>
+      <div style="font-size:12px;color:#888">${u.empresa||'—'}</div>
+      <div style="font-size:11px;color:#888;margin-top:4px">${(u.seg||'').split(',').slice(0,2).join(' · ')||'—'}</div>
+    </div>`).join('')}</div>`;
+}
+
+function renderParceiros(){
+  const el=document.getElementById('con-parceiros');if(!el)return;
+  const parceiros=users.filter(u=>u.perfil==='Parceiro'&&u.status==='Ativo');
+  if(!parceiros.length){el.innerHTML=`<div style="color:#aaa;font-size:13px">Nenhum parceiro ativo ainda.</div>`;return;}
+  const socios=users.filter(u=>u.perfil==='Sócio');
+  el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">${parceiros.map(u=>{
+    const socioVinc=socios.find(s=>s.id===u.vinculo||s.nome===u.vinculoNome);
+    return`<div style="border:1.5px solid #d97706;border-radius:10px;padding:12px 14px;cursor:pointer" onclick="${isSocio()?`openEditUsr(${u.id})`:``}">
+      <div style="font-size:13px;font-weight:600;color:#0a1628;margin-bottom:4px">${isSocio()?u.nome:(u.seg||'Parceiro')}</div>
+      <div style="font-size:12px;color:#888;margin-bottom:4px">${u.empresa||'—'}</div>
+      ${socioVinc?`<div style="font-size:11px;color:#d97706">via ${socioVinc.nome}</div>`:''}
+    </div>`;
+  }).join('')}</div>`;
+}
 
 function renderConexoes(targetEl){
   _conexoesTarget=targetEl||null;
@@ -5478,6 +5472,8 @@ function saveData(){
     localStorage.setItem('iahub_negocios',JSON.stringify(negocios));
     localStorage.setItem('iahub_portfolio',JSON.stringify(portfolio));
     localStorage.setItem('iahub_pagamentos',JSON.stringify(pagamentos));
+    localStorage.setItem('iahub_receitas',JSON.stringify(receitas));
+    localStorage.setItem('iahub_comissoes',JSON.stringify(comissoes));
   }catch(e){console.warn('saveData failed',e);}
   syncToSupabase();
 }
@@ -5496,6 +5492,8 @@ function loadData(){
     const neg=localStorage.getItem('iahub_negocios');if(neg)negocios=JSON.parse(neg);
     const prt=localStorage.getItem('iahub_portfolio');if(prt)portfolio=JSON.parse(prt);
     const pag=localStorage.getItem('iahub_pagamentos');if(pag)pagamentos=JSON.parse(pag);
+    const rec=localStorage.getItem('iahub_receitas');if(rec)receitas=JSON.parse(rec);
+    const com=localStorage.getItem('iahub_comissoes');if(com)comissoes=JSON.parse(com);
   }catch(e){console.warn('loadData failed',e);}
 }
 
