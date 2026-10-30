@@ -910,11 +910,28 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
         <select id="p-recorr"><option value="">Não</option><option>Mensal</option><option>Trimestral</option><option>Anual</option></select></div>
       <div><label>Recorrência até</label><input id="p-recorr-ate" type="date"></div>
       <div class="full"><label>Sinergia explorada</label><input id="p-sin" placeholder="Ex: Advocacia ↔ Contabilidade"></div>
-      <div class="full"><label>Participantes</label>
-        <select id="p-parts" multiple style="height:100px"></select>
-        <div style="font-size:11px;color:#aaa;margin-top:4px">Segure Ctrl para selecionar mais de um</div></div>
-      <div class="full"><label>Distribuição de rendimentos (%)</label>
-        <div id="p-dist-wrap" style="font-size:13px;color:#aaa;margin-top:4px">Selecione participantes acima</div></div>
+      <div class="full">
+        <label>Distribuição de Comissão</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px">
+          <div style="border:1.5px solid #0a1628;border-radius:10px;padding:12px">
+            <div style="font-size:11px;font-weight:700;color:#0a1628;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Sócio Originador · Comissão de Venda (50%)</div>
+            <select id="p-socio-principal" style="width:100%;padding:7px;border:1px solid #ddd;border-radius:7px;font-size:13px" onchange="updateSocioResto()"></select>
+            <div id="p-socio-resto" style="font-size:12px;color:#888;margin-top:8px;padding:6px 8px;background:#f9f9f7;border-radius:6px">Fica com 100% dos 50% de comissão</div>
+          </div>
+          <div style="border:1.5px dashed #d97706;border-radius:10px;padding:12px">
+            <div style="font-size:11px;font-weight:700;color:#d97706;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Rede do Sócio · % da sua comissão</div>
+            <div id="p-rede-list" style="display:flex;flex-direction:column;gap:6px"></div>
+            <button type="button" onclick="addRedeOriginador()" style="margin-top:8px;font-size:12px;color:#d97706;background:none;border:1px dashed #d97706;border-radius:6px;cursor:pointer;padding:4px 10px;width:100%">+ Adicionar pessoa da rede</button>
+          </div>
+        </div>
+        <div style="margin-top:12px;border:1.5px solid #e5e7eb;border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;background:#f9fafb">
+          <span style="font-size:18px">🏢</span>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:#0F6E56;text-transform:uppercase;letter-spacing:.04em">BIdaTX (4 Sócios) · 50% Institucional</div>
+            <div style="font-size:12px;color:#888;margin-top:2px">Distribuído igualmente entre os sócios — automático</div>
+          </div>
+        </div>
+      </div>
       <div class="full"><label>1º follow-up</label><textarea id="p-fu1" placeholder="Registro inicial do projeto..."></textarea></div>
     </div>
     <div class="modal-btns">
@@ -980,52 +997,27 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 <!-- Modal conexão -->
 <div class="overlay" id="ov-con">
   <div class="modal" style="width:520px">
-    <h2 id="con-modal-ttl">Nova conexão</h2>
-    <p style="font-size:13px;color:#888;margin-bottom:16px">Cadastre um contato sem revelar dados pessoais. O sistema fará o match automático com membros da rede.</p>
+    <h2 id="con-modal-ttl">Cadastrar na Rede</h2>
     <div class="fg">
-      <div style="background:#eff6ff;border-radius:8px;padding:10px 12px;margin-bottom:4px;font-size:12px;color:#0a1628;grid-column:1/-1">
-        💡 Não informe nome da empresa nem dados pessoais. Use atributos que descrevam o perfil sem identificar.
+      <div class="full"><label>Nome *</label><input id="con-nome" placeholder="Nome completo"></div>
+      <div><label>Empresa</label><input id="con-empresa" placeholder="Nome da empresa"></div>
+      <div><label>Segmento / Área *</label><input id="con-seg" placeholder="Ex: Contabilidade, TI, Saúde"></div>
+      <div><label>Telefone</label><input id="con-tel" placeholder="(21) 99999-9999"></div>
+      <div class="full"><label>E-mail</label><input id="con-email" type="email" placeholder="email@exemplo.com"></div>
+      <div class="full">
+        <label>Quem trouxe para a rede?</label>
+        <select id="con-orig1" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px" onchange="updateCadeia()">
+          <option value="">— Direto pelo sócio / já era conhecido —</option>
+        </select>
       </div>
-      <div class="full"><label>Segmento / Indústria *</label>
-        <input id="con-seg" placeholder="Ex: Agronegócio, Tecnologia, Varejo, Logística, Saúde..."></div>
-      <div><label>Porte da empresa</label>
-        <select id="con-porte">
-          <option value="">Não informado</option>
-          <option value="Startup">Startup</option>
-          <option value="Pequena empresa">Pequena empresa</option>
-          <option value="Média empresa">Média empresa</option>
-          <option value="Grande empresa">Grande empresa</option>
-          <option value="Multinacional">Multinacional</option>
-        </select></div>
-      <div><label>Hierarquia de influência *</label>
-        <select id="con-acesso">
-          <option value="">Não informado</option>
-          <option value="C-Level (CEO / Owner / Presidente)">C-Level — CEO / Owner / Presidente</option>
-          <option value="Diretoria (CFO / CMO / CTO)">Diretoria — CFO / CMO / CTO</option>
-          <option value="Comitê de Inovação / Conselho">Comitê de Inovação / Conselho</option>
-          <option value="Gerência de Compras / Suprimentos">Gerência de Compras / Suprimentos</option>
-          <option value="Gerência Operacional">Gerência Operacional</option>
-          <option value="Contato operacional / Analista">Contato operacional / Analista</option>
-        </select></div>
-      <div><label>Índice de relacionamento (1–5)</label>
-        <select id="con-nivel">
-          <option value="5">5 — Tomei café com o decisor esta semana</option>
-          <option value="4">4 — Contato frequente, alto nível de confiança</option>
-          <option value="3">3 — Já tratei negócios, conheço bem</option>
-          <option value="2">2 — Conheço, tivemos contato pontual</option>
-          <option value="1">1 — Conheço de vista / LinkedIn</option>
-        </select></div>
-      <div class="full"><label>Descrição mascarada do contato *</label>
-        <textarea id="con-desc" style="height:90px" placeholder="Descreva sem identificar. Ex: Construtora de médio porte em SP buscando soluções de gestão financeira. Decisor receptivo, empresa em expansão. Ticket estimado: alto."></textarea></div>
-      <div class="full"><label>Fit sugerido com a rede</label>
-        <input id="con-fit-segs" placeholder="Ex: Contabilidade, Mercado Financeiro (o sistema também sugere automaticamente)"></div>
-      <div class="full"><label>Observação interna (visível só para sócios)</label>
-        <input id="con-obs" placeholder="Contexto adicional, urgência, próximos passos..."></div>
+      <div class="full" id="con-cadeia-display" style="display:none">
+        <div style="background:#f9f9f7;border:1px solid #e5e7eb;border-radius:8px;padding:10px;font-size:12px;color:#0a1628"></div>
+      </div>
     </div>
     <div class="modal-btns">
-      <button class="btn-s" id="btn-del-con" style="display:none;margin-right:auto;color:#c0392b;border-color:#fecaca" onclick="deleteCon()">Remover</button>
+      <button class="btn-s" id="btn-del-con" style="display:none;margin-right:auto;color:#c0392b;border-color:#fecaca" onclick="deleteConMembro()">Remover</button>
       <button class="btn-s" onclick="closeOv('ov-con')">Cancelar</button>
-      <button class="btn-p" onclick="saveCon()">Salvar conexão</button>
+      <button class="btn-p" onclick="saveCon()">Salvar</button>
     </div>
   </div>
 </div>
@@ -1922,7 +1914,7 @@ function showTab(name){
   if(tbtn)tbtn.classList.add('active');
   if(name==='rede')renderDashboard();
   if(name==='receitas')renderReceitas();
-  if(name==='rede-membros'){renderSocios();renderParceiros();renderConexoes(document.getElementById('con-inner-mbr'));}
+  if(name==='rede-membros'){renderSocios();renderParceiros();renderRedeMembros();}
   if(name==='financeiro')renderFinanceiro();
   if(name==='projetos')renderProjetos();
   if(name==='pipeline')renderPipeline();
@@ -1959,7 +1951,7 @@ function initFilters(){
 
 function closeOv(id){document.getElementById(id).classList.remove('open');}
 window.addEventListener('click',e=>{
-  ['ov-usr','ov-proj','ov-fu','ov-lanc','ov-sin','ov-notif','ov-con','ov-relatorio','ov-propor','ov-moderacao','ov-aprovacao','ov-revelar','ov-onboarding','ov-vit-detalhe','ov-vit-int','ov-vit-int-rapido','ov-cred'].forEach(id=>{if(e.target.id===id)closeOv(id);});
+  if(e.target.classList&&e.target.classList.contains('overlay')&&e.target.id)closeOv(e.target.id);
 });
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
@@ -3213,28 +3205,75 @@ function saveLanc(){
 function removeLanc(id){if(!confirm('Remover?'))return;lancamentos=lancamentos.filter(l=>l.id!==id);renderFinanceiro();saveData();}
 
 // ===================== PROJETOS =====================
-function refreshProjParts(){
-  const sel=document.getElementById('p-parts');if(!sel)return;
-  const cur=Array.from(sel.selectedOptions).map(o=>parseInt(o.value));
-  sel.innerHTML='';
-  users.filter(u=>u.status==='Ativo').forEach(u=>{
-    const o=document.createElement('option');o.value=u.id;o.text=`${u.nome} (${u.perfil})`;
-    if(cur.includes(u.id))o.selected=true;
+let _redeOriginadores=[];
+
+function initProjDistForm(socioPrincipalId,redeExistente){
+  const sel=document.getElementById('p-socio-principal');if(!sel)return;
+  sel.innerHTML='<option value="">— Selecione o sócio —</option>';
+  users.filter(u=>u.perfil==='Sócio').forEach(u=>{
+    const o=document.createElement('option');o.value=u.id;o.text=u.nome;
+    if(u.id===socioPrincipalId)o.selected=true;
     sel.appendChild(o);
   });
-  buildDist({});
+  _redeOriginadores=redeExistente?[...redeExistente]:[];
+  renderRedeList();
+  updateSocioResto();
 }
-function buildDist(existing){
-  const sel=document.getElementById('p-parts');if(!sel)return;
-  const sel2=Array.from(sel.selectedOptions).map(o=>parseInt(o.value));
-  const wrap=document.getElementById('p-dist-wrap');if(!wrap)return;
-  if(!sel2.length){wrap.innerHTML='<span style="color:#aaa;font-size:13px">Selecione participantes acima</span>';return;}
-  const eq=Math.floor(100/sel2.length);
-  wrap.innerHTML=sel2.map(id=>{const u=users.find(x=>x.id===id);const v=existing[id]!==undefined?existing[id]:eq;
-    return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="flex:1;font-size:13px">${u?u.nome:'?'}</span><input type="number" id="dist-${id}" value="${v}" min="0" max="100" style="width:70px;padding:4px 8px;border:1px solid #ddd;border-radius:6px;font-size:13px"> %</div>`;
+
+function renderRedeList(){
+  const el=document.getElementById('p-rede-list');if(!el)return;
+  if(!_redeOriginadores.length){el.innerHTML='<span style="font-size:12px;color:#aaa">Nenhum membro da rede adicionado</span>';return;}
+  el.innerHTML=_redeOriginadores.map((r,i)=>{
+    const u=users.find(x=>x.id===r.userId);
+    return`<div style="display:flex;align-items:center;gap:6px;font-size:13px">
+      <span style="flex:1">${u?u.nome:'?'}</span>
+      <input type="number" value="${r.pct}" min="1" max="99" style="width:58px;padding:3px 6px;border:1px solid #ddd;border-radius:5px;font-size:12px" onchange="_redeOriginadores[${i}].pct=parseInt(this.value)||0;updateSocioResto()">
+      <span style="font-size:12px;color:#888">%</span>
+      <button onclick="_redeOriginadores.splice(${i},1);renderRedeList();updateSocioResto()" style="color:#c0392b;background:none;border:none;cursor:pointer;font-size:14px;padding:0 2px">×</button>
+    </div>`;
   }).join('');
+  updateSocioResto();
 }
-document.addEventListener('change',e=>{if(e.target.id==='p-parts')buildDist({});});
+
+function updateSocioResto(){
+  const el=document.getElementById('p-socio-resto');if(!el)return;
+  const totalRede=_redeOriginadores.reduce((s,r)=>s+(parseInt(r.pct)||0),0);
+  const resto=100-totalRede;
+  const sel=document.getElementById('p-socio-principal');
+  const nome=sel&&sel.value?(users.find(u=>u.id===parseInt(sel.value))||{}).nome||'Sócio':'Sócio';
+  if(totalRede>100){el.style.color='#c0392b';el.textContent='⚠ Rede excede 100% — ajuste os percentuais';return;}
+  el.style.color='#888';
+  el.textContent=totalRede===0?`${nome} fica com 100% dos 50% de comissão`:`${nome} fica com ${resto}% · Rede: ${totalRede}% (dos 50% de comissão)`;
+}
+
+function addRedeOriginador(){
+  const membros=users.filter(u=>u.perfil!=='Sócio'||(u.perfil==='Sócio'&&parseInt(document.getElementById('p-socio-principal').value)!==u.id));
+  const jaAdicionados=_redeOriginadores.map(r=>r.userId);
+  const disponiveis=membros.filter(u=>!jaAdicionados.includes(u.id));
+  if(!disponiveis.length){showToast('Todos os membros já foram adicionados.');return;}
+  const opts=disponiveis.map(u=>`<option value="${u.id}">${u.nome} (${u.perfil})</option>`).join('');
+  const html=`<select id="_tmp-rede-sel" style="padding:7px;border:1px solid #ddd;border-radius:7px;font-size:13px;width:100%"><option value="">— Selecione —</option>${opts}</select>`;
+  const div=document.createElement('div');div.innerHTML=html;
+  const list=document.getElementById('p-rede-list');
+  // append directly
+  const wrapper=document.createElement('div');
+  wrapper.style.cssText='display:flex;gap:6px;align-items:center';
+  wrapper.innerHTML=`${html}<button onclick="confirmAddRede(this)" style="padding:5px 10px;background:#d97706;color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;white-space:nowrap">OK</button>`;
+  list.appendChild(wrapper);
+}
+
+function confirmAddRede(btn){
+  const row=btn.parentElement;
+  const sel=row.querySelector('select');
+  const uid=parseInt(sel.value);
+  if(!uid){showToast('Selecione um membro.');return;}
+  _redeOriginadores.push({userId:uid,pct:20});
+  row.remove();
+  renderRedeList();
+  updateSocioResto();
+}
+
+document.addEventListener('change',e=>{if(e.target.id==='p-socio-principal')updateSocioResto();});
 
 function renderProjetos(){
   document.getElementById('btn-novo-proj').style.display=isSocio()?'inline-block':'none';
@@ -3297,7 +3336,12 @@ function projCard(p){
       ${p.fim?`<span>🏁 ${p.fim}</span>`:''}
       ${p.recorrAte?`<span>até ${p.recorrAte}</span>`:''}
     </div>
-    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px">${parts.map(u=>{const ps=PS[u.perfil]||{bg:'#eee',tx:'#555'};const pct=p.dist&&p.dist[u.id]?` ${p.dist[u.id]}%`:'';return`<span class="chip"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${ps.tx};margin-right:4px;vertical-align:middle"></span>${u.nome}${pct}</span>`;}).join('')}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px">${(()=>{
+      const socio=users.find(u=>u.id===p.socioPrincipalId);
+      const rede=(p.redeOriginadores||[]).map(r=>{const u=users.find(x=>x.id===r.userId);return u?`<span class="chip" style="background:#fef3c7;color:#92400e">${u.nome} ${r.pct}%</span>`:''}).join('');
+      const socioChip=socio?`<span class="chip" style="background:#e0f2fe;color:#0a1628">${socio.nome} — originador</span>`:'';
+      return socioChip+rede;
+    })()}</div>
     <div style="font-size:12px;font-weight:600;color:#888;margin-bottom:6px">Atualizações (${fus.length})</div>
     ${fus.length?`<div class="fu-line">${[...fus].reverse().map(f=>`<div class="fu-item"><div class="fu-txt">${f.texto}</div><div class="fu-meta">${f.data} · ${f.autor||'Sistema'}</div></div>`).join('')}</div>`:`<div style="font-size:12px;color:#aaa">Nenhuma atualização ainda.</div>`}
   </div>`;
@@ -3323,7 +3367,7 @@ function openAddProj(){
   ['p-nome','p-desc','p-valor','p-inicio','p-fim','p-sin','p-fu1','p-recorr-ate'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('p-status').value='Em andamento';
   document.getElementById('p-recorr').value='';
-  refreshProjParts();
+  initProjDistForm(currentUser.id,[]);
   document.getElementById('ov-proj').classList.add('open');
 }
 function openEditProj(id){
@@ -3335,21 +3379,24 @@ function openEditProj(id){
   document.getElementById('p-inicio').value=p.inicio||'';document.getElementById('p-fim').value=p.fim||'';
   document.getElementById('p-recorr').value=p.recorr||'';document.getElementById('p-recorr-ate').value=p.recorrAte||'';
   document.getElementById('p-sin').value=p.sinergia||'';document.getElementById('p-fu1').value='';
-  refreshProjParts();
-  Array.from(document.getElementById('p-parts').options).forEach(o=>o.selected=p.participantes.includes(parseInt(o.value)));
-  buildDist(p.dist||{});
+  initProjDistForm(p.socioPrincipalId||p.criadorId,p.redeOriginadores||[]);
   document.getElementById('ov-proj').classList.add('open');
 }
 function saveProj(){
   const nome=document.getElementById('p-nome').value.trim();
   if(!nome){alert('Informe o nome do projeto.');return;}
-  const parts=Array.from(document.getElementById('p-parts').selectedOptions).map(o=>parseInt(o.value));
-  const dist={};parts.forEach(id=>{const el=document.getElementById('dist-'+id);if(el)dist[id]=parseInt(el.value)||0;});
+  const socioPrincipalId=parseInt(document.getElementById('p-socio-principal').value)||null;
+  if(!socioPrincipalId){alert('Selecione o sócio originador.');return;}
+  const redeOriginadores=[..._redeOriginadores];
+  const totalRede=redeOriginadores.reduce((s,r)=>s+(r.pct||0),0);
+  if(totalRede>100){alert('O percentual da rede excede 100%. Ajuste antes de salvar.');return;}
+  const participantes=[socioPrincipalId,...redeOriginadores.map(r=>r.userId)];
   const fu1=document.getElementById('p-fu1').value.trim();
   const obj={nome,desc:document.getElementById('p-desc').value.trim(),status:document.getElementById('p-status').value,
     valor:parseFloat(document.getElementById('p-valor').value)||0,inicio:document.getElementById('p-inicio').value,
     fim:document.getElementById('p-fim').value,recorr:document.getElementById('p-recorr').value,
-    recorrAte:document.getElementById('p-recorr-ate').value,participantes:parts,dist,
+    recorrAte:document.getElementById('p-recorr-ate').value,
+    socioPrincipalId,redeOriginadores,participantes,
     sinergia:document.getElementById('p-sin').value.trim(),criadorId:currentUser.id};
   if(editProjId){
     const i=projetos.findIndex(p=>p.id===editProjId);
@@ -4206,7 +4253,7 @@ function nivelWeight(n){const v=parseInt(n)||1;return v>=4?1.5:v===3?1.2:v<=2?0.
 
 function renderSocios(){
   const el=document.getElementById('con-socios');if(!el)return;
-  const socios=users.filter(u=>u.perfil==='Sócio'&&u.status==='Ativo');
+  const socios=users.filter(u=>u.perfil==='Sócio');
   if(!socios.length){el.innerHTML=`<div style="color:#aaa;font-size:13px">Nenhum sócio ativo.</div>`;return;}
   el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">${socios.map(u=>`
     <div style="border:1.5px solid #0a1628;border-radius:10px;padding:12px 14px;cursor:pointer" onclick="openEditUsr(${u.id})">
@@ -4229,6 +4276,30 @@ function renderParceiros(){
       ${socioVinc?`<div style="font-size:11px;color:#d97706">via ${socioVinc.nome}</div>`:''}
     </div>`;
   }).join('')}</div>`;
+}
+
+function renderRedeMembros(){
+  const el=document.getElementById('con-inner-mbr');if(!el)return;
+  const rede=users.filter(u=>u.perfil==='Rede'&&u.status==='Ativo');
+  const header=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div style="font-size:13px;color:#888">${rede.length} membro${rede.length!==1?'s':''} na rede</div>
+    <button class="btn-p btn-sm" onclick="openAddCon()">+ Novo membro</button>
+  </div>`;
+  if(!rede.length){el.innerHTML=header+`<div class="empty-msg">Nenhum membro de rede ainda.</div>`;return;}
+  const cards=rede.map(u=>{
+    const chain=_buildOrigemChain(u.id);
+    const cadeia=chain.length>1?chain.join(' → '):chain[0]||'—';
+    return`<div style="border:1.5px solid #e5e7eb;border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:700;color:#0a1628;margin-bottom:2px">${u.nome}</div>
+        <div style="font-size:12px;color:#888;margin-bottom:6px">${u.empresa||''}${u.empresa&&u.segmento?' · ':''}${u.segmento||''}</div>
+        <div style="font-size:11px;color:#d97706;font-weight:600">Cadeia: ${cadeia}</div>
+        ${u.telefone?`<div style="font-size:11px;color:#888;margin-top:4px">${u.telefone}${u.email?' · '+u.email:''}</div>`:''}
+      </div>
+      ${isSocio()?`<button class="btn-s btn-sm" onclick="openEditCon(${u.id})">Editar</button>`:''}
+    </div>`;
+  }).join('');
+  el.innerHTML=header+`<div style="display:flex;flex-direction:column;gap:8px">${cards}</div>`;
 }
 
 function renderConexoes(targetEl){
@@ -4549,52 +4620,107 @@ function interesseCon(conId,userId){
   showToast(`✅ Interesse registrado! ${dono?dono.nome:'O dono'} e os sócios foram notificados. O dono do contato participará dos lucros deste negócio.`);
 }
 
+function _buildOrigemChain(userId){
+  const chain=[];let cur=userId;
+  while(cur){const u=users.find(x=>x.id===cur);if(!u||chain.includes(cur))break;chain.unshift(u.nome);cur=u.originadorId||null;}
+  return chain;
+}
+
 function openAddCon(){
   editConId=null;
-  document.getElementById('con-modal-ttl').textContent='Nova conexão';
-  ['con-seg','con-desc','con-fit-segs','con-obs'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('con-porte').value='';
-  document.getElementById('con-acesso').value='';
-  document.getElementById('con-nivel').value='3';
+  document.getElementById('con-modal-ttl').textContent='Cadastrar na Rede';
+  ['con-nome','con-empresa','con-seg','con-tel','con-email'].forEach(id=>document.getElementById(id).value='');
+  // Preenche "quem trouxe" com todos os usuários ativos
+  const sel=document.getElementById('con-orig1');
+  sel.innerHTML='<option value="">— Direto pelo sócio / já era conhecido —</option>';
+  users.filter(u=>u.status==='Ativo').forEach(u=>{
+    const o=document.createElement('option');o.value=u.id;o.text=`${u.nome} (${u.perfil})`;
+    sel.appendChild(o);
+  });
   document.getElementById('btn-del-con').style.display='none';
+  document.getElementById('con-cadeia-display').style.display='none';
   document.getElementById('ov-con').classList.add('open');
 }
+
 function openEditCon(id){
-  const c=conexoes.find(x=>x.id===id);if(!c)return;
+  const u=users.find(x=>x.id===id);if(!u)return;
   editConId=id;
-  document.getElementById('con-modal-ttl').textContent='Editar conexão';
-  document.getElementById('con-seg').value=c.seg||'';
-  document.getElementById('con-desc').value=c.desc||'';
-  document.getElementById('con-fit-segs').value=c.fitSegs||'';
-  document.getElementById('con-obs').value=c.obs||'';
-  document.getElementById('con-porte').value=c.porte||'';
-  document.getElementById('con-acesso').value=c.acesso||'';
-  document.getElementById('con-nivel').value=c.nivel||'3';
+  document.getElementById('con-modal-ttl').textContent='Editar membro';
+  document.getElementById('con-nome').value=u.nome||'';
+  document.getElementById('con-empresa').value=u.empresa||'';
+  document.getElementById('con-seg').value=u.segmento||'';
+  document.getElementById('con-tel').value=u.telefone||'';
+  document.getElementById('con-email').value=u.email||'';
+  const sel=document.getElementById('con-orig1');
+  sel.innerHTML='<option value="">— Direto pelo sócio / já era conhecido —</option>';
+  users.filter(x=>x.status==='Ativo'&&x.id!==id).forEach(x=>{
+    const o=document.createElement('option');o.value=x.id;o.text=`${x.nome} (${x.perfil})`;
+    if(x.id===u.originadorId)o.selected=true;
+    sel.appendChild(o);
+  });
   document.getElementById('btn-del-con').style.display='inline-block';
+  updateCadeia();
   document.getElementById('ov-con').classList.add('open');
 }
-function saveCon(){
-  const seg=document.getElementById('con-seg').value.trim();
-  const desc=document.getElementById('con-desc').value.trim();
-  if(!seg||!desc){alert('Segmento e descrição são obrigatórios.');return;}
-  const isOperador=currentUser.perfil==='Operador';
-  const origem=isOperador?'CorpLink':'IA Hub';
-  const statusCon=isOperador?'pendente':'ativo';
-  const obj={seg,porte:document.getElementById('con-porte').value,acesso:document.getElementById('con-acesso').value,nivel:document.getElementById('con-nivel').value,desc,fitSegs:document.getElementById('con-fit-segs').value.trim(),obs:document.getElementById('con-obs').value.trim(),criadorId:currentUser.id,desde:new Date().toLocaleDateString('pt-BR'),origem,status:statusCon};
-  if(editConId){const i=conexoes.findIndex(c=>c.id===editConId);conexoes[i]={...conexoes[i],...obj};}
-  else conexoes.push({...obj,id:Date.now()});
-  closeOv('ov-con');
-  if(!isOperador)renderConexoes();
-  saveData();
-  showToast(isOperador?'✅ Conexão enviada para moderação dos sócios!':'✅ Conexão salva!');
-  if(isOperador)renderOperadorView();
+
+function updateCadeia(){
+  const sel=document.getElementById('con-orig1');
+  const origId=parseInt(sel.value)||null;
+  const display=document.getElementById('con-cadeia-display');
+  if(!origId){display.style.display='none';return;}
+  const chain=_buildOrigemChain(origId);
+  chain.push('(novo membro)');
+  display.style.display='block';
+  display.querySelector('div').innerHTML='<strong>Cadeia de origem:</strong> '+chain.join(' → ');
 }
+
+function saveCon(){
+  const nome=document.getElementById('con-nome').value.trim();
+  if(!nome){alert('Informe o nome.');return;}
+  const origId=parseInt(document.getElementById('con-orig1').value)||null;
+  const obj={
+    nome,
+    empresa:document.getElementById('con-empresa').value.trim(),
+    segmento:document.getElementById('con-seg').value.trim(),
+    telefone:document.getElementById('con-tel').value.trim(),
+    email:document.getElementById('con-email').value.trim(),
+    originadorId:origId,
+    perfil:'Rede',
+    status:'Ativo',
+    desde:new Date().toLocaleDateString('pt-BR')
+  };
+  if(editConId){
+    const i=users.findIndex(u=>u.id===editConId);
+    users[i]={...users[i],...obj};
+    showToast('✅ Membro atualizado!');
+  } else {
+    users.push({...obj,id:Date.now()});
+    showToast('✅ Membro adicionado à rede!');
+  }
+  closeOv('ov-con');
+  if(typeof renderSocios==='function')renderSocios();
+  if(typeof renderParceiros==='function')renderParceiros();
+  if(typeof renderConexoes==='function')renderConexoes(document.getElementById('con-inner-mbr'));
+  saveData();
+}
+
+function deleteConMembro(){
+  if(!editConId||!confirm('Remover este membro da rede?'))return;
+  users=users.filter(u=>u.id!==editConId);
+  closeOv('ov-con');
+  if(typeof renderSocios==='function')renderSocios();
+  if(typeof renderParceiros==='function')renderParceiros();
+  if(typeof renderConexoes==='function')renderConexoes(document.getElementById('con-inner-mbr'));
+  saveData();
+  showToast('Membro removido.');
+}
+
 function deleteCon(id){
   const targetId=id||editConId;
   if(!targetId||!confirm('Remover esta conexão?'))return;
   conexoes=conexoes.filter(c=>c.id!==targetId);
   if(!id)closeOv('ov-con');
-  renderConexoes();saveData();
+  renderConexoes(document.getElementById('con-inner-mbr'));saveData();
 }
 
 
