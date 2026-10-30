@@ -5699,7 +5699,7 @@ function saveData(){
 }
 function loadData(){
   try{
-    const u=localStorage.getItem('iahub_users');if(u)users=JSON.parse(u);
+    const u=localStorage.getItem('iahub_users');if(u){users=JSON.parse(u);users.forEach(x=>{if(x.perfil==='Associado')x.perfil='Parceiro';});}
     const p=localStorage.getItem('iahub_projetos');if(p)projetos=JSON.parse(p);
     const l=localStorage.getItem('iahub_lancamentos');if(l)lancamentos=JSON.parse(l);
     const s=localStorage.getItem('iahub_sinergias');if(s)sinergias=JSON.parse(s);
