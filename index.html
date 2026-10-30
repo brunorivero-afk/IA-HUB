@@ -4383,7 +4383,8 @@ function renderContatos(){
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
         <button class="btn-s btn-sm" onclick="editContato(${c.id})">Editar</button>
-        <button class="btn-p btn-sm" onclick="converterParaMembro(${c.id})" style="font-size:11px;white-space:nowrap">→ Rede</button>
+        <button class="btn-p btn-sm" onclick="converterParaMembro(${c.id})" style="font-size:11px;white-space:nowrap" title="Promover para membro da rede">→ Rede</button>
+        <button onclick="excluirContato(${c.id})" title="Excluir contato" style="border:none;background:none;cursor:pointer;color:#c0392b;font-size:16px;padding:2px 0;line-height:1">🗑</button>
       </div>
     </div>`).join('');
   el.innerHTML=header+`<div style="display:flex;flex-direction:column;gap:8px">${cards}</div>`;
@@ -4427,6 +4428,30 @@ function removeContato(){
   closeOv('ov-contato');saveData();renderContatos();
 }
 
+function excluirContato(id){
+  if(!confirm('Excluir este contato?'))return;
+  contatos=contatos.filter(c=>c.id!==id);
+  saveData();renderContatos();
+}
+
+function excluirMembro(id){
+  const u=users.find(x=>x.id===id);
+  if(!u||!confirm(`Excluir ${u.nome} da rede?`))return;
+  users=users.filter(x=>x.id!==id);
+  saveData();renderRedeMembros();
+  showToast('Membro removido.');
+}
+
+function moverParaContatos(id){
+  const u=users.find(x=>x.id===id);
+  if(!u||!confirm(`Mover ${u.nome} de volta para Contatos?`))return;
+  contatos.push({id:Date.now(),nome:u.nome,empresa:u.empresa||'',segmento:u.segmento||'',telefone:u.telefone||'',email:u.email||'',obs:'',desde:new Date().toLocaleDateString('pt-BR')});
+  users=users.filter(x=>x.id!==id);
+  saveData();
+  switchConSub('contatos');
+  showToast(`${u.nome} movido para Contatos.`);
+}
+
 function converterParaMembro(id){
   const c=contatos.find(x=>x.id===id);if(!c)return;
   // Pre-fill the ov-con form and switch to rede sub
@@ -4455,14 +4480,18 @@ function renderRedeMembros(){
   const cards=rede.map(u=>{
     const chain=_buildOrigemChain(u.id);
     const cadeia=chain.length>1?chain.join(' → '):chain[0]||'—';
-    return`<div style="border:1.5px solid #e5e7eb;border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+    return`<div style="border:1.5px solid #e5e7eb;border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px">
       <div style="flex:1;min-width:0">
         <div style="font-size:14px;font-weight:700;color:#0a1628;margin-bottom:2px">${u.nome}</div>
         <div style="font-size:12px;color:#888;margin-bottom:6px">${u.empresa||''}${u.empresa&&u.segmento?' · ':''}${u.segmento||''}</div>
         <div style="font-size:11px;color:#d97706;font-weight:600">Cadeia: ${cadeia}</div>
-        ${u.telefone?`<div style="font-size:11px;color:#888;margin-top:4px">${u.telefone}${u.email?' · '+u.email:''}</div>`:''}
+        ${u.telefone||u.email?`<div style="font-size:11px;color:#aaa;margin-top:4px">${[u.telefone,u.email].filter(Boolean).join(' · ')}</div>`:''}
       </div>
-      ${isSocio()?`<button class="btn-s btn-sm" onclick="openEditCon(${u.id})">Editar</button>`:''}
+      ${isSocio()?`<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+        <button class="btn-s btn-sm" onclick="openEditCon(${u.id})">Editar</button>
+        <button class="btn-s btn-sm" onclick="moverParaContatos(${u.id})" title="Mover de volta para Contatos" style="font-size:11px;white-space:nowrap;color:#888;border-color:#ddd">→ Contatos</button>
+        <button onclick="excluirMembro(${u.id})" title="Excluir membro" style="border:none;background:none;cursor:pointer;color:#c0392b;font-size:16px;padding:2px 0;line-height:1">🗑</button>
+      </div>`:''}
     </div>`;
   }).join('');
   el.innerHTML=header+`<div style="display:flex;flex-direction:column;gap:8px">${cards}</div>`;
