@@ -683,7 +683,6 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
         <div class="section-hdr" style="margin-top:0;border-bottom:none;margin-bottom:0">Conexões da Rede</div>
         <div style="display:flex;gap:8px">
-          <button class="btn-p" style="background:#5b21b6" onclick="openCred()">🔑 Credenciais</button>
           <button class="btn-p" style="background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="abrirNovaConexao()">🔗 Nova Conexão</button>
           <button class="btn-p" id="btn-novo-membro" onclick="openAddUsr()" style="display:none">+ Membro</button>
         </div>
@@ -701,6 +700,10 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <!-- FINANCEIRO (só sócios) -->
     <div class="panel" id="tab-financeiro">
       <div id="fin-inner"></div>
+    </div>
+    <!-- CONFIG -->
+    <div class="panel" id="tab-config">
+      <div id="cfg-inner"></div>
     </div>
     <!-- PROJETOS -->
     <div class="panel" id="tab-projetos">
@@ -1221,6 +1224,13 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
         <label>Originador</label>
         <select id="neg-orig" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px"></select>
       </div>
+      <div>
+        <label>Comissão da Rede (%)</label>
+        <input id="neg-taxa" type="number" min="0" max="100" placeholder="auto" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px">
+      </div>
+      <div style="display:flex;align-items:center;padding-top:20px">
+        <span style="font-size:12px;color:#888">Base: <strong id="neg-taxa-base">—</strong></span>
+      </div>
       <div style="grid-column:1/-1"><label>Segmento</label><input id="neg-segmento" placeholder="Ex: Indústria, Varejo, Saúde…"></div>
       <div style="grid-column:1/-1"><label>Notas</label><textarea id="neg-notas" placeholder="Contexto, necessidade, próximos passos…" style="width:100%;height:70px;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px;resize:vertical"></textarea></div>
     </div>
@@ -1720,6 +1730,19 @@ let receitas=[];
 let comissoes=[];
 let currentRecTab='geral';
 
+let config={
+  comissoes:[
+    {id:1,produto:'Revisão de Créditos Tributários',taxa:20,taxaBase:'honorários BIdaTX',obs:'PIS/COFINS, ICMS, Previdenciário e outros créditos'},
+    {id:2,produto:'Revisão de Passivos e Recuperação Tributária',taxa:20,taxaBase:'honorários BIdaTX',obs:'Transação tributária, gestão de passivos e recuperação'},
+    {id:3,produto:'Consultoria para Reforma Tributária',taxa:10,taxaBase:'honorários BIdaTX',obs:'Planejamento, adequação de processos e estratégias'},
+    {id:4,produto:'Sicoob',taxa:15,taxaBase:'comissionamento BIdaTX',obs:'Produtos e soluções financeiras Sicoob RJ'},
+    {id:5,produto:'GruPag',taxa:15,taxaBase:'comissionamento BIdaTX',obs:'Maquininhas de cartão e soluções de pagamento'},
+    {id:6,produto:'Energia',taxa:20,taxaBase:'comissionamento BIdaTX',obs:'Mercado livre, eficiência energética e redução de custos'},
+    {id:7,produto:'EcoÁgua',taxa:20,taxaBase:'comissionamento BIdaTX',obs:'Tratamento, reuso e eficiência hídrica'},
+    {id:8,produto:'Contabilidade',taxa:null,taxaBase:'pagamento integral',obs:'Revisão e regularização contábil, fiscal e trabalhista'},
+  ]
+};
+
 // ===================== TELAS =====================
 function showScreen(name){
   document.getElementById('screen-login').style.display='none';
@@ -1877,6 +1900,7 @@ function buildTabs(){
     {id:'vitrine',label:'Projetos',icon:'📁',all:true},
     {id:'rede-membros',label:'Conexões',icon:'🔗',all:true},
     {id:'financeiro',label:'Financeiro',icon:'💰',socio:true},
+    {id:'config',label:'Config',icon:'⚙️',socio:true},
   ];
   const bar=document.getElementById('tabs-bar');
   bar.innerHTML='';
@@ -1919,6 +1943,7 @@ function showTab(name){
   if(name==='projetos')renderProjetos();
   if(name==='pipeline')renderPipeline();
   if(name==='vitrine')renderVitrine();
+  if(name==='config')renderConfig();
   setTimeout(sizeActivePanel,0);
 }
 
@@ -3984,15 +4009,23 @@ function openNegModal(id){
   const selOrig=document.getElementById('neg-orig');
   selOrig.innerHTML=users.map(u=>`<option value="${u.id}">${u.nome}</option>`).join('');
   const selPort=document.getElementById('neg-port');
-  selPort.innerHTML='<option value="">— Selecione o negócio —</option>'+portfolio.map(p=>`<option value="${p.id}">${esc(p.nome)}</option>`).join('');
+  selPort.innerHTML='<option value="">— Selecione o produto —</option>'+config.comissoes.map(p=>`<option value="${p.id}">${esc(p.produto)}</option>`).join('');
+  selPort.onchange=function(){
+    const pid=parseInt(this.value)||null;
+    const prod=pid?config.comissoes.find(c=>c.id===pid):null;
+    document.getElementById('neg-taxa').value=prod&&prod.taxa!=null?prod.taxa:'';
+    document.getElementById('neg-taxa-base').textContent=prod?prod.taxaBase:'—';
+  };
   document.getElementById('neg-titulo').value=n?n.titulo:'';
   document.getElementById('neg-cnpj').value=n?n.cnpj||'':'';
   document.getElementById('neg-razao').value=n?n.razaoSocial||'':'';
   document.getElementById('neg-perfil-trib').value=n?n.perfilTributario||'':'';
   document.getElementById('neg-status').value=n?n.status||'Prospecção':'Prospecção';
   document.getElementById('neg-orig').value=n?n.originadorId||currentUser.id:currentUser.id;
-  const portVal=n?n.portafolioId||'':(_pipFilter!=='all'?_pipFilter:'');
+  const portVal=n?n.portafolioId||n.configProdutoId||'':'';
   document.getElementById('neg-port').value=portVal;
+  if(portVal)selPort.onchange.call(selPort);
+  else{document.getElementById('neg-taxa').value=n?n.taxaRede||'':'';document.getElementById('neg-taxa-base').textContent=n?n.taxaBase||'—':'—';}
   document.getElementById('neg-segmento').value=n?n.segmento||'':'';
   document.getElementById('neg-notas').value=n?n.notas||'':'';
   document.getElementById('ov-neg').classList.add('open');
@@ -4008,7 +4041,9 @@ function saveNeg(){
     perfilTributario:document.getElementById('neg-perfil-trib').value,
     status:document.getElementById('neg-status').value,
     originadorId:parseInt(document.getElementById('neg-orig').value)||currentUser.id,
-    portafolioId:parseInt(document.getElementById('neg-port').value)||null,
+    configProdutoId:parseInt(document.getElementById('neg-port').value)||null,
+    taxaRede:parseFloat(document.getElementById('neg-taxa').value)||null,
+    taxaBase:document.getElementById('neg-taxa-base').textContent||null,
     segmento:document.getElementById('neg-segmento').value.trim(),
     notas:document.getElementById('neg-notas').value.trim(),
   };
@@ -5600,6 +5635,7 @@ function saveData(){
     localStorage.setItem('iahub_pagamentos',JSON.stringify(pagamentos));
     localStorage.setItem('iahub_receitas',JSON.stringify(receitas));
     localStorage.setItem('iahub_comissoes',JSON.stringify(comissoes));
+    localStorage.setItem('iahub_config',JSON.stringify(config));
   }catch(e){console.warn('saveData failed',e);}
   syncToSupabase();
 }
@@ -5620,7 +5656,82 @@ function loadData(){
     const pag=localStorage.getItem('iahub_pagamentos');if(pag)pagamentos=JSON.parse(pag);
     const rec=localStorage.getItem('iahub_receitas');if(rec)receitas=JSON.parse(rec);
     const com=localStorage.getItem('iahub_comissoes');if(com)comissoes=JSON.parse(com);
+    const cfg=localStorage.getItem('iahub_config');if(cfg){const parsed=JSON.parse(cfg);config={...config,...parsed};}
   }catch(e){console.warn('loadData failed',e);}
+}
+
+// ===================== CONFIG =====================
+function renderConfig(){
+  if(!isSocio())return;
+  const el=document.getElementById('cfg-inner');if(!el)return;
+
+  const socios=users.filter(u=>u.perfil==='Sócio');
+  const sociosHtml=socios.map(u=>`
+    <div style="border:1.5px solid #0a1628;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:12px">
+      <div style="width:36px;height:36px;border-radius:50%;background:#0a1628;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0">${u.nome.charAt(0)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:700;color:#0a1628">${u.nome}</div>
+        <div style="font-size:12px;color:#888">${u.email||'—'}</div>
+      </div>
+      <button class="btn-s btn-sm" onclick="openEditUsr(${u.id})">Editar</button>
+    </div>`).join('');
+
+  const matrizHtml=config.comissoes.map((c,i)=>{
+    const taxaLabel=c.taxa!=null?`${c.taxa}%`:'Integral';
+    const baseLabel=c.taxaBase||'—';
+    return`<div style="display:grid;grid-template-columns:1fr auto auto 80px auto;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid #f0ede8">
+      <div>
+        <div style="font-size:13px;font-weight:600;color:#0a1628">${c.produto}</div>
+        <div style="font-size:11px;color:#888">${c.obs||''}</div>
+      </div>
+      <div style="font-size:12px;color:#555;text-align:right;padding-right:8px">Base: ${baseLabel}</div>
+      <input type="number" value="${c.taxa!=null?c.taxa:''}" placeholder="—" min="0" max="100"
+        style="width:68px;padding:5px 8px;border:1px solid #ddd;border-radius:7px;font-size:13px;text-align:center"
+        onchange="config.comissoes[${i}].taxa=this.value?parseFloat(this.value):null;saveData();showToast('Taxa atualizada')">
+      <span style="font-size:12px;color:#888">% comissão</span>
+      <button onclick="removeConfigProduto(${i})" style="color:#c0392b;background:none;border:none;cursor:pointer;font-size:16px;padding:0 4px">×</button>
+    </div>`;
+  }).join('');
+
+  el.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <h2 style="font-size:18px;font-weight:700;color:#0a1628">Configurações BIdaTX</h2>
+    </div>
+
+    <div class="section-hdr" style="margin-top:0">Sócios</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;margin-bottom:24px">
+      ${sociosHtml||'<div style="color:#aaa;font-size:13px">Nenhum sócio cadastrado.</div>'}
+      <button onclick="openAddUsr()" style="border:2px dashed #0a1628;border-radius:10px;padding:14px;background:none;color:#0a1628;font-size:13px;cursor:pointer;font-weight:600">+ Adicionar sócio</button>
+    </div>
+
+    <div class="section-hdr" style="margin-top:0">Matriz de Comissionamento da Rede</div>
+    <p style="font-size:12px;color:#888;margin-bottom:12px">Percentual que o originador da rede recebe sobre cada produto. Pode ser editado por deal na criação do negócio.</p>
+    <div style="border:1.5px solid #e5e7eb;border-radius:10px;overflow:hidden;margin-bottom:12px">
+      <div style="display:grid;grid-template-columns:1fr auto auto 80px auto;gap:8px;padding:8px 12px;background:#f9fafb;border-bottom:1px solid #e5e7eb">
+        <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase">Produto</div>
+        <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase">Referência</div>
+        <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase">Taxa</div>
+        <div></div><div></div>
+      </div>
+      ${matrizHtml||'<div style="padding:12px;color:#aaa;font-size:13px">Nenhum produto cadastrado.</div>'}
+    </div>
+    <button onclick="addConfigProduto()" style="border:2px dashed #d97706;border-radius:8px;padding:8px 14px;background:none;color:#d97706;font-size:13px;cursor:pointer;font-weight:600">+ Novo produto / combinado</button>
+  `;
+}
+
+function removeConfigProduto(idx){
+  if(!confirm('Remover este produto da matriz?'))return;
+  config.comissoes.splice(idx,1);
+  saveData();renderConfig();
+}
+
+function addConfigProduto(){
+  const nome=prompt('Nome do produto ou combinado:');if(!nome||!nome.trim())return;
+  const taxa=prompt('Taxa de comissão (%) — deixe vazio para "Integral":');
+  const base=prompt('Base de cálculo (ex: "honorários BIdaTX", "comissionamento BIdaTX"):','comissionamento BIdaTX');
+  config.comissoes.push({id:Date.now(),produto:nome.trim(),taxa:taxa?parseFloat(taxa):null,taxaBase:base||'—',obs:''});
+  saveData();renderConfig();
+  showToast('Produto adicionado à matriz!');
 }
 
 // ===================== ONBOARDING (Item 14) =====================
