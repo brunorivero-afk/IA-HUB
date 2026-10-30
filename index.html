@@ -1154,9 +1154,31 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
   <div class="modal" style="width:540px;max-height:92vh;overflow-y:auto">
     <h2 id="neg-ttl" style="font-size:16px;font-weight:700;margin-bottom:14px">Novo Negócio</h2>
 
+    <!-- 0. Tipo — Próprio vs Não-Próprio -->
+    <div style="margin-bottom:18px">
+      <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#0a1628;display:block;margin-bottom:8px">Tipo de Negócio *</label>
+      <div style="display:flex;gap:10px">
+        <button type="button" id="neg-tipo-proprio" onclick="selectNegTipo('proprio')"
+          style="flex:1;padding:10px;border-radius:10px;border:2px solid #0a1628;background:#0a1628;color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;text-align:center">
+          <div style="font-size:16px;margin-bottom:3px">🏛</div>
+          <div>Próprio</div>
+          <div style="font-size:10px;font-weight:400;opacity:.75;margin-top:2px">BIdaTX opera e entrega</div>
+        </button>
+        <button type="button" id="neg-tipo-nao-proprio" onclick="selectNegTipo('nao-proprio')"
+          style="flex:1;padding:10px;border-radius:10px;border:2px solid #d1d5db;background:transparent;color:#6b7280;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;text-align:center">
+          <div style="font-size:16px;margin-bottom:3px">🤝</div>
+          <div>Não-Próprio</div>
+          <div style="font-size:10px;font-weight:400;opacity:.75;margin-top:2px">Intermediação · só comissão</div>
+        </button>
+      </div>
+      <div id="neg-tipo-hint" style="display:none;margin-top:8px;padding:8px 10px;background:#fef9e7;border:1px solid #f59e0b44;border-radius:7px;font-size:11px;color:#92400e;line-height:1.5">
+        ⚡ Negócio de intermediação: BIdaTX não opera nem entrega o serviço. Receita = comissão sobre o valor fechado.
+      </div>
+    </div>
+
     <!-- 1. Produto — destaque -->
     <div style="margin-bottom:16px">
-      <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#0a1628;display:block;margin-bottom:8px">Produto / Serviço BIdaTX *</label>
+      <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#0a1628;display:block;margin-bottom:8px">Produto / Serviço *</label>
       <div id="neg-prod-chips" style="display:flex;flex-wrap:wrap;gap:8px"></div>
       <!-- Outro tipo -->
       <div id="neg-outro-wrap" style="display:none;margin-top:10px">
@@ -1175,8 +1197,13 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
         style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px">
     </div>
 
-    <!-- 3. Etapa + Originador -->
+    <!-- 3. Valor estimado + Etapa + Originador -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div style="grid-column:1/-1">
+        <label style="font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:4px">Valor Estimado (R$)</label>
+        <input id="neg-valor" type="number" min="0" step="0.01" placeholder="Ex: 15000"
+          style="width:100%;padding:8px;border:1px solid #0F6E5644;border-radius:8px;font-size:13px;background:#f0faf4">
+      </div>
       <div>
         <label style="font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:4px">Etapa</label>
         <select id="neg-status" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px"></select>
@@ -1200,13 +1227,6 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <textarea id="neg-notas" placeholder="Contexto, necessidade, próximos passos…"
         style="width:100%;height:70px;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px;resize:vertical"></textarea>
     </div>
-
-    <!-- campos ocultos mantidos para compatibilidade -->
-    <input type="hidden" id="neg-cnpj">
-    <input type="hidden" id="neg-razao">
-    <input type="hidden" id="neg-perfil-trib">
-    <input type="hidden" id="neg-segmento">
-    <input type="hidden" id="neg-port">
 
     <div class="modal-footer" style="display:flex;gap:10px;justify-content:space-between;margin-top:18px">
       <button onclick="if(_negEditId)removeNeg(_negEditId)" style="border:none;background:none;color:#ef4444;cursor:pointer;font-size:13px;padding:6px 0" id="neg-del-btn">Excluir</button>
@@ -1972,12 +1992,14 @@ function renderDashboard(){
   renderDashboardModeracao();
   const totalRec=receitas.reduce((s,r)=>s+(r.valor||0),0);
   const totalFat=projetos.reduce((s,p)=>s+(p.valor||0),0);
-  const pipAtivos=negocios.filter(n=>n.status!=='Fechado'&&n.status!=='Pagamento Realizado').length;
+  const pipAtivosArr=negocios.filter(n=>n.status!=='Fechado'&&n.status!=='Pagamento Realizado'&&n.status!=='Perdido');
+  const pipAtivos=pipAtivosArr.length;
+  const pipValor=pipAtivosArr.reduce((s,n)=>s+(n.valor||0),0);
   const kpisEl=document.getElementById('dash-kpis');
   if(kpisEl)kpisEl.innerHTML=`
     <div class="stat"><div class="stat-label">Receita Registrada</div><div class="stat-value" style="font-size:16px">R$ ${totalRec.toLocaleString('pt-BR',{minimumFractionDigits:0})}</div></div>
     <div class="stat"><div class="stat-label">Faturamento (Negócios)</div><div class="stat-value" style="font-size:16px">R$ ${totalFat.toLocaleString('pt-BR',{minimumFractionDigits:0})}</div></div>
-    <div class="stat"><div class="stat-label">Pipeline Ativo</div><div class="stat-value" style="font-size:15px">${pipAtivos} oportunidades</div></div>
+    <div class="stat"><div class="stat-label">Pipeline Ativo</div><div class="stat-value" style="font-size:15px">${pipAtivos} deals${pipValor?`<div style="font-size:13px;color:#0F6E56;font-weight:600;margin-top:2px">R$ ${pipValor.toLocaleString('pt-BR',{minimumFractionDigits:0})}</div>`:''}</div></div>
     <div class="stat"><div class="stat-label">Conexões na Rede</div><div class="stat-value">${conexoes.length}</div></div>`;
   // Receita por frente
   const frentes=[
@@ -1994,9 +2016,9 @@ function renderDashboard(){
   // Pipeline resumo
   const pipEl=document.getElementById('dash-pipeline-resumo');
   if(pipEl){
-    const prox=negocios.filter(n=>n.status!=='Fechado'&&n.status!=='Pagamento Realizado').sort((a,b)=>(b.vlrEst||0)-(a.vlrEst||0)).slice(0,4);
+    const prox=negocios.filter(n=>n.status!=='Fechado'&&n.status!=='Pagamento Realizado'&&n.status!=='Perdido').sort((a,b)=>(b.valor||0)-(a.valor||0)).slice(0,4);
     if(!prox.length){pipEl.innerHTML=`<div style="color:#aaa;font-size:13px">Nenhuma oportunidade ativa. Vá em Pipeline para adicionar.</div>`;}
-    else{pipEl.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">${prox.map(n=>`<div style="border:1.5px solid #e5e7eb;border-radius:8px;padding:12px"><div style="font-size:13px;font-weight:600;color:#0a1628;margin-bottom:4px">${n.titulo||'Sem nome'}</div><div style="font-size:12px;color:#888;margin-bottom:6px">${n.status||'—'}</div><div style="font-size:14px;font-weight:600;color:#0F6E56">R$ ${(n.vlrEst||0).toLocaleString('pt-BR',{minimumFractionDigits:0})}</div></div>`).join('')}</div>`;}
+    else{pipEl.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">${prox.map(n=>`<div style="border:1.5px solid #e5e7eb;border-radius:8px;padding:12px;border-left:3px solid ${n.tipo==='nao-proprio'?'#f59e0b':'#0a1628'}"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><div style="font-size:13px;font-weight:600;color:#0a1628;flex:1">${n.titulo||'Sem nome'}</div><span style="font-size:9px;font-weight:700;color:${n.tipo==='nao-proprio'?'#92400e':'#fff'};background:${n.tipo==='nao-proprio'?'#fef3c7':'#0a1628'};border-radius:6px;padding:1px 6px;white-space:nowrap">${n.tipo==='nao-proprio'?'NÃO-PRÓPRIO':'PRÓPRIO'}</span></div><div style="font-size:12px;color:#888;margin-bottom:6px">${n.status||'—'}</div>${n.valor?`<div style="font-size:14px;font-weight:600;color:#0F6E56">R$ ${(n.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:0})}</div>`:'<div style="font-size:12px;color:#aaa">Valor não informado</div>'}</div>`).join('')}</div>`;}
   }
   // Comissões da rede
   const comEl=document.getElementById('dash-comissoes');
@@ -3758,6 +3780,7 @@ let _negDragId=null;
 let _negEditId=null;
 let _negPartTemp=[];
 let _negProdSelecionado=null;
+let _negTipo='proprio';
 let _pipSubtab='portfolio';
 let _pipFilter='all';
 let _portEditId=null;
@@ -3885,8 +3908,12 @@ function _renderClientesView(){
               return`<div draggable="true" ondragstart="negDragStart(event,${n.id})" ondragend="negDragEnd(event)"
                        class="pip-card" style="border-radius:8px;padding:10px;cursor:grab;flex-shrink:0;border-left:3px solid ${NEG_COL_COLOR[col]}"
                        onclick="openNegModal(${n.id})">
-                <div style="font-size:13px;font-weight:600;color:#0a1628;margin-bottom:4px;line-height:1.3">${esc(n.titulo)}</div>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:4px">
+                  <div style="font-size:13px;font-weight:600;color:#0a1628;line-height:1.3">${esc(n.titulo)}</div>
+                  ${n.tipo==='nao-proprio'?`<span style="flex-shrink:0;font-size:9px;font-weight:700;color:#92400e;background:#fef3c7;border:1px solid #f59e0b44;border-radius:8px;padding:1px 6px;white-space:nowrap">NÃO-PRÓPRIO</span>`:`<span style="flex-shrink:0;font-size:9px;font-weight:700;color:#fff;background:#0a1628;border-radius:8px;padding:1px 6px;white-space:nowrap">PRÓPRIO</span>`}
+                </div>
                 ${prodLabel?`<div style="margin-bottom:5px"><span style="display:inline-flex;align-items:center;gap:4px;background:${empProd?empProd.cor+'15':'#f3f4f6'};border:1px solid ${empProd?empProd.cor+'44':'#d1d5db'};border-radius:12px;padding:2px 8px;font-size:10px;font-weight:700;color:${empProd?empProd.cor:'#374151'}">${esc(prodLabel)}</span></div>`:''}
+                ${n.valor?`<div style="font-size:13px;font-weight:700;color:#0F6E56;margin-bottom:4px">R$ ${(n.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:0})}</div>`:''}
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
                   ${orig?`<div style="font-size:11px;color:#9ca3af">✦ ${orig.nome.split(' ')[0]}</div>`:'<div></div>'}
                   ${n.taxaRede?`<div style="font-size:10px;color:#6b7280;background:#f3f4f6;border-radius:6px;padding:1px 6px">${n.taxaRede}%</div>`:''}
@@ -3950,6 +3977,17 @@ function removePort(id){
   if(!tem&&!confirm('Remover este negócio do portfólio?'))return;
   portfolio=portfolio.filter(p=>p.id!==id);
   closeOv('ov-port');saveData();renderPipeline();
+}
+
+// --- Tipo Próprio / Não-Próprio ---
+function selectNegTipo(tipo){
+  _negTipo=tipo;
+  const bp=document.getElementById('neg-tipo-proprio');
+  const bn=document.getElementById('neg-tipo-nao-proprio');
+  const hint=document.getElementById('neg-tipo-hint');
+  if(bp){bp.style.border=tipo==='proprio'?'2px solid #0a1628':'2px solid #d1d5db';bp.style.background=tipo==='proprio'?'#0a1628':'transparent';bp.style.color=tipo==='proprio'?'#fff':'#6b7280';}
+  if(bn){bn.style.border=tipo==='nao-proprio'?'2px solid #d97706':'2px solid #d1d5db';bn.style.background=tipo==='nao-proprio'?'#fef3c7':'transparent';bn.style.color=tipo==='nao-proprio'?'#92400e':'#6b7280';}
+  if(hint)hint.style.display=tipo==='nao-proprio'?'block':'none';
 }
 
 // --- Chips de produto no modal negócio ---
@@ -4022,6 +4060,9 @@ function openNegModal(id){
   document.getElementById('neg-status').value=n?n.status||'Prospecção':'Prospecção';
   document.getElementById('neg-orig').value=n?n.originadorId||currentUser.id:currentUser.id;
   document.getElementById('neg-notas').value=n?n.notas||'':'';
+  document.getElementById('neg-valor').value=n&&n.valor?n.valor:'';
+  _negTipo=n&&n.tipo?n.tipo:'proprio';
+  selectNegTipo(_negTipo);
   document.getElementById('ov-neg').classList.add('open');
 }
 function isSocioUser(u){return u&&(u.perfil==='Sócio'||u.perfil==='Sócio-Fundador');}
@@ -4034,16 +4075,14 @@ function saveNeg(){
   if(isProdOutro&&!produtoOutro){alert('Descreva o tipo de negócio.');return;}
   const obj={
     titulo,
-    cnpj:'',
-    razaoSocial:'',
-    perfilTributario:'',
+    tipo:_negTipo||'proprio',
+    valor:parseFloat(document.getElementById('neg-valor').value)||null,
     status:document.getElementById('neg-status').value,
     originadorId:parseInt(document.getElementById('neg-orig').value)||currentUser.id,
     configProdutoId:isProdOutro?null:(_negProdSelecionado||null),
     produtoOutro:isProdOutro?produtoOutro:null,
     taxaRede:parseFloat(document.getElementById('neg-taxa').value)||null,
     taxaBase:document.getElementById('neg-taxa-base').innerText||null,
-    segmento:'',
     notas:document.getElementById('neg-notas').value.trim(),
   };
   if(obj.status==='Fechado'&&!(_negEditId&&negocios.find(x=>x.id===_negEditId)?.fechadoEm)){
