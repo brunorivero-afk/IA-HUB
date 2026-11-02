@@ -757,7 +757,8 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <!-- PROJETOS -->
     <!-- NEGÓCIOS (unifica Pipeline + Projetos) -->
     <div class="panel" id="tab-negocios">
-      <div style="display:flex;gap:8px;padding:12px 16px 8px;border-bottom:1px solid #f0ede8;flex-shrink:0">
+      <!-- Sub-abas ocultas: "Projetos para investidores" fica só na aba Projetos -->
+      <div style="display:none">
         <button id="neg-sub-negocios" class="pip-stab active" onclick="switchNegSub('negocios')">Negócios</button>
         <button id="neg-sub-projetos" class="pip-stab" onclick="switchNegSub('projetos')">Projetos para investidores</button>
       </div>
@@ -3798,7 +3799,7 @@ function renderNegocios(){
     if(el)el.innerHTML='<div class="blocked"><h2>Acesso restrito</h2></div>';
     return;
   }
-  switchNegSub(_negSubtab||'negocios');
+  switchNegSub('negocios');
 }
 let _portEditId=null;
 
