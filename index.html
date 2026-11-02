@@ -170,56 +170,79 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 .panel{display:none;}
 .panel.active{display:block;position:absolute;inset:0;overflow-y:auto;padding:20px 24px;box-sizing:border-box;scrollbar-width:none;-ms-overflow-style:none;}
 .panel.active::-webkit-scrollbar{display:none;}
-/* ===== SIDEBAR LAYOUT ===== */
-#screen-main{grid-template-columns:1fr;grid-template-rows:auto 1fr;grid-template-areas:"topbar" "app";position:fixed;inset:0;overflow:hidden;padding-left:52px;}
-.topbar{grid-area:topbar;justify-content:flex-end;}
+/* ===== LAYOUT: NAVEGAÇÃO NO CABEÇALHO ===== */
+#screen-main{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr;grid-template-areas:"topbar" "app";position:fixed;inset:0;overflow:hidden;}
+.topbar{grid-area:topbar;flex-wrap:nowrap;padding:0 24px;min-height:56px;min-width:0;}
+.topbar-brand{flex-shrink:0;}
 .tabs-wrap{display:none;}
-.topbar-brand{display:none;}
-/* Hamburger — oculto no desktop */
-#btn-menu{display:none;background:none;border:none;cursor:pointer;font-size:22px;color:#0a1628;padding:2px 8px;line-height:1;flex-shrink:0;}
-[data-theme="dark"] #btn-menu{color:#e2e8f0;}
-/* Overlay do sidebar no mobile */
-#sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:190;}
-#sidebar-overlay.open{display:block;}
-/* ===== SIDEBAR COLAPSÁVEL (cortina) — desktop ===== */
-@media(min-width:769px){
-  .sidebar{grid-area:unset;position:absolute;left:0;top:0;bottom:0;width:52px;z-index:150;transition:width .22s ease;overflow:hidden;}
-  .sidebar:hover{width:210px;box-shadow:4px 0 24px rgba(0,0,0,.22);}
-  .sidebar-header{padding:12px 0 10px;align-items:center;display:flex;flex-direction:column;}
-  .sidebar:hover .sidebar-header{padding:12px 16px 10px;align-items:flex-start;}
-  .sidebar-brand-name{opacity:0;max-height:0;overflow:hidden;transition:opacity .15s .06s,max-height .2s;white-space:nowrap;margin:0;}
-  .sidebar:hover .sidebar-brand-name{opacity:1;max-height:36px;margin-top:8px;}
-  #logo-sidebar-wrap{display:flex;justify-content:center;width:52px;}
-  .sidebar:hover #logo-sidebar-wrap{width:auto;justify-content:flex-start;}
-  .sidebar .tab{padding:10px 0;justify-content:center;white-space:nowrap;overflow:hidden;transition:padding .15s,background .15s,color .15s;}
-  .sidebar:hover .tab{padding:10px 14px;justify-content:flex-start;}
-  .tab-icon{flex-shrink:0;font-size:16px;width:24px;text-align:center;}
-  .tab-label{margin-left:10px;opacity:0;transition:opacity .12s .04s;white-space:nowrap;}
-  .sidebar:hover .tab-label{opacity:1;}
-}
-
-/* ===== RESPONSIVO MOBILE ===== */
+.topnav{display:flex;align-items:stretch;align-self:stretch;flex:1;min-width:0;justify-content:center;overflow-x:auto;scrollbar-width:none;}
+.topnav::-webkit-scrollbar{display:none;}
+.topnav .tab{display:flex;align-items:center;padding:0 14px;font-size:13px;color:#64748b;border-top:2px solid transparent;border-bottom:2px solid transparent;}
+.topnav .tab:hover{color:#0a1628;}
+.topnav .tab.active{color:#0a1628;border-bottom-color:#d4a017;font-weight:600;}
+[data-theme="dark"] .topnav .tab.active{color:#e2e8f0;}
+.topnav .tab-icon{display:none;}
+.topbar-right{flex-shrink:0;}
+@media(max-width:1100px){.topnav{justify-content:flex-start;}.topnav .tab{padding:0 10px;}}
 @media(max-width:768px){
-  /* Grid: sem coluna sidebar */
-  #screen-main{grid-template-columns:1fr;grid-template-rows:auto 1fr;grid-template-areas:"topbar" "app";}
-  /* Sidebar: overlay deslizante */
-  .sidebar{position:fixed;top:0;left:0;bottom:0;width:240px;z-index:200;transform:translateX(-100%);transition:transform .25s ease;display:flex!important;}
-  .sidebar.open{transform:translateX(0);}
-  /* Topbar: mostra brand + hamburger */
-  .topbar{justify-content:space-between;padding:10px 16px;grid-area:topbar;}
-  .topbar-brand{display:flex!important;}
-  #btn-menu{display:block!important;}
-  /* Painel: menos padding lateral */
+  .topbar{flex-wrap:wrap;padding:8px 12px 0;row-gap:4px;}
+  .topnav{order:3;flex-basis:100%;height:40px;}
+  .topnav .tab{padding:0 10px;font-size:12px;}
+  .topbar-right{min-width:0;}
+  .topbar-right .user-pill{max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .panel.active{padding:16px;}
 }
-.sidebar{grid-area:sidebar;background:#0a1628;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid rgba(255,255,255,.05);}
-.sidebar-header{padding:22px 16px 16px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;}
-.sidebar-brand-name{font-family:Georgia,serif;font-size:16px;color:#fff;letter-spacing:-.2px;margin-top:10px;line-height:1.2;}
-.sidebar-brand-accent{color:#d4a017;}
-.sidebar-nav{flex:1;padding:8px;overflow-y:auto;}
-.sidebar .tab{display:flex;align-items:center;width:100%;box-sizing:border-box;text-align:left;border:none!important;border-radius:7px;padding:10px 12px;font-size:13px;color:#94a3b8;background:none;cursor:pointer;transition:background .15s,color .15s;margin-bottom:2px;white-space:normal;line-height:1.3;}
-.sidebar .tab:hover{background:rgba(255,255,255,.07);color:#e2e8f0;}
-.sidebar .tab.active{background:rgba(212,160,23,.15);color:#d4a017;font-weight:500;}
+
+/* ===== DISTRIBUIÇÃO EM CASCATA ===== */
+.dist-tab{border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;font-size:12px;background:#fff;}
+.dist-row{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 110px;gap:8px;align-items:center;padding:6px 10px;border-top:1px solid #f3f4f6;}
+.dist-row:first-child{border-top:none;}
+.dist-nome{color:#374151;}
+.dist-quem{color:#0a1628;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dist-val{text-align:right;font-variant-numeric:tabular-nums;}
+.dist-val input{width:100%;padding:3px 6px;border:1px solid #ddd;border-radius:6px;font-size:12px;text-align:right;}
+.dist-val input.dist-ajustado{border-color:#d97706;background:#fffbeb;}
+.dist-sub{background:#f8fafc;}
+.dist-sub .dist-nome{font-weight:600;color:#0a1628;}
+.dist-ret .dist-nome,.dist-ret .dist-val{color:#9ca3af;}
+.dist-dest{color:#9ca3af;font-weight:400;font-size:11px;}
+.dist-aviso{color:#b45309;font-weight:500;}
+.dist-tot{background:#0a1628;color:#fff;}
+.dist-tot .dist-nome{color:#fff;font-weight:600;}
+.rg-card{border:1.5px solid #e5e7eb;border-radius:12px;padding:14px;margin-bottom:14px;background:#fff;}
+.rg-head{display:flex;gap:8px;align-items:center;margin-bottom:12px;}
+.rg-titulo{flex:1;min-width:0;width:auto;font-size:15px;font-weight:700;color:#0a1628;border:1px solid transparent;border-radius:6px;padding:4px 6px;background:none;}
+.rg-titulo:hover,.rg-titulo:focus{border-color:#ddd;}
+.rg-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;}
+@media(max-width:900px){.rg-grid{grid-template-columns:1fr;}}
+.rg-linha{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 0;border-top:1px dashed #eee;font-size:12px;}
+.rg-linha select,.rg-linha input{width:auto;padding:4px 6px;border:1px solid #ddd;border-radius:6px;font-size:12px;background:#fff;}
+.rg-nome{flex:1 1 140px;font-weight:600;min-width:0;}
+.rg-num{width:62px;}
+.rg-seta{color:#9ca3af;}
+.rg-acoes{margin-left:auto;display:flex;gap:2px;}
+.rg-acoes button{border:none;background:none;cursor:pointer;color:#9ca3af;font-size:13px;padding:2px 5px;}
+.rg-acoes button:hover{color:#0a1628;}
+.rg-extra{flex-basis:100%;display:flex;flex-direction:column;gap:4px;padding-left:4px;}
+.rg-mini{font-size:11px;color:#6b7280;display:flex;align-items:center;gap:4px;font-weight:400;margin:0;}
+.rg-pool{display:flex;flex-wrap:wrap;gap:10px;}
+.rg-pool label{display:flex;align-items:center;gap:4px;font-size:12px;margin:0;font-weight:400;}
+.rg-sim-ctl{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;font-size:12px;}
+.rg-sim-ctl label{display:flex;align-items:center;gap:4px;margin:0;font-weight:400;color:#6b7280;}
+.rg-sim-ctl input,.rg-sim-ctl select{width:auto;padding:4px 6px;border:1px solid #ddd;border-radius:6px;font-size:12px;max-width:170px;}
+.rg-nova{border:2px dashed #0a1628;border-radius:8px;padding:8px 14px;background:none;color:#0a1628;font-size:13px;cursor:pointer;font-weight:600;}
+.ap-card{background:#fff;border:1px solid #eee;border-radius:10px;padding:12px 14px;margin-bottom:10px;}
+.ap-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:6px;}
+.ap-nome{font-size:14px;font-weight:700;color:#0a1628;}
+.ap-pix{font-size:11px;color:#6b7280;margin-top:2px;}
+.ap-tot{font-size:16px;font-weight:700;color:#0a1628;margin-bottom:4px;font-variant-numeric:tabular-nums;}
+.ap-item{display:flex;gap:10px;align-items:center;padding:6px 0;border-top:1px solid #f3f4f6;font-size:12px;}
+.ap-sub{font-size:11px;color:#9ca3af;}
+.ap-val{font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums;}
+.ap-pago{opacity:.55;}
+[data-theme="dark"] .dist-tab,[data-theme="dark"] .rg-card,[data-theme="dark"] .ap-card{background:#1a2035;border-color:#1e2a42;}
+[data-theme="dark"] .dist-sub{background:#13182b;}
+[data-theme="dark"] .dist-nome,[data-theme="dark"] .dist-quem,[data-theme="dark"] .ap-nome,[data-theme="dark"] .ap-tot,[data-theme="dark"] .rg-titulo{color:#e2e8f0;}
 
 /* ===== PAINÉIS COM LAYOUT INTERNO ===== */
 #mbr-pag button:disabled{opacity:.4;cursor:default;}
@@ -547,7 +570,6 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <input type="password" id="l-senha" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
       <button class="btn-auth" onclick="doLogin()">Entrar na plataforma</button>
       <div class="auth-err" id="login-err">Email ou senha incorretos.</div>
-      <span class="auth-link" onclick="showScreen('cadastro')">Novo por aqui? Solicite seu acesso</span>
     </div>
   </div>
 </div>
@@ -595,20 +617,12 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 
 <!-- ============ TELA MAIN ============ -->
 <div id="screen-main">
-  <nav class="sidebar" id="main-sidebar">
-    <div class="sidebar-header">
-      <div id="logo-sidebar-wrap"></div>
-      <div class="sidebar-brand-name">IA <span class="sidebar-brand-accent">Hub</span></div>
-    </div>
-    <div id="tabs-bar" class="sidebar-nav"></div>
-  </nav>
-  <div id="sidebar-overlay" onclick="closeSidebar()"></div>
   <div class="topbar">
     <div class="topbar-brand">
-      <button id="btn-menu" onclick="toggleSidebar()" title="Menu">☰</button>
       <div id="logo-main-wrap"></div>
       <span>IA Hub</span>
     </div>
+    <nav id="tabs-bar" class="topnav"></nav>
     <div class="topbar-right">
       <button id="btn-dark-toggle" class="notif-btn" onclick="toggleDarkMode()" title="Alternar tema claro/escuro">🌙</button>
       <button class="notif-btn" onclick="showNotifPanel()" id="notif-btn" title="Notificações">
@@ -783,6 +797,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <div class="full"><label>Empresa / Cargo</label><input id="u-emp" placeholder="Empresa (se PF, pode deixar em branco)"></div>
       <div><label>Email *</label><input id="u-email" type="email" placeholder="email@exemplo.com"></div>
       <div><label>Telefone</label><input id="u-tel" placeholder="(00) 00000-0000"></div>
+      <div><label>Pix / dados p/ pagamento</label><input id="u-pix" placeholder="Chave Pix ou banco/agência/conta"></div>
       <div class="full"><label>Segmento(s)</label><input id="u-seg" placeholder="Ex: Advocacia, Contabilidade (vírgula)" oninput="updateSpecFields()"></div>
       <div id="u-spec-wrap" class="full" style="display:none;background:#f8faff;border:1px solid #dbeafe;border-radius:10px;padding:12px;margin-top:-4px">
         <div style="font-size:11px;font-weight:700;color:#0a1628;margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">Especialidade</div>
@@ -1071,25 +1086,25 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 
 <!-- Modal pagamento de negócio -->
 <div class="overlay" id="ov-pag">
-  <div class="modal" style="width:500px;max-height:90vh;overflow-y:auto">
-    <h2 id="pag-ttl">Registrar Pagamento</h2>
+  <div class="modal" style="width:660px;max-height:90vh;overflow-y:auto">
+    <h2 id="pag-ttl">Registrar Recebimento</h2>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div style="grid-column:1/-1">
         <label>Cliente *</label>
         <select id="pag-neg" onchange="_onPagNegChange()" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px"></select>
         <div id="pag-port-info" style="font-size:11px;color:#6b7280;margin-top:3px"></div>
       </div>
-      <div><label>Valor Recebido (R$) *</label><input id="pag-valor" type="number" min="0" placeholder="0,00"></div>
+      <div><label>Valor Recebido (R$) *</label><input id="pag-valor" type="number" min="0" placeholder="0,00" oninput="_pagRecalc()"></div>
       <div><label>Data</label><input id="pag-data" type="date"></div>
       <div style="grid-column:1/-1"><label>Observações</label><input id="pag-obs" placeholder="Referência, NF, parcela..."></div>
+      <div style="grid-column:1/-1"><label>Regra de distribuição</label><select id="pag-regra" onchange="_pagRecalc(true)"></select></div>
+      <div><label>Quem vendeu</label><select id="pag-vend" onchange="_pagRecalc(true)"></select></div>
+      <div><label>Fomentador</label><select id="pag-fom" onchange="_pagFomChange()"></select>
+        <input id="pag-fom-nome" placeholder="Nome do fomentador" style="display:none;margin-top:6px" oninput="_pagRecalc()"></div>
+      <div id="pag-custas-wrap"><label>Custas do negócio (R$)</label><input id="pag-custas" type="number" min="0" placeholder="0,00" oninput="_pagRecalc()"></div>
     </div>
-    <div style="margin-top:14px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <label style="margin:0">Comissões para Sócios</label>
-        <button onclick="_addPagCom()" class="btn-sec" style="font-size:12px;padding:4px 10px">+ Adicionar</button>
-      </div>
-      <div id="pag-com-lista"></div>
-    </div>
+    <div id="pag-dist" style="margin-top:14px"></div>
+    <div id="pag-ajuste-wrap" style="display:none;margin-top:8px"><label>Motivo do ajuste *</label><input id="pag-ajuste-motivo" placeholder="Por que a divisão deste negócio foge do padrão"></div>
     <div class="modal-footer" style="display:flex;justify-content:space-between;margin-top:18px">
       <button id="pag-del-btn" onclick="if(_pagEditId)removePagamento(_pagEditId)" style="border:none;background:none;color:#ef4444;cursor:pointer;font-size:13px">Excluir</button>
       <div style="display:flex;gap:10px">
@@ -1695,6 +1710,7 @@ let mbrPage=0;
 let negocios=[];
 let portfolio=[];
 let pagamentos=[];
+let regrasDistrib=[];
 
 let projetos=[
   {id:201,nome:'Estruturação societária – Cliente ABC',desc:'Reorganização societária com holding e planejamento tributário.',status:'Em andamento',valor:18000,inicio:'2025-03-01',fim:'2025-08-31',recorr:'',recorrAte:'',participantes:[1,2,4],dist:{1:20,2:50,4:30},sinergia:'Advocacia ↔ Contabilidade',criadorId:1,lastSeen:{},followups:[{texto:'Reunião inicial. Levantamento de documentos em andamento.',data:'2025-03-10',autor:'Sócio Demo',ts:1}]},
@@ -1769,7 +1785,6 @@ function injectLogos(){
   document.getElementById('logo-login-sm-wrap').innerHTML=sm;
   document.getElementById('logo-cad-wrap').innerHTML=lg;
   document.getElementById('logo-main-wrap').innerHTML=sm;
-  document.getElementById('logo-sidebar-wrap').innerHTML=sm;
 }
 
 // ===================== LOGIN =====================
@@ -1784,8 +1799,11 @@ function doLogin(){
       cand.status='Ativo';saveData();syncToSupabase();u=cand;
     }
   }
-  if(!u){document.getElementById('login-err').style.display='block';return;}
-  document.getElementById('login-err').style.display='none';
+  const errEl=document.getElementById('login-err');
+  if(!u){errEl.textContent='Email ou senha incorretos.';errEl.style.display='block';return;}
+  // Sistema de uso exclusivo dos sócios
+  if(!isSocioUser(u)){errEl.textContent='Acesso restrito aos sócios.';errEl.style.display='block';return;}
+  errEl.style.display='none';
   currentUser=u;
   setupMain();
   showScreen('main');
@@ -1902,11 +1920,11 @@ function buildTabs(){
   }
   const tabDefs=[
     {id:'rede',label:'Dashboard',icon:'📊',socio:true},
+    {id:'rede-membros',label:'Conexões',icon:'🔗',socio:true},
+    {id:'negocios',label:'Negócios/Pipeline',icon:'🎯',socio:true},
     {id:'receitas',label:'Receitas',icon:'💵',socio:true},
-    {id:'negocios',label:'Negócios',icon:'🎯',socio:true},
-    {id:'vitrine',label:'Projetos',icon:'📁',all:true},
-    {id:'rede-membros',label:'Conexões',icon:'🔗',all:true},
     {id:'financeiro',label:'Financeiro',icon:'💰',socio:true},
+    {id:'vitrine',label:'Projetos',icon:'📁',socio:true},
     {id:'config',label:'Config',icon:'⚙️',socio:true},
   ];
   const bar=document.getElementById('tabs-bar');
@@ -1924,8 +1942,6 @@ function buildTabs(){
 }
 
 function showTab(name){
-  // Fecha sidebar no mobile ao trocar de aba
-  if(window.innerWidth<=768)closeSidebar();
   // Operador só pode ver a tela de nova conexão
   if(isOperador()){
     document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
@@ -1956,21 +1972,6 @@ function showTab(name){
 function sizeActivePanel(){}
 window.addEventListener('resize',sizeActivePanel);
 
-// ===== SIDEBAR MOBILE =====
-function toggleSidebar(){
-  const sb=document.getElementById('main-sidebar');
-  const ov=document.getElementById('sidebar-overlay');
-  if(!sb||!ov)return;
-  const isOpen=sb.classList.contains('open');
-  sb.classList.toggle('open',!isOpen);
-  ov.classList.toggle('open',!isOpen);
-}
-function closeSidebar(){
-  const sb=document.getElementById('main-sidebar');
-  const ov=document.getElementById('sidebar-overlay');
-  if(sb)sb.classList.remove('open');
-  if(ov)ov.classList.remove('open');
-}
 function initFilters(){
   const allSegs=[...new Set(users.flatMap(u=>(u.seg||'').split(',').map(s=>s.trim()).filter(Boolean)))].sort();
   ['mbr-fseg','syn-seg'].forEach(id=>{
@@ -2397,7 +2398,7 @@ function updateSpecFields(){
 function openAddUsr(){
   editUsrId=null;
   document.getElementById('usr-modal-ttl').textContent='Novo membro';
-  ['u-nome','u-emp','u-email','u-tel','u-seg','u-ativ','u-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
+  ['u-nome','u-emp','u-email','u-tel','u-pix','u-seg','u-ativ','u-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
   ['u-spec-medico-val','u-spec-adv-val','u-spec-cont-val','u-spec-eng-val','u-spec-corr-val','u-spec-consul-val','u-spec-dent-val','u-spec-psico-val'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   updateSpecFields();
   document.getElementById('u-perfil').value='Parceiro';
@@ -2415,6 +2416,7 @@ function openEditUsr(id){
   document.getElementById('u-emp').value=u.emp||'';
   document.getElementById('u-email').value=u.email||'';
   document.getElementById('u-tel').value=u.tel||'';
+  document.getElementById('u-pix').value=u.pix||'';
   document.getElementById('u-seg').value=u.seg||'';
   document.getElementById('u-ativ').value=u.ativ||'';
   document.getElementById('u-perfil').value=u.perfil;
@@ -2475,6 +2477,7 @@ function saveUsr(){
   }
   const obj={nome,tipo:document.getElementById('u-tipo').value,emp:document.getElementById('u-emp').value.trim(),email,
     tel:document.getElementById('u-tel').value.trim(),
+    pix:document.getElementById('u-pix').value.trim(),
     perfil,
     status:isSocio()?document.getElementById('u-status').value:(editUsrId?(users.find(u=>u.id===editUsrId)||{}).status||'Em prospecção':'Em prospecção'),
     seg:document.getElementById('u-seg').value.trim(),
@@ -2509,10 +2512,12 @@ function renderFinanceiro(){
   el.innerHTML=`
     <div style="display:flex;gap:8px;padding:0 0 14px;flex-shrink:0">
       <button class="pip-stab ${_finSubtab==='empresa'?'active':''}" onclick="_finSubtab='empresa';renderFinanceiro()">Empresa</button>
-      <button class="pip-stab ${_finSubtab==='negocios'?'active':''}" onclick="_finSubtab='negocios';renderFinanceiro()">Negócios</button>
+      <button class="pip-stab ${_finSubtab==='negocios'?'active':''}" onclick="_finSubtab='negocios';renderFinanceiro()">Recebimentos</button>
+      <button class="pip-stab ${_finSubtab==='apagar'?'active':''}" onclick="_finSubtab='apagar';renderFinanceiro()">A pagar</button>
     </div>
     <div id="fin-subtab-content"></div>`;
   if(_finSubtab==='empresa') _renderFinEmpresa();
+  else if(_finSubtab==='apagar') _renderFinAPagar();
   else _renderFinNegocios();
 }
 function _renderFinEmpresa(){
@@ -2565,7 +2570,7 @@ function _renderFinNegocios(){
   el.innerHTML=`
     <div class="fin-saldo-bar" style="margin-bottom:14px">
       <div class="fin-saldo-item"><div class="fin-saldo-label">Total recebido</div><div class="fin-saldo-val val-in">R$ ${totalRec.toLocaleString('pt-BR')}</div></div>
-      <div class="fin-saldo-item"><div class="fin-saldo-label">Comissões pagas</div><div class="fin-saldo-val val-out">R$ ${totalCom.toLocaleString('pt-BR')}</div></div>
+      <div class="fin-saldo-item"><div class="fin-saldo-label">Distribuído a pessoas</div><div class="fin-saldo-val val-out">R$ ${totalCom.toLocaleString('pt-BR')}</div></div>
       <div class="fin-saldo-item"><div class="fin-saldo-label">Resultado líquido</div><div class="fin-saldo-val ${(totalRec-totalCom)>=0?'val-saldo-pos':'val-saldo-neg'}">R$ ${(totalRec-totalCom).toLocaleString('pt-BR')}</div></div>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
@@ -2581,7 +2586,7 @@ function _renderFinNegocios(){
       </div>
       <div style="display:flex;gap:8px">
         <button class="btn-p" style="font-size:12px;padding:6px 14px;background:#f0faf4;color:#0F6E56;border:1.5px solid #0F6E56" onclick="abrirExtratoPor()">📋 Extrato</button>
-        <button class="btn-p" style="font-size:12px;padding:6px 14px" onclick="openAddPagamento()">+ Registrar pagamento</button>
+        <button class="btn-p" style="font-size:12px;padding:6px 14px" onclick="openAddPagamento()">+ Registrar recebimento</button>
       </div>
     </div>
     <div id="fin-neg-lista">${_buildPagamentosList()}</div>`;
@@ -2636,47 +2641,97 @@ function openEditPagamento(id){
   document.getElementById('ov-pag').classList.add('open');
 }
 function _buildPagModal(negId,pg){
-  document.getElementById('pag-ttl').textContent=pg?'Editar Pagamento':'Registrar Pagamento';
+  document.getElementById('pag-ttl').textContent=pg?'Editar Recebimento':'Registrar Recebimento';
+  _pagAjustes={};
+  if(pg)(pg.distribuicao||[]).forEach(r=>{if(r.ajustado)_pagAjustes[_distKey(r)]=r.valor;});
+  const pessoas=users.filter(u=>u.perfil!=='Operador').sort((a,b)=>a.nome.localeCompare(b.nome));
+  document.getElementById('pag-regra').innerHTML=getRegras().map(r=>`<option value="${r.id}">${esc(r.nome)}</option>`).join('');
+  document.getElementById('pag-vend').innerHTML='<option value="">— selecione —</option>'+pessoas.map(u=>`<option value="${u.id}">${esc(u.nome)} · ${u.perfil}</option>`).join('');
+  document.getElementById('pag-fom').innerHTML='<option value="">— nenhum —</option>'+pessoas.map(u=>`<option value="${u.id}">${esc(u.nome)}</option>`).join('')+'<option value="ext">Outro (digitar nome)</option>';
+  document.getElementById('pag-custas').value=pg?pg.custas||'':'';
+  document.getElementById('pag-ajuste-motivo').value=pg?pg.ajusteMotivo||'':'';
+  document.getElementById('pag-fom').value=pg?(pg.fomentadorId||(pg.fomentadorNome?'ext':'')):'';
+  document.getElementById('pag-fom-nome').value=pg?pg.fomentadorNome||'':'';
+  document.getElementById('pag-fom-nome').style.display=document.getElementById('pag-fom').value==='ext'?'':'none';
   document.getElementById('pag-del-btn').style.display=pg?'':'none';
   const selNeg=document.getElementById('pag-neg');
   const pagRealiz=negocios.filter(n=>n.status==='Pagamento Realizado');
   selNeg.innerHTML='<option value="">— Selecione o cliente —</option>'+negocios.map(n=>{const p=n.portafolioId?portfolio.find(x=>x.id===n.portafolioId):null;return`<option value="${n.id}">${esc(n.titulo)}${p?' ('+esc(p.nome)+')':''}</option>`;}).join('');
   if(negId)selNeg.value=negId;
   else if(pg)selNeg.value=pg.negId||'';
-  _onPagNegChange();
+  _onPagNegChange(!pg);
+  if(pg){
+    document.getElementById('pag-regra').value=pg.regraId||getRegras()[0].id;
+    document.getElementById('pag-vend').value=pg.vendedorId||'';
+  }
   document.getElementById('pag-valor').value=pg?pg.valorRecebido||'':'';
   document.getElementById('pag-data').value=pg?pg.data||new Date().toISOString().slice(0,10):new Date().toISOString().slice(0,10);
   document.getElementById('pag-obs').value=pg?pg.obs||'':'';
-  _renderPagComissoes();
+  _pagRecalc();
 }
-function _onPagNegChange(){
+function _onPagNegChange(sugerir){
   const negId=parseInt(document.getElementById('pag-neg').value)||0;
   const neg=negId?negocios.find(n=>n.id===negId):null;
   const port=neg&&neg.portafolioId?portfolio.find(p=>p.id===neg.portafolioId):null;
   document.getElementById('pag-port-info').textContent=port?'Negócio: '+port.nome:'';
+  if(sugerir===false)return;
+  // Sugere quem vendeu (originador) e a regra (última usada nesse portfólio, ou pelo nome)
+  if(neg&&neg.originadorId)document.getElementById('pag-vend').value=neg.originadorId;
+  const ult=port?pagamentos.filter(p=>p.portafolioId===port.id&&p.regraId).slice(-1)[0]:null;
+  const porNome=port?getRegras().find(r=>r.nome.toLowerCase().split(' ').some(w=>w.length>3&&port.nome.toLowerCase().includes(w))):null;
+  const rg=ult?ult.regraId:porNome?porNome.id:null;
+  if(rg)document.getElementById('pag-regra').value=rg;
+  _pagAjustes={};
+  _pagRecalc();
 }
-function _renderPagComissoes(){
-  const socios=users.filter(u=>isSocioUser(u));
-  document.getElementById('pag-com-lista').innerHTML=_pagComTemp.map((c,i)=>`
-    <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
-      <select onchange="_pagComTemp[${i}].socioId=+this.value" style="flex:2;padding:5px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px">
-        ${socios.map(u=>`<option value="${u.id}" ${c.socioId===u.id?'selected':''}>${u.nome}</option>`).join('')}
-      </select>
-      <input type="number" min="0" placeholder="R$" value="${c.valor||''}"
-        onchange="_pagComTemp[${i}].valor=+this.value"
-        style="flex:1;padding:5px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px">
-      <button onclick="_pagComTemp.splice(${i},1);_renderPagComissoes()" style="border:none;background:none;color:#ef4444;cursor:pointer;font-size:16px">✕</button>
-    </div>`).join('')||'<div style="font-size:12px;color:#aaa;margin-bottom:6px">Nenhuma comissão.</div>';
+let _pagAjustes={},_pagRows=[];
+function _distKey(r){return r.linhaId+'|'+(r.pessoaId||'');}
+function _pagFomChange(){
+  document.getElementById('pag-fom-nome').style.display=document.getElementById('pag-fom').value==='ext'?'':'none';
+  _pagRecalc(true);
 }
-function _addPagCom(){
-  _pagComTemp.push({socioId:users.filter(u=>isSocioUser(u))[0]?.id||0,valor:0});
-  _renderPagComissoes();
+function _pagCtx(){
+  const fom=document.getElementById('pag-fom').value;
+  return{
+    valor:parseFloat(document.getElementById('pag-valor').value)||0,
+    vendedorId:parseInt(document.getElementById('pag-vend').value)||null,
+    fomentadorId:fom&&fom!=='ext'?parseInt(fom):null,
+    fomentadorNome:fom==='ext'?document.getElementById('pag-fom-nome').value.trim():'',
+    custas:parseFloat(document.getElementById('pag-custas').value)||0,
+  };
+}
+function _pagRecalc(resetAjustes){
+  if(resetAjustes)_pagAjustes={};
+  const regra=getRegras().find(r=>r.id==document.getElementById('pag-regra').value)||getRegras()[0];
+  document.getElementById('pag-custas-wrap').style.display=(regra.linhas||[]).some(l=>l.tipo==='custas')?'':'none';
+  _pagRows=calcDistribuicao(regra,_pagCtx()).map(r=>{
+    const k=_distKey(r);
+    return k in _pagAjustes?{...r,valorCalc:r.valor,valor:_pagAjustes[k],ajustado:true}:r;
+  });
+  document.getElementById('pag-dist').innerHTML=_distribTabela(_pagRows,true);
+  document.getElementById('pag-ajuste-wrap').style.display=_pagRows.some(r=>r.ajustado)?'':'none';
+}
+function _pagAjustar(i,v){
+  const r=_pagRows[i];if(!r)return;
+  const val=parseFloat(v);
+  if(isNaN(val)||val===(r.valorCalc??r.valor)&&!r.ajustado)return;
+  if(r.ajustado&&val===r.valorCalc)delete _pagAjustes[_distKey(r)];
+  else _pagAjustes[_distKey(r)]=Math.round(val*100)/100;
+  _pagRecalc();
 }
 function savePagamento(){
   const negId=parseInt(document.getElementById('pag-neg').value)||null;
   const valor=parseFloat(document.getElementById('pag-valor').value)||0;
   if(!valor){alert('Informe o valor recebido.');return;}
+  const ctx=_pagCtx();
+  const motivo=document.getElementById('pag-ajuste-motivo').value.trim();
+  if(_pagRows.some(r=>r.ajustado)&&!motivo){alert('Informe o motivo do ajuste na divisão.');return;}
+  if(_pagRows.some(r=>r.aviso)&&!confirm('Há linhas sem pessoa definida (ex.: quem vendeu). Salvar mesmo assim?'))return;
   const neg=negId?negocios.find(n=>n.id===negId):null;
+  // Mantém o status de pagamento das linhas que já existiam
+  const antigo=_pagEditId?pagamentos.find(p=>p.id===_pagEditId):null;
+  const pagoPorKey={};(antigo&&antigo.distribuicao||[]).forEach(r=>{if(r.pago)pagoPorKey[_distKey(r)]={pago:true,dataPago:r.dataPago};});
+  const distribuicao=_pagRows.map(r=>({...r,...(pagoPorKey[_distKey(r)]||{pago:false})}));
   const obj={
     negId,
     descCliente:neg?neg.titulo:document.getElementById('pag-obs').value.trim(),
@@ -2684,7 +2739,12 @@ function savePagamento(){
     valorRecebido:valor,
     data:document.getElementById('pag-data').value,
     obs:document.getElementById('pag-obs').value.trim(),
-    comissoes:_pagComTemp.filter(c=>c.valor>0),
+    regraId:+document.getElementById('pag-regra').value,
+    vendedorId:ctx.vendedorId,fomentadorId:ctx.fomentadorId,fomentadorNome:ctx.fomentadorNome,custas:ctx.custas,
+    ajusteMotivo:_pagRows.some(r=>r.ajustado)?motivo:'',
+    distribuicao,
+    // compatível com extrato/dashboard: só o que é pago a pessoas
+    comissoes:distribuicao.filter(_distEhPagavel).map(r=>({socioId:r.pessoaId,valor:r.valor})),
   };
   if(_pagEditId){const i=pagamentos.findIndex(p=>p.id===_pagEditId);pagamentos[i]={...pagamentos[i],...obj};}
   else pagamentos.push({...obj,id:Date.now()});
@@ -5644,7 +5704,7 @@ function getStateSnapshot(){
     users,projetos,lancamentos,sinergias,conexoes,
     notificacoes,oportunidadesPendentes,
     convidadosExternos,customGroups,interessesPendentes,
-    projetosVitrine,negocios,portfolio,pagamentos
+    projetosVitrine,negocios,portfolio,pagamentos,regrasDistrib
   };
 }
 
@@ -5664,6 +5724,7 @@ function applyStateSnapshot(d){
   if(d.negocios)negocios=d.negocios;
   if(d.portfolio)portfolio=d.portfolio;
   if(d.pagamentos)pagamentos=d.pagamentos;
+  if(d.regrasDistrib)regrasDistrib=d.regrasDistrib;
 }
 
 let _syncTimer=null;
@@ -5702,6 +5763,7 @@ function saveData(){
     localStorage.setItem('iahub_negocios',JSON.stringify(negocios));
     localStorage.setItem('iahub_portfolio',JSON.stringify(portfolio));
     localStorage.setItem('iahub_pagamentos',JSON.stringify(pagamentos));
+    localStorage.setItem('iahub_regras',JSON.stringify(regrasDistrib));
     localStorage.setItem('iahub_receitas',JSON.stringify(receitas));
     localStorage.setItem('iahub_comissoes',JSON.stringify(comissoes));
     localStorage.setItem('iahub_config',JSON.stringify(config));
@@ -5724,11 +5786,280 @@ function loadData(){
     const neg=localStorage.getItem('iahub_negocios');if(neg)negocios=JSON.parse(neg);
     const prt=localStorage.getItem('iahub_portfolio');if(prt)portfolio=JSON.parse(prt);
     const pag=localStorage.getItem('iahub_pagamentos');if(pag)pagamentos=JSON.parse(pag);
+    const rgs=localStorage.getItem('iahub_regras');if(rgs)regrasDistrib=JSON.parse(rgs);
     const rec=localStorage.getItem('iahub_receitas');if(rec)receitas=JSON.parse(rec);
     const com=localStorage.getItem('iahub_comissoes');if(com)comissoes=JSON.parse(com);
     const cfg=localStorage.getItem('iahub_config');if(cfg){const parsed=JSON.parse(cfg);config={...config,...parsed};}
     const ctts=localStorage.getItem('iahub_contatos');if(ctts)contatos=JSON.parse(ctts);
   }catch(e){console.warn('loadData failed',e);}
+}
+
+// ===================== REGRAS DE DISTRIBUIÇÃO (cascata) =====================
+// Cada regra é uma lista de linhas. Cada linha calcula sobre o total recebido
+// ou sobre um subtotal, e diz para onde vai o dinheiro.
+const DESTINOS_REGRA={
+  sai:'Sai (não fica no grupo)',grupo:'Subtotal (divide abaixo)',vendedor:'Quem vendeu',
+  fomentador:'Fomentador',pessoa:'Pessoa fixa',pool:'Divisão igual entre pessoas',
+  reserva:'Reserva',custo:'Custo / despesa'
+};
+const TIPOS_LINHA={pct:'%',fixo:'Valor fixo',custas:'Custas do negócio',resto:'O que sobrar'};
+function _brl(v){return'R$ '+(+v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function _r2(v){return Math.round((+v||0)*100)/100;}
+function _socioIdPorNome(p){const u=users.find(x=>isSocioUser(x)&&x.nome.toLowerCase().startsWith(p));return u?u.id:null;}
+function _seedRegras(){
+  const b=_socioIdPorNome('bruno'),d=_socioIdPorNome('diego'),e=_socioIdPorNome('eduardo'),v=_socioIdPorNome('vinicius');
+  return[
+    {id:1,nome:'Operação Sicoob',linhas:[
+      {id:'a',nome:'Operacional do banco',base:'total',tipo:'pct',pct:50,destino:'sai'},
+      {id:'b',nome:'BIdaTX',base:'total',tipo:'resto',destino:'grupo'},
+      {id:'c',nome:'Taxa de inadimplência',base:'b',tipo:'pct',pct:30,destino:'pessoa',pessoaId:v},
+      {id:'d',nome:'Pool de sócios',base:'b',tipo:'pct',pct:20,destino:'pool',poolIds:[b,d,e].filter(Boolean)},
+      {id:'e',nome:'Vendedor',base:'b',tipo:'pct',pct:50,destino:'vendedor',socioPct:20,pagarParceiro:false},
+    ]},
+    {id:2,nome:'Novo Negócio',linhas:[
+      {id:'a',nome:'Vendas parceiros',base:'total',tipo:'pct',pct:50,destino:'vendedor',socioPct:0,pagarParceiro:true},
+      {id:'b',nome:'Fomentador',base:'total',tipo:'pct',pct:5,destino:'fomentador'},
+      {id:'c',nome:'BIdaTX Empresa',base:'total',tipo:'resto',destino:'grupo'},
+      {id:'d',nome:'Reserva de lucro',base:'c',tipo:'pct',pct:5,destino:'reserva'},
+      {id:'e',nome:'Custas do negócio',base:'c',tipo:'custas',destino:'custo'},
+      {id:'f',nome:'Lucro dos sócios',base:'c',tipo:'resto',destino:'pool',poolIds:[b,d,e,v].filter(Boolean)},
+    ]},
+  ];
+}
+function getRegras(){if(!regrasDistrib.length)regrasDistrib=_seedRegras();return regrasDistrib;}
+function _subirAte(u,ok){
+  const vistos=new Set();let cur=u;
+  while(cur&&!vistos.has(cur.id)){if(ok(cur))return cur;vistos.add(cur.id);cur=users.find(x=>x.id===cur.vinculoId);}
+  return null;
+}
+function _socioDe(u){return _subirAte(u&&users.find(x=>x.id===u.vinculoId),isSocioUser);}
+// Rede é paga via o Parceiro acima dela (o que combinam entre si não passa pelo sistema)
+function _parceiroDe(u){return u.perfil==='Rede'?(_subirAte(u,x=>x.perfil==='Parceiro'||x.perfil==='Associado')||u):u;}
+function _distEhPagavel(r){return !r.retido&&!r.aviso&&!!(r.pessoaId||r.pessoaNome)&&r.valor>0;}
+
+function calcDistribuicao(regra,ctx){
+  const L=regra.linhas||[];const memo={};
+  const byId=id=>L.find(l=>l.id===id);
+  const baseDe=l=>l.base==='total'?(+ctx.valor||0):(byId(l.base)?amt(byId(l.base)):0);
+  function amt(l){
+    if(memo[l.id]!==undefined)return memo[l.id];
+    memo[l.id]=0;// proteção contra referência circular
+    const b=baseDe(l);let v=0;
+    if(l.tipo==='pct')v=b*(+l.pct||0)/100;
+    else if(l.tipo==='fixo')v=+l.fixo||0;
+    else if(l.tipo==='custas')v=+ctx.custas||0;
+    else if(l.tipo==='resto')v=b-L.filter(x=>x!==l&&x.base===l.base&&x.tipo!=='resto').reduce((s,x)=>s+amt(x),0);
+    // Sem fomentador, a parte dele volta para o "o que sobrar"
+    if(l.destino==='fomentador'&&!ctx.fomentadorId&&!ctx.fomentadorNome)v=0;
+    return memo[l.id]=_r2(v);
+  }
+  const nivel=l=>{let n=0,cur=l;const vistos=new Set();while(cur&&cur.base!=='total'&&!vistos.has(cur.id)){vistos.add(cur.id);cur=byId(cur.base);n++;}return n;};
+  const rows=[];
+  L.forEach(l=>{
+    const v=amt(l),r={linhaId:l.id,nome:l.nome,destino:l.destino,nivel:nivel(l)};
+    if(l.destino==='vendedor'){
+      let vend=users.find(u=>u.id===ctx.vendedorId);
+      if(!vend){rows.push({...r,pessoaId:null,pessoaNome:'defina quem vendeu',valor:v,aviso:true});return;}
+      if(isSocioUser(vend)){rows.push({...r,pessoaId:vend.id,pessoaNome:vend.nome,valor:v});return;}
+      if(l.pagarParceiro)vend=_parceiroDe(vend);
+      const soc=_socioDe(vend);
+      const vs=soc?Math.min(v,_r2(baseDe(l)*(+l.socioPct||0)/100)):0;
+      if(vs>0)rows.push({...r,linhaId:l.id+'s',nome:l.nome+' · sócio responsável',pessoaId:soc.id,pessoaNome:soc.nome,valor:vs});
+      rows.push({...r,pessoaId:vend.id,pessoaNome:vend.nome,valor:_r2(v-vs)});
+    }else if(l.destino==='pool'){
+      const ids=(l.poolIds||[]).filter(id=>users.some(u=>u.id===id));
+      if(!ids.length){rows.push({...r,pessoaId:null,pessoaNome:'escolha as pessoas',valor:v,aviso:true});return;}
+      const parte=Math.floor(v/ids.length*100)/100,sobra=_r2(v-parte*ids.length);
+      ids.forEach((id,i)=>rows.push({...r,pessoaId:id,pessoaNome:users.find(x=>x.id===id).nome,valor:i===0?_r2(parte+sobra):parte}));
+    }else if(l.destino==='pessoa'){
+      const u=users.find(x=>x.id===l.pessoaId);
+      rows.push({...r,pessoaId:u?u.id:null,pessoaNome:u?u.nome:'escolha a pessoa',valor:v,aviso:!u});
+    }else if(l.destino==='fomentador'){
+      if(!v)return;
+      const u=users.find(x=>x.id===ctx.fomentadorId);
+      rows.push({...r,pessoaId:u?u.id:null,pessoaNome:u?u.nome:ctx.fomentadorNome,valor:v});
+    }else rows.push({...r,pessoaId:null,pessoaNome:'',valor:v,retido:true,subtotal:l.destino==='grupo'});
+  });
+  return rows;
+}
+
+function _distribTabela(rows,editavel){
+  if(!rows.length)return'<div style="font-size:12px;color:#aaa">Regra sem linhas.</div>';
+  const pagar=rows.filter(_distEhPagavel).reduce((s,r)=>s+r.valor,0);
+  return`<div class="dist-tab">
+    ${rows.map((r,i)=>{
+      const quem=r.retido?`<span class="dist-dest">${DESTINOS_REGRA[r.destino]||''}</span>`:
+        `<span class="${r.aviso?'dist-aviso':''}">${esc(r.pessoaNome||'')}</span>`;
+      const val=editavel&&!r.retido&&!r.aviso
+        ?`<input type="number" step="0.01" value="${r.valor}" onchange="_pagAjustar(${i},this.value)" class="${r.ajustado?'dist-ajustado':''}" title="${r.ajustado?'Calculado: '+_brl(r.valorCalc):''}">`
+        :`<b>${_brl(r.valor)}</b>`;
+      return`<div class="dist-row ${r.subtotal?'dist-sub':''} ${r.retido&&!r.subtotal?'dist-ret':''}" style="padding-left:${10+r.nivel*18}px">
+        <div class="dist-nome">${esc(r.nome)}</div><div class="dist-quem">${quem}</div><div class="dist-val">${val}</div></div>`;
+    }).join('')}
+    <div class="dist-row dist-tot"><div class="dist-nome">Total a pagar a pessoas</div><div class="dist-quem"></div><div class="dist-val"><b>${_brl(pagar)}</b></div></div>
+  </div>`;
+}
+
+// ---------- Config: editor de regras ----------
+let _simRegra={};
+function _renderCfgRegras(){
+  const el=document.getElementById('cfg-regras');if(!el)return;
+  const pessoas=users.filter(u=>u.perfil!=='Operador').sort((a,b)=>a.nome.localeCompare(b.nome));
+  const socios=users.filter(isSocioUser);
+  el.innerHTML=getRegras().map((rg,ri)=>{
+    const sim=_simRegra[rg.id]||(_simRegra[rg.id]={valor:10000,vendedorId:null,custas:0,fom:false});
+    const linhas=(rg.linhas||[]).map((l,li)=>{
+      const bases=`<option value="total">Total recebido</option>`+rg.linhas.filter(x=>x.id!==l.id&&x.destino==='grupo').map(x=>`<option value="${x.id}" ${l.base===x.id?'selected':''}>${esc(x.nome)}</option>`).join('');
+      let extra='';
+      if(l.destino==='pessoa')extra=`<select onchange="_rgSet(${ri},${li},'pessoaId',+this.value)"><option value="">— pessoa —</option>${pessoas.map(u=>`<option value="${u.id}" ${l.pessoaId===u.id?'selected':''}>${esc(u.nome)}</option>`).join('')}</select>`;
+      if(l.destino==='pool')extra=`<div class="rg-pool">${socios.concat(pessoas.filter(u=>!isSocioUser(u)&&(l.poolIds||[]).includes(u.id))).map(u=>`<label><input type="checkbox" ${(l.poolIds||[]).includes(u.id)?'checked':''} onchange="_rgPool(${ri},${li},${u.id},this.checked)">${esc(u.nome.split(' ')[0])}</label>`).join('')}</div>`;
+      if(l.destino==='vendedor')extra=`<label class="rg-mini">Sócio responsável fica com <input class="rg-num" type="number" value="${l.socioPct||0}" onchange="_rgSet(${ri},${li},'socioPct',+this.value)">% da base quando quem vende não é sócio</label>
+        <label class="rg-mini"><input type="checkbox" ${l.pagarParceiro?'checked':''} onchange="_rgSet(${ri},${li},'pagarParceiro',this.checked)"> Se quem vendeu for da Rede, pagar ao Parceiro dela</label>`;
+      return`<div class="rg-linha" style="margin-left:${l.base==='total'?0:22}px">
+        <input class="rg-nome" value="${esc(l.nome)}" onchange="_rgSet(${ri},${li},'nome',this.value)">
+        <select title="Calcula sobre" onchange="_rgSet(${ri},${li},'base',this.value)">${bases}</select>
+        <select onchange="_rgSet(${ri},${li},'tipo',this.value)">${Object.entries(TIPOS_LINHA).map(([k,t])=>`<option value="${k}" ${l.tipo===k?'selected':''}>${t}</option>`).join('')}</select>
+        ${l.tipo==='pct'?`<input class="rg-num" type="number" value="${l.pct||0}" onchange="_rgSet(${ri},${li},'pct',+this.value)">%`:''}
+        ${l.tipo==='fixo'?`<input class="rg-num" type="number" value="${l.fixo||0}" onchange="_rgSet(${ri},${li},'fixo',+this.value)">`:''}
+        <span class="rg-seta">→</span>
+        <select onchange="_rgSet(${ri},${li},'destino',this.value)">${Object.entries(DESTINOS_REGRA).map(([k,t])=>`<option value="${k}" ${l.destino===k?'selected':''}>${t}</option>`).join('')}</select>
+        <span class="rg-acoes"><button title="Subir" onclick="_rgMover(${ri},${li},-1)">↑</button><button title="Remover linha" onclick="_rgDelLinha(${ri},${li})">✕</button></span>
+        ${extra?`<div class="rg-extra">${extra}</div>`:''}
+      </div>`;
+    }).join('');
+    const temCustas=rg.linhas.some(l=>l.tipo==='custas'),temFom=rg.linhas.some(l=>l.destino==='fomentador');
+    const rows=calcDistribuicao(rg,{valor:sim.valor,vendedorId:sim.vendedorId,custas:sim.custas,fomentadorNome:sim.fom?'Fomentador (exemplo)':''});
+    return`<div class="rg-card">
+      <div class="rg-head">
+        <input class="rg-titulo" value="${esc(rg.nome)}" onchange="_rgNome(${ri},this.value)">
+        <button class="btn-s btn-sm" onclick="_rgAddLinha(${ri})">+ Linha</button>
+        <button class="btn-d btn-sm" onclick="_rgDel(${ri})">Excluir regra</button>
+      </div>
+      <div class="rg-grid">
+        <div>${linhas||'<div style="color:#aaa;font-size:12px">Sem linhas.</div>'}</div>
+        <div class="rg-sim">
+          <div class="rg-sim-ctl">
+            <label>Simular com R$ <input type="number" value="${sim.valor}" onchange="_simRegra[${rg.id}].valor=+this.value;_renderCfgRegras()"></label>
+            <label>Quem vendeu <select onchange="_simRegra[${rg.id}].vendedorId=+this.value||null;_renderCfgRegras()"><option value="">—</option>${pessoas.map(u=>`<option value="${u.id}" ${sim.vendedorId===u.id?'selected':''}>${esc(u.nome)} · ${u.perfil}</option>`).join('')}</select></label>
+            ${temCustas?`<label>Custas R$ <input type="number" value="${sim.custas}" onchange="_simRegra[${rg.id}].custas=+this.value;_renderCfgRegras()"></label>`:''}
+            ${temFom?`<label class="rg-mini"><input type="checkbox" ${sim.fom?'checked':''} onchange="_simRegra[${rg.id}].fom=this.checked;_renderCfgRegras()"> com fomentador</label>`:''}
+          </div>
+          ${_distribTabela(rows,false)}
+        </div>
+      </div>
+    </div>`;
+  }).join('')+`<button onclick="_rgAdd()" class="rg-nova">+ Nova regra de distribuição</button>`;
+}
+function _rgSalvar(){saveData();_renderCfgRegras();}
+function _rgSet(ri,li,campo,val){getRegras()[ri].linhas[li][campo]=val;_rgSalvar();}
+function _rgNome(ri,v){getRegras()[ri].nome=v.trim()||'Sem nome';_rgSalvar();}
+function _rgPool(ri,li,uid,on){const l=getRegras()[ri].linhas[li];l.poolIds=(l.poolIds||[]).filter(x=>x!==uid);if(on)l.poolIds.push(uid);_rgSalvar();}
+function _rgMover(ri,li,d){const L=getRegras()[ri].linhas;const j=li+d;if(j<0||j>=L.length)return;[L[li],L[j]]=[L[j],L[li]];_rgSalvar();}
+function _rgAddLinha(ri){getRegras()[ri].linhas.push({id:'l'+Date.now(),nome:'Nova linha',base:'total',tipo:'pct',pct:0,destino:'pessoa'});_rgSalvar();}
+function _rgDelLinha(ri,li){
+  const rg=getRegras()[ri],l=rg.linhas[li];
+  if(rg.linhas.some(x=>x.base===l.id)){alert('Outras linhas calculam sobre esta. Mude a base delas antes.');return;}
+  if(!confirm(`Remover a linha "${l.nome}"?`))return;
+  rg.linhas.splice(li,1);_rgSalvar();
+}
+function _rgAdd(){
+  const nome=prompt('Nome da regra (ex.: Revisão de Créditos Tributários):');if(!nome||!nome.trim())return;
+  getRegras().push({id:Date.now(),nome:nome.trim(),linhas:[{id:'a',nome:'Vendedor',base:'total',tipo:'pct',pct:20,destino:'vendedor',socioPct:0,pagarParceiro:true}]});
+  _rgSalvar();
+}
+function _rgDel(ri){
+  const rg=getRegras()[ri];
+  if(pagamentos.some(p=>p.regraId===rg.id)){alert('Já há recebimentos usando esta regra. Ela não pode ser excluída.');return;}
+  if(!confirm(`Excluir a regra "${rg.nome}"?`))return;
+  getRegras().splice(ri,1);_rgSalvar();
+}
+
+// ---------- Financeiro: relatório de pagamento ----------
+let _apFiltro='pendentes';
+function _linhasAPagar(){
+  const out=[];
+  pagamentos.forEach(pg=>(pg.distribuicao||[]).forEach((r,ri)=>{if(_distEhPagavel(r))out.push({pg,r,ri});}));
+  return out;
+}
+function _apChave(r){return r.pessoaId?String(r.pessoaId):'ext:'+r.pessoaNome;}
+function _apAgrupar(lista){
+  const g={};
+  lista.forEach(x=>{const k=_apChave(x.r);(g[k]=g[k]||{k,nome:x.r.pessoaNome,u:users.find(u=>u.id===x.r.pessoaId),itens:[]}).itens.push(x);});
+  return Object.values(g).sort((a,b)=>a.nome.localeCompare(b.nome));
+}
+function _renderFinAPagar(){
+  const el=document.getElementById('fin-subtab-content');
+  const todas=_linhasAPagar();
+  const lista=todas.filter(x=>_apFiltro==='todos'||(_apFiltro==='pagos'?x.r.pago:!x.r.pago));
+  const pend=todas.filter(x=>!x.r.pago).reduce((s,x)=>s+x.r.valor,0);
+  const pagos=todas.filter(x=>x.r.pago).reduce((s,x)=>s+x.r.valor,0);
+  const grupos=_apAgrupar(lista);
+  el.innerHTML=`
+    <div class="fin-saldo-bar" style="margin-bottom:14px">
+      <div class="fin-saldo-item"><div class="fin-saldo-label">A pagar</div><div class="fin-saldo-val val-out">${_brl(pend)}</div></div>
+      <div class="fin-saldo-item"><div class="fin-saldo-label">Já pago</div><div class="fin-saldo-val val-in">${_brl(pagos)}</div></div>
+      <div class="fin-saldo-item"><div class="fin-saldo-label">Pessoas a pagar</div><div class="fin-saldo-val">${new Set(todas.filter(x=>!x.r.pago).map(x=>_apChave(x.r))).size}</div></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div style="display:flex;gap:6px">
+        ${['pendentes','pagos','todos'].map(f=>`<button class="pip-stab ${_apFiltro===f?'active':''}" onclick="_apFiltro='${f}';_renderFinAPagar()">${f[0].toUpperCase()+f.slice(1)}</button>`).join('')}
+      </div>
+      <button class="btn-p" style="font-size:12px;padding:6px 14px" onclick="gerarRelatorioPagamento()">🖨 Relatório para pagamento</button>
+    </div>
+    ${grupos.length?grupos.map((g,gi)=>{
+      const tot=g.itens.reduce((s,x)=>s+x.r.valor,0),algumPend=g.itens.some(x=>!x.r.pago);
+      return`<div class="ap-card">
+        <div class="ap-head">
+          <div><div class="ap-nome">${esc(g.nome)}</div><div class="ap-pix">${g.u?(g.u.pix?'Pix: '+esc(g.u.pix):'<span class="dist-aviso">sem Pix cadastrado</span>')+' · '+g.u.perfil:'externo'}</div></div>
+          <div style="text-align:right"><div class="ap-tot">${_brl(tot)}</div>
+          ${algumPend?`<button class="btn-s btn-sm" onclick="_apMarcarGrupo(${gi})">Marcar tudo como pago</button>`:''}</div>
+        </div>
+        ${g.itens.map(x=>`<div class="ap-item ${x.r.pago?'ap-pago':''}">
+          <input type="checkbox" ${x.r.pago?'checked':''} onchange="_apMarcar(${x.pg.id},${x.ri},this.checked)">
+          <div style="flex:1;min-width:0"><b>${esc(x.pg.descCliente||'—')}</b> · ${esc(x.r.nome)}<div class="ap-sub">recebido em ${x.pg.data||'—'}${x.r.pago?' · pago em '+(x.r.dataPago||''):''}</div></div>
+          <div class="ap-val">${_brl(x.r.valor)}</div>
+        </div>`).join('')}
+      </div>`;}).join(''):`<div style="text-align:center;padding:40px;color:#9ca3af;font-size:14px">Nada ${_apFiltro==='pagos'?'pago':'a pagar'} por enquanto.</div>`}`;
+  _apGruposVisiveis=grupos;
+}
+let _apGruposVisiveis=[];
+function _apMarcar(pgId,ri,on){
+  const pg=pagamentos.find(p=>p.id===pgId);if(!pg)return;
+  const r=pg.distribuicao[ri];r.pago=on;r.dataPago=on?new Date().toISOString().slice(0,10):'';
+  saveData();_renderFinAPagar();
+}
+function _apMarcarGrupo(gi){
+  const g=_apGruposVisiveis[gi];if(!g)return;
+  const itens=g.itens.filter(x=>!x.r.pago);
+  if(!confirm(`Marcar ${itens.length} item(ns) de ${g.nome} como pagos hoje?`))return;
+  const hoje=new Date().toISOString().slice(0,10);
+  itens.forEach(x=>{x.r.pago=true;x.r.dataPago=hoje;});
+  saveData();_renderFinAPagar();
+}
+function gerarRelatorioPagamento(){
+  const pend=_linhasAPagar().filter(x=>!x.r.pago);
+  if(!pend.length){alert('Nada pendente de pagamento.');return;}
+  const grupos=_apAgrupar(pend);
+  const total=pend.reduce((s,x)=>s+x.r.valor,0);
+  const blocos=grupos.map(g=>{
+    const t=g.itens.reduce((s,x)=>s+x.r.valor,0);
+    return`<div class="b"><div class="h"><div><b>${esc(g.nome)}</b><br><span>${g.u&&g.u.pix?'Pix: '+esc(g.u.pix):'Dados de pagamento: ____________________'}</span></div><div class="t">${_brl(t)}</div></div>
+      <table>${g.itens.map(x=>`<tr><td>${esc(x.pg.descCliente||'—')}</td><td>${esc(x.r.nome)}</td><td>${x.pg.data||''}</td><td class="v">${_brl(x.r.valor)}</td></tr>`).join('')}</table>
+      <div class="ok">Pago em ___/___/______ &nbsp; Comprovante: ________________</div></div>`;
+  }).join('');
+  const hoje=new Date().toLocaleDateString('pt-BR');
+  const win=window.open('','_blank','width=900,height=800');
+  win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Relatório de pagamento — ${hoje}</title><style>
+    *{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,'Segoe UI',sans-serif;padding:32px;color:#111;font-size:12px}
+    h1{font-size:18px;color:#0a1628}.sub{color:#888;margin:4px 0 18px}.b{border:1px solid #ddd;border-radius:8px;padding:12px;margin-bottom:12px;page-break-inside:avoid}
+    .h{display:flex;justify-content:space-between;margin-bottom:8px}.h span{color:#666}.t{font-size:15px;font-weight:700}
+    table{width:100%;border-collapse:collapse}td{padding:4px 6px;border-top:1px solid #f0f0f0}.v{text-align:right;white-space:nowrap}
+    .ok{margin-top:8px;color:#888}.tot{font-size:14px;font-weight:700;text-align:right;margin-top:8px}
+    @media print{body{padding:0}@page{margin:15mm}}</style></head><body>
+    <h1>Relatório de pagamento — IA Hub</h1><div class="sub">Gerado em ${hoje} · ${grupos.length} pessoa(s) · total ${_brl(total)}</div>
+    ${blocos}<div class="tot">Total: ${_brl(total)}</div>
+    <script>window.onload=function(){window.print();}<\/script></body></html>`);
+  win.document.close();
 }
 
 // ===================== CONFIG =====================
@@ -5814,7 +6145,12 @@ function renderConfig(){
       ${matrizHtml||'<div style="padding:12px;color:#aaa;font-size:13px">Nenhum produto cadastrado.</div>'}
     </div>
     <button onclick="addConfigProduto()" style="border:2px dashed #d97706;border-radius:8px;padding:8px 14px;background:none;color:#d97706;font-size:13px;cursor:pointer;font-weight:600">+ Novo produto / combinado</button>
+
+    <div class="section-hdr" style="margin-top:28px">Regras de Distribuição</div>
+    <p style="font-size:12px;color:#888;margin-bottom:12px">Como cada recebimento é dividido, em cascata. Cada linha calcula sobre o total recebido ou sobre um subtotal. Ao registrar um recebimento, você escolhe a regra e pode ajustar valores naquele negócio (com motivo).</p>
+    <div id="cfg-regras"></div>
   `;
+  _renderCfgRegras();
 }
 
 function removeConfigProduto(idx){
