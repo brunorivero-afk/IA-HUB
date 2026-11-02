@@ -249,9 +249,10 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 .ap-pago{opacity:.55;}
 .pip-parado{margin-top:6px;font-size:10px;font-weight:600;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:2px 6px;}
 .pip-atualizei{font-size:10px;color:#0F6E56;background:none;border:none;cursor:pointer;padding:0;font-weight:600;}
-.pip-sel{padding:6px 10px;border:1.5px solid #e5e7eb;border-radius:20px;font-size:12px;font-weight:600;color:#0a1628;background:#fff;cursor:pointer;}
+.pip-sel{max-width:140px;padding:6px 10px;border:1.5px solid #e5e7eb;border-radius:20px;font-size:12px;font-weight:600;color:#0a1628;background:#fff;cursor:pointer;}
 .pip-btn-parados{padding:6px 12px;border:1.5px solid #d97706;border-radius:20px;font-size:12px;font-weight:600;color:#b45309;background:#fff;cursor:pointer;}
 .pip-btn-parados.on{background:#d97706;color:#fff;}
+.pip-btn-sec{font-size:12px!important;padding:6px 12px!important;background:#fff!important;color:#0a1628!important;border:1.5px solid #0a1628!important;}
 .dash-parados{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:#92400e;cursor:pointer;}
 .dash-parado-chip{background:#fff;border:1px solid #fde68a;border-radius:12px;padding:2px 8px;font-size:12px;}
 .dash-parado-ver{font-size:12px;font-weight:600;white-space:nowrap;}
@@ -3811,7 +3812,7 @@ let _negProdSelecionado=null;
 let _negTipo='proprio';
 let _negSubtab='negocios';
 let _pipSubtab='portfolio';
-let _pipFilter='all',_pipParados=false,_pipSocio='all';
+let _pipFilter='all',_pipParados=false,_pipSocio='all',_pipRede='all';
 
 function switchNegSub(sub){
   _negSubtab=sub;
@@ -3911,11 +3912,10 @@ function _renderPortfolioView(){
 
 function _renderClientesView(){
   const hoje=new Date();const mesAtual=hoje.getMonth(),anoAtual=hoje.getFullYear();
-  let negFilt=_pipFilter==='all'?negocios:negocios.filter(n=>n.portafolioId===_pipFilter);
-  if(_pipSocio!=='all')negFilt=negFilt.filter(n=>_negSocios(n).includes(_pipSocio));
-  const qtdParados=negFilt.filter(_negParado).length;
-  if(_pipParados)negFilt=negFilt.filter(_negParado);
+  const qtdParados=_pipFiltrados(false).filter(_negParado).length;
+  const negFilt=_pipFiltrados(true);
   const sociosPip=users.filter(isSocioUser).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  const redePip=_pipPessoasRede();
   const ativos=negFilt.filter(n=>n.status!=='Fechado'&&n.status!=='Perdido');
   const fechadosMes=negFilt.filter(n=>{
     if(n.status!=='Fechado')return false;
@@ -3927,7 +3927,7 @@ function _renderClientesView(){
   return`<div style="height:100%;display:flex;flex-direction:column;overflow:hidden">
     <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;padding:0 16px 8px;flex-wrap:wrap">
       <select onchange="_pipFilter=this.value==='all'?'all':+this.value;renderPipeline()"
-        style="padding:6px 10px;border:1.5px solid #e5e7eb;border-radius:20px;font-size:12px;font-weight:600;color:#0a1628;background:#fff;cursor:pointer">
+        style="max-width:160px;padding:6px 10px;border:1.5px solid #e5e7eb;border-radius:20px;font-size:12px;font-weight:600;color:#0a1628;background:#fff;cursor:pointer">
         <option value="all" ${_pipFilter==='all'?'selected':''}>Todos os negócios</option>
         ${portfolio.map(p=>`<option value="${p.id}" ${_pipFilter===p.id?'selected':''}>${esc(p.nome)}</option>`).join('')}
       </select>
@@ -3944,9 +3944,14 @@ function _renderClientesView(){
       <select onchange="_pipSocio=this.value==='all'?'all':+this.value;renderPipeline()" class="pip-sel">
         <option value="all">Todos os sócios</option>${sociosPip.map(u=>`<option value="${u.id}" ${_pipSocio===u.id?'selected':''}>${esc(u.nome.split(' ')[0])}</option>`).join('')}
       </select>
+      <select onchange="_pipRede=this.value==='all'?'all':+this.value;renderPipeline()" class="pip-sel">
+        <option value="all">Toda a rede</option>${redePip.map(u=>`<option value="${u.id}" ${_pipRede===u.id?'selected':''}>${esc(u.nome)}</option>`).join('')}
+      </select>
       <button class="pip-btn-parados ${_pipParados?'on':''}" onclick="_pipParados=!_pipParados;renderPipeline()">⏰ Parados ${qtdParados}</button>
       <button class="btn-p" style="font-size:12px;padding:6px 14px;background:#fef2f2;color:#991b1b;border:1.5px solid #991b1b" onclick="abrirInativos()">📋 Inativos</button>
-      <button class="btn-p" style="font-size:12px;padding:6px 14px;background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="abrirImportarPlanilha()">⬆ Importar planilha</button>
+      <button class="btn-p pip-btn-sec" onclick="abrirImportarPlanilha()">⬆ Importar</button>
+      <button class="btn-p pip-btn-sec" onclick="exportarPipelineExcel()" title="Baixa em Excel o que está filtrado na tela">⬇ Excel</button>
+      <button class="btn-p pip-btn-sec" onclick="relatorioPipeline()" title="Relatório do que está filtrado (imprimir ou salvar em PDF)">🖨 Relatório</button>
       <button class="btn-p" style="font-size:12px;padding:6px 14px;margin-left:auto;flex-shrink:0" onclick="openNegModal(null)">+ Novo negócio</button>
     </div>
     <div style="flex:1;display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;min-height:0;padding:0 16px 12px">
@@ -4272,6 +4277,94 @@ function _dashParadosHtml(){
   return`<div class="dash-parados" onclick="_pipParados=true;_pipSubtab='clientes';showTab('negocios')">
     <div><b>⏰ ${total} negócio(s) sem atualização há mais de ${DIAS_PARADO} dias</b><div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px">${nomes}</div></div>
     <span class="dash-parado-ver">Ver no pipeline →</span></div>`;
+}
+
+// ===================== PIPELINE: FILTROS, EXCEL E RELATÓRIO =====================
+// Um só filtro alimenta a tela, o Excel e o relatório: o que você vê é o que sai.
+function _negRede(n){
+  const ids=((n.comissaoVenda&&n.comissaoVenda.participantes)||[]).map(p=>p.userId);
+  const o=users.find(u=>u.id===n.originadorId);
+  if(o&&!isSocioUser(o))ids.push(o.id);
+  return[...new Set(ids)];
+}
+function _pipFiltrados(aplicaParados){
+  let l=_pipFilter==='all'?negocios:negocios.filter(n=>n.portafolioId===_pipFilter);
+  if(_pipSocio!=='all')l=l.filter(n=>_negSocios(n).includes(_pipSocio));
+  if(_pipRede!=='all')l=l.filter(n=>_negRede(n).includes(_pipRede));
+  if(aplicaParados&&_pipParados)l=l.filter(_negParado);
+  return l;
+}
+// Só quem aparece em algum negócio entra na lista de rede (lista curta)
+function _pipPessoasRede(){
+  const ids=new Set(negocios.flatMap(_negRede));
+  return users.filter(u=>ids.has(u.id)).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+}
+function _pipTituloFiltro(){
+  const p=[];
+  if(_pipSocio!=='all')p.push('Sócio: '+((users.find(u=>u.id===_pipSocio)||{}).nome||''));
+  if(_pipRede!=='all')p.push('Rede: '+((users.find(u=>u.id===_pipRede)||{}).nome||''));
+  if(_pipFilter!=='all')p.push((portfolio.find(x=>x.id===_pipFilter)||{}).nome||'');
+  if(_pipParados)p.push('só parados');
+  return p.length?p.join(' · '):'Todos os negócios';
+}
+function _negLinhaRel(n){
+  const prod=n.configProdutoId?(config.comissoes.find(c=>c.id===n.configProdutoId)||{}).produto:(n.produtoOutro||'');
+  const nome=id=>(users.find(u=>u.id===id)||{}).nome||'';
+  const cv=n.comissaoVenda||{};
+  const rede=(cv.participantes||[]).map(p=>`${nome(p.userId)} ${p.pct}%`).join(', ')||(()=>{const o=users.find(u=>u.id===n.originadorId);return o&&!isSocioUser(o)?o.nome:'';})();
+  const notas=String(n.notas||'').split('\n').map(s=>s.trim()).filter(Boolean);
+  return{cliente:n.titulo,cnpj:n.cnpj||'',produto:prod,etapa:n.status||'Prospecção',
+    socios:_negSocios(n).map(nome).join(' + '),rede,valor:n.valor||null,
+    dias:_negAtivo(n)?_diasParado(n):'',parado:_negParado(n),
+    atualizado:n.atualizadoEm?new Date(n.atualizadoEm).toLocaleDateString('pt-BR'):(n.criado||''),
+    ultimaNota:notas.filter(s=>!/^Importado de /.test(s)).slice(-1)[0]||''};
+}
+function _pipOrdenados(){
+  const ordem=[...NEG_COLS,'Perdido'];
+  return _pipFiltrados(true).slice().sort((a,b)=>ordem.indexOf(a.status||'Prospecção')-ordem.indexOf(b.status||'Prospecção')||String(a.titulo).localeCompare(String(b.titulo),'pt-BR'));
+}
+async function exportarPipelineExcel(){
+  const lista=_pipOrdenados();
+  if(!lista.length){alert('Nada para exportar com esse filtro.');return;}
+  try{await _impLoadXLSX();}catch(e){alert(e.message);return;}
+  const cab=['Cliente','CNPJ','Produto','Etapa','Sócio(s)','Rede (% comissão)','Valor estimado','Dias sem atualização','Última atualização','Última nota'];
+  const linhas=lista.map(n=>{const r=_negLinhaRel(n);return[r.cliente,r.cnpj,r.produto,r.etapa,r.socios,r.rede,r.valor,r.dias,r.atualizado,r.ultimaNota];});
+  const ws=XLSX.utils.aoa_to_sheet([cab,...linhas]);
+  ws['!cols']=[{wch:32},{wch:20},{wch:28},{wch:14},{wch:22},{wch:30},{wch:14},{wch:12},{wch:14},{wch:50}];
+  ws['!autofilter']={ref:XLSX.utils.encode_range({s:{r:0,c:0},e:{r:linhas.length,c:cab.length-1}})};
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Pipeline');
+  const sufixo=_pipTituloFiltro().replace(/[^\wÀ-ú ]+/g,' ').replace(/\s+/g,'_').slice(0,50);
+  XLSX.writeFile(wb,`IA_Hub_Pipeline_${sufixo}_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+function relatorioPipeline(){
+  const lista=_pipOrdenados();
+  if(!lista.length){alert('Nada para o relatório com esse filtro.');return;}
+  const rows=lista.map(n=>({n,r:_negLinhaRel(n)}));
+  const brl=v=>v?'R$ '+(+v).toLocaleString('pt-BR',{maximumFractionDigits:0}):'';
+  const ativos=rows.filter(x=>_negAtivo(x.n));
+  const parados=rows.filter(x=>x.r.parado).length;
+  const valorAtivo=ativos.reduce((s,x)=>s+(+x.n.valor||0),0);
+  const porEtapa=[...NEG_COLS,'Perdido'].map(et=>({et,itens:rows.filter(x=>x.r.etapa===et)})).filter(g=>g.itens.length);
+  const clientes=new Set(rows.map(x=>_impNorm(x.r.cliente))).size;
+  const hoje=new Date().toLocaleDateString('pt-BR');
+  const win=window.open('','_blank','width=1000,height=800');
+  win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Pipeline — ${esc(_pipTituloFiltro())}</title><style>
+    *{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,'Segoe UI',sans-serif;padding:28px;color:#111;font-size:11px}
+    h1{font-size:18px;color:#0a1628}.sub{color:#888;margin:4px 0 14px}
+    .kpis{display:flex;gap:10px;margin-bottom:16px}.k{border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px}.k b{display:block;font-size:16px;color:#0a1628}
+    h2{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#0a1628;margin:14px 0 6px}
+    table{width:100%;border-collapse:collapse}th{background:#0a1628;color:#fff;text-align:left;padding:5px 6px;font-size:10px}
+    td{padding:5px 6px;border-bottom:1px solid #f0f0f0;vertical-align:top}.p{color:#b45309;font-weight:600}.n{color:#666}
+    @media print{body{padding:0}@page{margin:12mm;size:A4 landscape}h2{page-break-after:avoid}tr{page-break-inside:avoid}}</style></head><body>
+    <h1>Pipeline — ${esc(_pipTituloFiltro())}</h1><div class="sub">IA Hub · gerado em ${hoje}</div>
+    <div class="kpis"><div class="k">Cards<b>${rows.length}</b></div><div class="k">Clientes<b>${clientes}</b></div>
+      <div class="k">Ativos<b>${ativos.length}</b></div><div class="k">Parados +${DIAS_PARADO} dias<b>${parados}</b></div>
+      ${valorAtivo?`<div class="k">Valor estimado (ativos)<b>${brl(valorAtivo)}</b></div>`:''}</div>
+    ${porEtapa.map(g=>`<h2>${g.et} (${g.itens.length})</h2><table><thead><tr><th>Cliente</th><th>Produto</th><th>Sócio(s)</th><th>Rede</th><th>Valor</th><th>Atualizado</th><th>Última nota</th></tr></thead><tbody>
+      ${g.itens.map(({r})=>`<tr><td><b>${esc(r.cliente)}</b></td><td>${esc(r.produto)}</td><td>${esc(r.socios)}</td><td>${esc(r.rede)}</td><td>${brl(r.valor)}</td>
+        <td class="${r.parado?'p':''}">${esc(r.atualizado)}${r.parado?` (${r.dias} dias)`:''}</td><td class="n">${esc(r.ultimaNota)}</td></tr>`).join('')}</tbody></table>`).join('')}
+    <script>window.onload=function(){window.print();}<\/script></body></html>`);
+  win.document.close();
 }
 
 // --- Modal Portfólio ---
