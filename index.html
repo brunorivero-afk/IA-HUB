@@ -247,6 +247,30 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 .ap-sub{font-size:11px;color:#9ca3af;}
 .ap-val{font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums;}
 .ap-pago{opacity:.55;}
+.pip-parado{margin-top:6px;font-size:10px;font-weight:600;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:2px 6px;}
+.pip-atualizei{font-size:10px;color:#0F6E56;background:none;border:none;cursor:pointer;padding:0;font-weight:600;}
+.pip-sel{padding:6px 10px;border:1.5px solid #e5e7eb;border-radius:20px;font-size:12px;font-weight:600;color:#0a1628;background:#fff;cursor:pointer;}
+.pip-btn-parados{padding:6px 12px;border:1.5px solid #d97706;border-radius:20px;font-size:12px;font-weight:600;color:#b45309;background:#fff;cursor:pointer;}
+.pip-btn-parados.on{background:#d97706;color:#fff;}
+.dash-parados{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:#92400e;cursor:pointer;}
+.dash-parado-chip{background:#fff;border:1px solid #fde68a;border-radius:12px;padding:2px 8px;font-size:12px;}
+.dash-parado-ver{font-size:12px;font-weight:600;white-space:nowrap;}
+.modal.imp-modal{width:860px!important;max-width:96vw!important;max-height:92vh;overflow-y:auto;}
+.imp-ajuda{font-size:12px;color:#6b7280;}
+.imp-sec{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#0a1628;margin:16px 0 8px;}
+.imp-cols{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;}
+.imp-col{border:1px solid #e5e7eb;border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:4px;font-size:12px;}
+.imp-col select{width:100%;padding:4px 6px;border:1px solid #ddd;border-radius:6px;font-size:12px;}
+.imp-opt{display:flex;gap:6px;align-items:flex-start;font-size:13px;font-weight:400;margin:4px 0;flex-wrap:wrap;}
+.imp-opt input{width:auto!important;flex:0 0 auto;margin-top:3px;}
+.imp-prev{max-height:300px;overflow:auto;border:1px solid #e5e7eb;border-radius:8px;}
+.imp-prev table{font-size:12px;}
+.imp-prev td,.imp-prev th{padding:6px 8px;}
+.imp-ok{color:#0F6E56;font-weight:600;}
+.imp-novo{color:#b45309;font-weight:600;}
+.imp-erro{color:#b91c1c;font-weight:600;}
+.imp-resumo{margin-top:12px;font-size:13px;}
+.imp-rodape{display:flex;justify-content:flex-end;gap:10px;margin-top:16px;}
 .cv-box{border:1.5px solid #e5e7eb;border-radius:10px;padding:12px;margin-bottom:12px;background:#fafaf8;}
 .cv-titulo{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#0a1628;margin-bottom:8px;}
 .cv-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
@@ -676,6 +700,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
           <button class="btn-p" style="background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="showTab('negocios')">🎯 Ver Pipeline</button>
         </div>
       </div>
+      <div id="dash-parados"></div>
       <div id="dashboard-moderacao"></div>
       <!-- KPIs gerais -->
       <div class="stats" id="dash-kpis" style="margin-bottom:20px"></div>
@@ -1845,7 +1870,7 @@ function doLogin(){
   if(isOperador()){
     showTab('conexoes');
   } else if(isSocio()){
-    showTab('rede');
+    showTab('rede');_lembreteLogin();
   } else {
     showTab('rede-membros');
     if(!u.onboardingConcluido){
@@ -2030,6 +2055,7 @@ document.addEventListener('keydown',e=>{
 
 // ===================== DASHBOARD =====================
 function renderDashboard(){
+  const dp=document.getElementById('dash-parados');if(dp)dp.innerHTML=_dashParadosHtml();
   renderDashboardModeracao();
   const totalRec=receitas.reduce((s,r)=>s+(r.valor||0),0);
   const totalFat=projetos.reduce((s,p)=>s+(p.valor||0),0);
@@ -3780,7 +3806,7 @@ let _negProdSelecionado=null;
 let _negTipo='proprio';
 let _negSubtab='negocios';
 let _pipSubtab='portfolio';
-let _pipFilter='all';
+let _pipFilter='all',_pipParados=false,_pipSocio='all';
 
 function switchNegSub(sub){
   _negSubtab=sub;
@@ -3812,7 +3838,7 @@ function negDrop(e,col){
   if(!_negDragId)return;
   const i=negocios.findIndex(n=>n.id===_negDragId);
   if(i===-1){_negDragId=null;return;}
-  negocios[i].status=col;
+  negocios[i].status=col;negocios[i].atualizadoEm=new Date().toISOString();
   saveData();renderPipeline();_negDragId=null;
 }
 
@@ -3880,7 +3906,11 @@ function _renderPortfolioView(){
 
 function _renderClientesView(){
   const hoje=new Date();const mesAtual=hoje.getMonth(),anoAtual=hoje.getFullYear();
-  const negFilt=_pipFilter==='all'?negocios:negocios.filter(n=>n.portafolioId===_pipFilter);
+  let negFilt=_pipFilter==='all'?negocios:negocios.filter(n=>n.portafolioId===_pipFilter);
+  if(_pipSocio!=='all')negFilt=negFilt.filter(n=>_negSocios(n).includes(_pipSocio));
+  const qtdParados=negFilt.filter(_negParado).length;
+  if(_pipParados)negFilt=negFilt.filter(_negParado);
+  const sociosPip=users.filter(isSocioUser).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   const ativos=negFilt.filter(n=>n.status!=='Fechado'&&n.status!=='Perdido');
   const fechadosMes=negFilt.filter(n=>{
     if(n.status!=='Fechado')return false;
@@ -3906,7 +3936,12 @@ function _renderClientesView(){
           <span style="font-size:14px;font-weight:700;color:#0F6E56">${fechadosMes.length}</span>
         </div>
       </div>
+      <select onchange="_pipSocio=this.value==='all'?'all':+this.value;renderPipeline()" class="pip-sel">
+        <option value="all">Todos os sócios</option>${sociosPip.map(u=>`<option value="${u.id}" ${_pipSocio===u.id?'selected':''}>${esc(u.nome.split(' ')[0])}</option>`).join('')}
+      </select>
+      <button class="pip-btn-parados ${_pipParados?'on':''}" onclick="_pipParados=!_pipParados;renderPipeline()">⏰ Parados ${qtdParados}</button>
       <button class="btn-p" style="font-size:12px;padding:6px 14px;background:#fef2f2;color:#991b1b;border:1.5px solid #991b1b" onclick="abrirInativos()">📋 Inativos</button>
+      <button class="btn-p" style="font-size:12px;padding:6px 14px;background:#fff;color:#0a1628;border:1.5px solid #0a1628" onclick="abrirImportarPlanilha()">⬆ Importar planilha</button>
       <button class="btn-p" style="font-size:12px;padding:6px 14px;margin-left:auto;flex-shrink:0" onclick="openNegModal(null)">+ Novo negócio</button>
     </div>
     <div style="flex:1;display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;min-height:0;padding:0 16px 12px">
@@ -3936,7 +3971,9 @@ function _renderClientesView(){
                   ${orig?`<div style="font-size:11px;color:#9ca3af">✦ ${orig.nome.split(' ')[0]}</div>`:'<div></div>'}
                   ${n.taxaRede?`<div style="font-size:10px;color:#6b7280;background:#f3f4f6;border-radius:6px;padding:1px 6px">${n.taxaRede}%</div>`:''}
                 </div>
-                <div style="margin-top:6px;padding-top:6px;border-top:1px solid #f0f0f0;text-align:right">
+                ${_negParado(n)?`<div class="pip-parado">⏰ ${_diasParado(n)} dias sem atualização</div>`:''}
+                <div style="margin-top:6px;padding-top:6px;border-top:1px solid #f0f0f0;display:flex;justify-content:space-between">
+                  ${_negAtivo(n)?`<button onclick="event.stopPropagation();_negMarcarAtualizado(${n.id})" class="pip-atualizei" title="Registrar andamento">✓ Atualizei</button>`:'<span></span>'}
                   <button onclick="event.stopPropagation();abrirFichaCliente(${n.id})" style="font-size:10px;color:#0059a9;background:none;border:none;cursor:pointer;padding:0;font-weight:600">👤 Ver cliente</button>
                 </div>
               </div>`;
@@ -3946,6 +3983,230 @@ function _renderClientesView(){
       }).join('')}
     </div>
   </div>`;
+}
+
+// ===================== IMPORTAR PLANILHA → PIPELINE =====================
+// Lê .xlsx/.csv no navegador, deixa o sócio dizer o papel de cada coluna,
+// mostra a prévia (nomes reconhecidos, pessoas novas, duplicados) e só então grava.
+const _IMP_ALIAS={vick:'vinicius'};
+const _IMP_PAPEIS={ignorar:'Ignorar',cliente:'Cliente',socio:'Sócio(s)',rede:'Rede',produto:'Produto (marcado com x)',obs:'Observações'};
+let _imp=null;
+function _impNorm(s){return String(s==null?'':s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/\s+/g,' ').trim();}
+function _impTokens(s){return _impNorm(s).split(/[^a-z0-9]+/).filter(Boolean);}
+function _impLoadXLSX(){
+  if(window.XLSX)return Promise.resolve();
+  return new Promise((ok,err)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';s.onload=ok;s.onerror=()=>err(new Error('Não foi possível carregar o leitor de planilhas.'));document.head.appendChild(s);});
+}
+// Acha uma pessoa cadastrada pelo texto da planilha (sem acento, sem caixa)
+function _impAcharPessoa(txt,soSocios){
+  const t=_impNorm(txt);if(!t||t==='-')return null;
+  const cand=users.filter(u=>u.perfil!=='Operador'&&(!soSocios||isSocioUser(u)));
+  const tk=_impTokens(t).sort().join(' ');
+  let u=cand.find(x=>_impTokens(x.nome).sort().join(' ')===tk);if(u)return u;
+  const ws=_impTokens(t);
+  if(ws.length>1){
+    const hits=cand.filter(x=>{const xt=_impTokens(x.nome);return ws.every(w=>xt.includes(w));});
+    return hits.length===1?hits[0]:null;
+  }
+  const w=_IMP_ALIAS[ws[0]]||ws[0];
+  const hits=cand.filter(x=>_impTokens(x.nome).includes(w));
+  if(hits.length===1)return hits[0];
+  const primeiro=hits.filter(x=>_impTokens(x.nome)[0]===w);
+  return primeiro.length===1?primeiro[0]:null;
+}
+// "Ronaldo / Fábio" → tenta a célula inteira, senão cada parte
+// Na coluna de sócio, tenta primeiro só entre sócios (ex.: "Eduardo" = Eduardo Lagrimante)
+function _impPessoas(cell,preferSocio){
+  const achar=p=>(preferSocio&&_impAcharPessoa(p,true))||_impAcharPessoa(p);
+  const t=String(cell||'').trim();if(!t||t==='-')return[];
+  const inteiro=achar(t);if(inteiro)return[{nome:inteiro.nome,user:inteiro}];
+  return t.split(/\s*(?:\/|,|;|\+|\be\b)\s*/i).map(p=>p.trim()).filter(p=>p&&p!=='-').map(p=>({nome:p,user:achar(p)}));
+}
+function _impProdutoPorTexto(h){
+  const n=_impNorm(h);
+  const regras=[['tribut',/revis.*cr[eé]dit/i],['sicoob',/sicoob/i],['grupag',/grupag/i],['energia',/energia/i],['agua',/[aá]gua/i],['contab',/contab/i],['bpo',/bpo/i],['vgv',/vgv/i],['consult',/consult/i]];
+  for(const [k,re] of regras)if(n.includes(k)){const p=config.comissoes.find(c=>re.test(c.produto));if(p)return p.id;}
+  return 'outro';
+}
+function _impPapelPorTexto(h,col,linhas){
+  const n=_impNorm(h);
+  if(/negocio|cliente|empresa|razao/.test(n))return'cliente';
+  if(/^quem|socio/.test(n))return'socio';
+  if(/rede|parceir|indica/.test(n))return'rede';
+  if(/obs|nota|coment/.test(n))return'obs';
+  const vals=linhas.map(l=>_impNorm(l[col])).filter(Boolean);
+  if(vals.length&&vals.every(v=>v==='x'||v==='sim'||v==='s'||v==='1'))return'produto';
+  if(!vals.length)return'produto';
+  return'ignorar';
+}
+function abrirImportarPlanilha(){
+  let ov=document.getElementById('ov-imp');
+  if(!ov){ov=document.createElement('div');ov.className='overlay';ov.id='ov-imp';ov.innerHTML='<div class="modal imp-modal"><div id="imp-corpo"></div></div>';document.body.appendChild(ov);}
+  _imp=null;
+  document.getElementById('imp-corpo').innerHTML=`<h2 style="font-size:16px;font-weight:700;margin-bottom:6px">Importar planilha para o Pipeline</h2>
+    <p class="imp-ajuda">Excel (.xlsx) ou CSV. A primeira linha deve ter os nomes das colunas. Nada é gravado antes da prévia.</p>
+    <input type="file" accept=".xlsx,.xls,.csv" onchange="_impLer(this.files[0])">
+    <div id="imp-status" class="imp-ajuda" style="margin-top:8px"></div>
+    <div class="imp-rodape"><button class="btn-sec" onclick="closeOv('ov-imp')">Cancelar</button></div>`;
+  ov.classList.add('open');
+}
+async function _impLer(file){
+  if(!file)return;
+  const st=document.getElementById('imp-status');st.textContent='Lendo planilha…';
+  try{
+    await _impLoadXLSX();
+    const wb=XLSX.read(await file.arrayBuffer(),{type:'array'});
+    const ws=wb.Sheets[wb.SheetNames.find(n=>(XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1}).length>1))||wb.SheetNames[0]];
+    const linhas=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false});
+    const hi=linhas.findIndex(l=>l.filter(c=>String(c).trim()).length>=2);
+    if(hi<0)throw new Error('Não encontrei a linha de cabeçalho.');
+    const cab=linhas[hi].map(c=>String(c).trim());
+    const dados=linhas.slice(hi+1).filter(l=>l.some(c=>String(c).trim()));
+    _imp={arquivo:file.name,cab,dados,porProduto:true,criarPessoas:true,
+      colunas:cab.map((h,i)=>{const papel=h?_impPapelPorTexto(h,i,dados):'ignorar';return{papel,prodId:papel==='produto'?_impProdutoPorTexto(h):null,rotulo:h};})};
+    _impRender();
+  }catch(e){st.textContent='⚠ '+e.message;}
+}
+function _impCol(i,campo,v){_imp.colunas[i][campo]=v;if(campo==='papel'&&v==='produto'&&!_imp.colunas[i].prodId)_imp.colunas[i].prodId=_impProdutoPorTexto(_imp.colunas[i].rotulo);_impRender();}
+function _impSocioDe(n){
+  if(n.comissaoVenda&&n.comissaoVenda.socioDonoId)return n.comissaoVenda.socioDonoId;
+  const o=users.find(u=>u.id===n.originadorId);return o?(isSocioUser(o)?o.id:(_socioDe(o)||{}).id||null):null;
+}
+// Monta a prévia: uma linha por cliente, com produtos, sócios e rede reconhecidos
+function _impPrevia(){
+  const C=_imp.colunas,idx=p=>C.map((c,i)=>c.papel===p?i:-1).filter(i=>i>=0);
+  const iCli=idx('cliente')[0],iSoc=idx('socio'),iRede=idx('rede'),iObs=idx('obs'),iProd=idx('produto');
+  const novos={};
+  const linhas=_imp.dados.map(l=>{
+    const cliente=iCli!=null?String(l[iCli]||'').trim():'';
+    const pessoasSoc=iSoc.flatMap(i=>_impPessoas(l[i],true));
+    const socios=pessoasSoc.filter(p=>p.user&&isSocioUser(p.user)).map(p=>p.user);
+    const rede=[...pessoasSoc.filter(p=>!(p.user&&isSocioUser(p.user))),...iRede.flatMap(i=>_impPessoas(l[i]))]
+      .filter((p,k,a)=>a.findIndex(q=>_impNorm(q.nome)===_impNorm(p.nome))===k);
+    rede.forEach(p=>{if(!p.user){const k=_impNorm(p.nome);if(!novos[k])novos[k]={nome:p.nome,socio:socios[0]||null};}});
+    const produtos=iProd.filter(i=>_impNorm(l[i])).map(i=>({prodId:C[i].prodId,rotulo:C[i].rotulo}));
+    const obs=iObs.map(i=>String(l[i]||'').trim()).filter(Boolean).join(' · ');
+    return{cliente,socios,rede,produtos,obs,celRede:iRede.map(i=>String(l[i]||'').trim()).filter(x=>x&&x!=='-').join(' / ')};
+  }).filter(r=>r.cliente);
+  return{linhas,novos:Object.values(novos)};
+}
+function _impNegociosDe(pv){
+  // Mesmo cliente: nomes parecidos ("Saint Barth" = "Condomínio Saint Barth - Península")
+  const mesmo=(a,b)=>{const ta=_impTokens(a).filter(w=>w.length>2),tb=_impTokens(b).filter(w=>w.length>2);return(ta.length&&ta.every(w=>tb.includes(w)))||(tb.length&&tb.every(w=>ta.includes(w)));};
+  const existente=t=>negocios.find(n=>mesmo(n.titulo,t));
+  const existe=(titulo,prodId,outro)=>negocios.some(n=>mesmo(n.titulo,titulo)&&(!prodId&&outro==='A definir'||(prodId&&n.configProdutoId===prodId)||(!prodId&&_impNorm(n.produtoOutro)===_impNorm(outro))));
+  const out=[];
+  pv.linhas.forEach(r=>{
+    const prods=r.produtos.length?r.produtos:[{prodId:'outro',rotulo:'A definir'}];
+    const grupos=_imp.porProduto?prods.map(p=>[p]):[prods];
+    grupos.forEach(g=>{
+      const p=g[0],prodId=p.prodId!=='outro'?p.prodId:null,outro=prodId?null:p.rotulo;
+      const ex=existente(r.cliente);out.push({r,prodId,outro,outrosProdutos:g.slice(1),dup:existe(r.cliente,prodId,outro),titulo:ex?ex.titulo:r.cliente});
+    });
+  });
+  return out;
+}
+function _impRender(){
+  const pv=_impPrevia(),negs=_impNegociosDe(pv);
+  const novosNegs=negs.filter(x=>!x.dup);
+  const opProd=sel=>config.comissoes.map(p=>`<option value="${p.id}" ${sel===p.id?'selected':''}>${esc(p.produto)}</option>`).join('')+`<option value="outro" ${sel==='outro'?'selected':''}>Outro (usa o nome da coluna)</option>`;
+  const nomeP=p=>p.user?`<span class="imp-ok">${esc(p.user.nome.split(' ')[0])}</span>`:`<span class="imp-novo">${esc(p.nome)} (novo)</span>`;
+  const semSocio=pv.linhas.filter(r=>!r.socios.length).length;
+  document.getElementById('imp-corpo').innerHTML=`<h2 style="font-size:16px;font-weight:700;margin-bottom:4px">Importar planilha para o Pipeline</h2>
+    <div class="imp-ajuda">${esc(_imp.arquivo)} · ${pv.linhas.length} clientes</div>
+    <div class="imp-sec">1. O que é cada coluna</div>
+    <div class="imp-cols">${_imp.colunas.map((c,i)=>c.rotulo?`<div class="imp-col"><b>${esc(c.rotulo)}</b>
+      <select onchange="_impCol(${i},'papel',this.value)">${Object.entries(_IMP_PAPEIS).map(([k,t])=>`<option value="${k}" ${c.papel===k?'selected':''}>${t}</option>`).join('')}</select>
+      ${c.papel==='produto'?`<select onchange="_impCol(${i},'prodId',this.value==='outro'?'outro':+this.value)">${opProd(c.prodId)}</select>`:''}</div>`:'').join('')}</div>
+    <div class="imp-sec">2. Como criar os cards</div>
+    <label class="imp-opt"><input type="radio" name="imp-modo" ${_imp.porProduto?'checked':''} onchange="_imp.porProduto=true;_impRender()"> Um card por produto marcado (cada um com sua regra de comissão)</label>
+    <label class="imp-opt"><input type="radio" name="imp-modo" ${!_imp.porProduto?'checked':''} onchange="_imp.porProduto=false;_impRender()"> Um card por cliente (demais produtos vão para as notas)</label>
+    ${pv.novos.length?`<label class="imp-opt"><input type="checkbox" ${_imp.criarPessoas?'checked':''} onchange="_imp.criarPessoas=this.checked;_impRender()"> Cadastrar ${pv.novos.length} pessoa(s) nova(s) como Rede do sócio da linha:
+      <span class="imp-ajuda">${pv.novos.map(n=>esc(n.nome)+(n.socio?' → '+esc(n.socio.nome.split(' ')[0]):'')).join(', ')}</span></label>`:''}
+    <div class="imp-sec">3. Prévia</div>
+    <div class="imp-prev"><table><thead><tr><th>Cliente</th><th>Produtos</th><th>Sócio</th><th>Rede</th></tr></thead><tbody>
+      ${pv.linhas.map(r=>`<tr><td>${esc(r.cliente)}</td><td>${r.produtos.map(p=>esc(p.prodId==='outro'?p.rotulo:(config.comissoes.find(c=>c.id===p.prodId)||{}).produto||p.rotulo)).join(', ')||'<span class="imp-ajuda">a definir</span>'}</td>
+        <td>${r.socios.map(s=>`<span class="imp-ok">${esc(s.nome.split(' ')[0])}</span>`).join(' + ')||'<span class="imp-erro">não reconhecido</span>'}</td>
+        <td>${r.rede.map(nomeP).join(', ')||'<span class="imp-ajuda">—</span>'}</td></tr>`).join('')}
+    </tbody></table></div>
+    <div class="imp-resumo">Serão criados <b>${novosNegs.length}</b> cards em Prospecção${negs.length-novosNegs.length?` · <b>${negs.length-novosNegs.length}</b> já existem e serão pulados`:''}${semSocio?` · <span class="imp-erro">${semSocio} cliente(s) sem sócio reconhecido</span>`:''}</div>
+    <div class="imp-rodape"><button class="btn-sec" onclick="closeOv('ov-imp')">Cancelar</button>
+      <button class="btn-p" ${novosNegs.length?'':'disabled'} onclick="_impExecutar()">Importar ${novosNegs.length} cards</button></div>`;
+}
+function _impExecutar(){
+  const pv=_impPrevia(),negs=_impNegociosDe(pv).filter(x=>!x.dup);
+  if(!negs.length)return;
+  if(!confirm(`Criar ${negs.length} cards no Pipeline${_imp.criarPessoas&&pv.novos.length?` e cadastrar ${pv.novos.length} pessoa(s) na Rede`:''}?`))return;
+  const agora=new Date(),hojeBR=agora.toLocaleDateString('pt-BR');
+  let seq=Date.now();
+  // 1. pessoas novas (Rede vinculada ao sócio da linha)
+  const criadas={};
+  if(_imp.criarPessoas)pv.novos.forEach(n=>{
+    const id=++seq;
+    users.push({id,nome:n.nome,perfil:'Rede',status:'Ativo',emp:'',email:'',senha:'',tel:'',seg:'',ativ:'',vinculoId:n.socio?n.socio.id:null,vinculoNome:n.socio?n.socio.nome:'',obs:`Cadastrado pela importação de ${_imp.arquivo}`,desde:hojeBR});
+    criadas[_impNorm(n.nome)]=users.find(u=>u.id===id);
+  });
+  const pessoa=p=>p.user||criadas[_impNorm(p.nome)]||null;
+  // 2. cards
+  negs.forEach(x=>{
+    const r=x.r,soc=r.socios[0]||null,rede=r.rede.map(pessoa).filter(Boolean);
+    const prod=x.prodId?config.comissoes.find(c=>c.id===x.prodId):null;
+    const regra=_regraParaProduto(prod);
+    const piso=prod&&prod.taxa!=null?+prod.taxa:0;
+    const teto=_cvTetoPct(regra);
+    const orig=rede[0]||soc;
+    const notas=[r.obs,r.celRede?'Rede (planilha): '+r.celRede:'',x.outrosProdutos.length?'Também interessa: '+x.outrosProdutos.map(p=>p.prodId==='outro'?p.rotulo:(config.comissoes.find(c=>c.id===p.prodId)||{}).produto).join(', '):'',`Importado de ${_imp.arquivo} em ${hojeBR}`].filter(Boolean).join('\n');
+    negocios.push({
+      id:++seq,titulo:x.titulo,tipo:'proprio',status:'Prospecção',valor:null,
+      originadorId:orig?orig.id:currentUser.id,
+      configProdutoId:prod?prod.id:null,produtoOutro:prod?null:(x.outro||'A definir'),
+      comissaoVenda:{regraId:regra.id,socioDonoId:soc?soc.id:null,cosocios:r.socios.slice(1).map(s=>s.id),
+        participantes:rede.map((u,k)=>({userId:u.id,pct:k===0?Math.min(piso,teto):0}))},
+      taxaRede:rede.length?Math.min(piso,teto):null,
+      notas,criado:hojeBR,atualizadoEm:agora.toISOString(),importadoDe:_imp.arquivo,
+    });
+  });
+  saveData();closeOv('ov-imp');renderPipeline();
+  showToast(`✅ ${negs.length} cards importados`);
+}
+
+// ===================== LEMBRETES: CARD PARADO =====================
+const DIAS_PARADO=7;
+function _negAtivo(n){return!['Fechado','Pagamento Realizado','Perdido'].includes(n.status||'Prospecção');}
+function _diasParado(n){
+  const ts=n.atualizadoEm?Date.parse(n.atualizadoEm):(typeof n.id==='number'&&n.id>1e12?n.id:NaN);
+  return isNaN(ts)?0:Math.floor((Date.now()-ts)/864e5);
+}
+function _negParado(n){return _negAtivo(n)&&_diasParado(n)>DIAS_PARADO;}
+function _negSocios(n){
+  const ids=[_impSocioDe(n),...((n.comissaoVenda&&n.comissaoVenda.cosocios)||[])].filter(Boolean);
+  return [...new Set(ids)];
+}
+function _negMarcarAtualizado(id){
+  const n=negocios.find(x=>x.id===id);if(!n)return;
+  const nota=prompt(`O que andou em "${n.titulo}"? (vai para as notas do card)`);
+  if(nota===null)return;
+  const hoje=new Date().toLocaleDateString('pt-BR');
+  if(nota.trim())n.notas=(n.notas?n.notas+'\n':'')+`${hoje} · ${currentUser.nome.split(' ')[0]}: ${nota.trim()}`;
+  n.atualizadoEm=new Date().toISOString();
+  saveData();renderPipeline();
+}
+function _paradosPorSocio(){
+  const cont={};
+  negocios.filter(_negParado).forEach(n=>{const s=_negSocios(n);(s.length?s:[0]).forEach(id=>cont[id]=(cont[id]||0)+1);});
+  return cont;
+}
+function _lembreteLogin(){
+  const meus=negocios.filter(n=>_negParado(n)&&_negSocios(n).includes(currentUser.id)).length;
+  if(meus)setTimeout(()=>showToast(`⏰ Você tem ${meus} negócio(s) sem atualização há mais de ${DIAS_PARADO} dias`),800);
+}
+function _dashParadosHtml(){
+  const cont=_paradosPorSocio(),total=negocios.filter(_negParado).length;
+  if(!total)return'';
+  const nomes=Object.entries(cont).sort((a,b)=>b[1]-a[1]).map(([id,q])=>{const u=users.find(x=>x.id===+id);return`<span class="dash-parado-chip">${u?esc(u.nome.split(' ')[0]):'Sem sócio'}: <b>${q}</b></span>`;}).join('');
+  return`<div class="dash-parados" onclick="_pipParados=true;_pipSubtab='clientes';showTab('negocios')">
+    <div><b>⏰ ${total} negócio(s) sem atualização há mais de ${DIAS_PARADO} dias</b><div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px">${nomes}</div></div>
+    <span class="dash-parado-ver">Ver no pipeline →</span></div>`;
 }
 
 // --- Modal Portfólio ---
@@ -4065,7 +4326,9 @@ function _cvPisoPct(){
 }
 function _cvOrig(){return users.find(u=>u.id===parseInt(document.getElementById('neg-orig').value));}
 function _cvRegraSugerida(){
-  const prod=_negProdSelecionado&&_negProdSelecionado!=='outro'?config.comissoes.find(c=>c.id===_negProdSelecionado):null;
+  return _regraParaProduto(_negProdSelecionado&&_negProdSelecionado!=='outro'?config.comissoes.find(c=>c.id===_negProdSelecionado):null);
+}
+function _regraParaProduto(prod){
   const nome=(prod?prod.produto:'').toLowerCase();
   // Regra com mais palavras em comum com o produto (ex.: "Consultoria..." → "Consultoria Tributária")
   const pontos=r=>nome?r.nome.toLowerCase().split(/[^a-zà-ú]+/).filter(w=>w.length>3&&nome.includes(w)).length:0;
@@ -4201,6 +4464,7 @@ function saveNeg(){
     taxaBase:document.getElementById('neg-taxa-base').innerText||null,
     notas:document.getElementById('neg-notas').value.trim(),
   };
+  obj.atualizadoEm=new Date().toISOString();
   if(obj.status==='Fechado'&&!(_negEditId&&negocios.find(x=>x.id===_negEditId)?.fechadoEm)){
     obj.fechadoEm=new Date().toISOString().slice(0,10);
   }
