@@ -247,6 +247,23 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 .ap-sub{font-size:11px;color:#9ca3af;}
 .ap-val{font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums;}
 .ap-pago{opacity:.55;}
+.cv-box{border:1.5px solid #e5e7eb;border-radius:10px;padding:12px;margin-bottom:12px;background:#fafaf8;}
+.cv-titulo{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#0a1628;margin-bottom:8px;}
+.cv-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.cv-grid label{font-size:11px;color:#6b7280;margin-bottom:3px;display:block;}
+.cv-grid select{width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:7px;font-size:12px;}
+.cv-info{font-size:11px;color:#6b7280;margin-bottom:8px;line-height:1.5;}
+.cv-linha{display:flex;gap:6px;align-items:center;margin-bottom:6px;font-size:12px;}
+.cv-linha select{flex:1 1 auto;min-width:0;width:auto!important;padding:6px 8px;border:1px solid #ddd;border-radius:7px;font-size:12px;}
+.cv-linha input{flex:0 0 70px;width:70px!important;padding:6px 8px;border:1px solid #ddd;border-radius:7px;font-size:12px;text-align:right;}
+.cv-linha button{border:none;background:none;color:#ef4444;cursor:pointer;font-size:14px;}
+.cv-rs{color:#9ca3af;font-size:11px;white-space:nowrap;}
+.cv-vazio{font-size:12px;color:#9ca3af;margin-bottom:6px;}
+.cv-add{border:1px dashed #0a1628;background:none;color:#0a1628;border-radius:7px;padding:5px 10px;font-size:12px;cursor:pointer;width:100%;}
+.cv-resumo{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding:8px 10px;background:#0a1628;color:#fff;border-radius:7px;font-size:12px;}
+.cv-resumo .cv-rs{color:#cbd5e1;}
+.cv-erros{margin-top:8px;font-size:12px;color:#b45309;line-height:1.5;}
+[data-theme="dark"] .cv-box{background:#1a2035;border-color:#1e2a42;}
 [data-theme="dark"] .dist-tab,[data-theme="dark"] .rg-card,[data-theme="dark"] .ap-card{background:#1a2035;border-color:#1e2a42;}
 [data-theme="dark"] .dist-sub{background:#13182b;}
 [data-theme="dark"] .dist-nome,[data-theme="dark"] .dist-quem,[data-theme="dark"] .ap-nome,[data-theme="dark"] .ap-tot,[data-theme="dark"] .rg-titulo{color:#e2e8f0;}
@@ -1101,7 +1118,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
         <select id="pag-neg" onchange="_onPagNegChange()" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px"></select>
         <div id="pag-port-info" style="font-size:11px;color:#6b7280;margin-top:3px"></div>
       </div>
-      <div><label>Valor Recebido (R$) *</label><input id="pag-valor" type="number" min="0" placeholder="0,00" oninput="_pagRecalc()"></div>
+      <div><label>Valor recebido, sem impostos (R$) *</label><input id="pag-valor" type="number" min="0" placeholder="0,00" oninput="_pagRecalc()"></div>
       <div><label>Data</label><input id="pag-data" type="date"></div>
       <div style="grid-column:1/-1"><label>Observações</label><input id="pag-obs" placeholder="Referência, NF, parcela..."></div>
       <div style="grid-column:1/-1"><label>Regra de distribuição</label><select id="pag-regra" onchange="_pagRecalc(true)"></select></div>
@@ -1230,7 +1247,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
       <div style="grid-column:1/-1">
         <label style="font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:4px">Valor Estimado (R$)</label>
-        <input id="neg-valor" type="number" min="0" step="0.01" placeholder="Ex: 15000"
+        <input id="neg-valor" type="number" min="0" step="0.01" placeholder="Ex: 15000" oninput="if(_cvAberto)_cvRender()"
           style="width:100%;padding:8px;border:1px solid #0F6E5644;border-radius:8px;font-size:13px;background:#f0faf4">
       </div>
       <div>
@@ -1239,15 +1256,22 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       </div>
       <div>
         <label style="font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:4px">Originador</label>
-        <select id="neg-orig" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px"></select>
+        <select id="neg-orig" onchange="_cvOrigChange()" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px"></select>
       </div>
     </div>
 
-    <!-- 4. Comissão da rede -->
-    <div style="margin-bottom:12px">
-      <label style="font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:4px">Comissão da Rede (%)</label>
-      <input id="neg-taxa" type="number" min="0" max="100" placeholder="auto (da matriz)"
-        style="width:140px;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px">
+    <!-- 4. Comissão de venda: rede do negócio e % de cada um -->
+    <input id="neg-taxa" type="hidden">
+    <div class="cv-box">
+      <div class="cv-titulo">Comissão de venda</div>
+      <div class="cv-grid">
+        <div><label>Regra de distribuição</label><select id="neg-regra" onchange="_cvRender()"></select></div>
+        <div><label>Sócio dono da rede</label><select id="neg-socio" onchange="_cvRender()"></select></div>
+      </div>
+      <div id="neg-cv-info" class="cv-info"></div>
+      <div id="neg-cv-lista"></div>
+      <button type="button" class="cv-add" onclick="_cvAdd()">+ Pessoa da rede</button>
+      <div id="neg-cv-resumo"></div>
     </div>
 
     <!-- 5. Notas -->
@@ -2670,6 +2694,7 @@ function _buildPagModal(negId,pg){
   if(pg){
     document.getElementById('pag-regra').value=pg.regraId||getRegras()[0].id;
     document.getElementById('pag-vend').value=pg.vendedorId||'';
+    _pagCV=pg.comissaoVenda||null;
   }
   document.getElementById('pag-valor').value=pg?pg.valorRecebido||'':'';
   document.getElementById('pag-data').value=pg?pg.data||new Date().toISOString().slice(0,10):new Date().toISOString().slice(0,10);
@@ -2681,17 +2706,19 @@ function _onPagNegChange(sugerir){
   const neg=negId?negocios.find(n=>n.id===negId):null;
   const port=neg&&neg.portafolioId?portfolio.find(p=>p.id===neg.portafolioId):null;
   document.getElementById('pag-port-info').textContent=port?'Negócio: '+port.nome:'';
+  _pagCV=neg&&neg.comissaoVenda?JSON.parse(JSON.stringify(neg.comissaoVenda)):null;
+  if(_pagCV)document.getElementById('pag-port-info').textContent+=(port?' · ':'')+'Comissão de venda conforme definida no negócio';
   if(sugerir===false)return;
   // Sugere quem vendeu (originador) e a regra (última usada nesse portfólio, ou pelo nome)
   if(neg&&neg.originadorId)document.getElementById('pag-vend').value=neg.originadorId;
   const ult=port?pagamentos.filter(p=>p.portafolioId===port.id&&p.regraId).slice(-1)[0]:null;
   const porNome=port?getRegras().find(r=>r.nome.toLowerCase().split(' ').some(w=>w.length>3&&port.nome.toLowerCase().includes(w))):null;
-  const rg=ult?ult.regraId:porNome?porNome.id:null;
+  const rg=_pagCV&&_pagCV.regraId?_pagCV.regraId:ult?ult.regraId:porNome?porNome.id:null;
   if(rg)document.getElementById('pag-regra').value=rg;
   _pagAjustes={};
   _pagRecalc();
 }
-let _pagAjustes={},_pagRows=[];
+let _pagAjustes={},_pagRows=[],_pagCV=null;
 function _distKey(r){return r.linhaId+'|'+(r.pessoaId||'');}
 function _pagFomChange(){
   document.getElementById('pag-fom-nome').style.display=document.getElementById('pag-fom').value==='ext'?'':'none';
@@ -2705,6 +2732,7 @@ function _pagCtx(){
     fomentadorId:fom&&fom!=='ext'?parseInt(fom):null,
     fomentadorNome:fom==='ext'?document.getElementById('pag-fom-nome').value.trim():'',
     custas:parseFloat(document.getElementById('pag-custas').value)||0,
+    participantes:_pagCV?_pagCV.participantes:null,socioDonoId:_pagCV?_pagCV.socioDonoId:null,
   };
 }
 function _pagRecalc(resetAjustes){
@@ -2749,7 +2777,7 @@ function savePagamento(){
     regraId:+document.getElementById('pag-regra').value,
     vendedorId:ctx.vendedorId,fomentadorId:ctx.fomentadorId,fomentadorNome:ctx.fomentadorNome,custas:ctx.custas,
     ajusteMotivo:_pagRows.some(r=>r.ajustado)?motivo:'',
-    distribuicao,
+    distribuicao,comissaoVenda:_pagCV,
     // compatível com extrato/dashboard: só o que é pago a pessoas
     comissoes:distribuicao.filter(_distEhPagavel).map(r=>({socioId:r.pessoaId,valor:r.valor})),
   };
@@ -4011,10 +4039,97 @@ function selectNegProd(id){
     infoEl.innerHTML='';
     if(id!=='outro')document.getElementById('neg-taxa').value='';
   }
+  if(_cvAberto)_cvProdChange();
+}
+
+// --- Comissão de venda do negócio ---
+// % sempre sobre o total recebido. Teto = comissão de venda da regra; piso = matriz do produto (para a ponta).
+let _cvPart=[],_cvTocado=false,_cvAberto=false;
+function _cvRegra(){return getRegras().find(r=>r.id==document.getElementById('neg-regra').value)||getRegras()[0];}
+function _cvTetoPct(regra){
+  const s=users.find(isSocioUser);if(!regra||!s)return 0;
+  const r=calcDistribuicao(regra,{valor:100,vendedorId:s.id}).find(x=>x.destino==='vendedor');
+  return r?r.valor:0;
+}
+function _cvPisoPct(){
+  const prod=_negProdSelecionado&&_negProdSelecionado!=='outro'?config.comissoes.find(c=>c.id===_negProdSelecionado):null;
+  return prod&&prod.taxa!=null?+prod.taxa:0;
+}
+function _cvOrig(){return users.find(u=>u.id===parseInt(document.getElementById('neg-orig').value));}
+function _cvRegraSugerida(){
+  const prod=_negProdSelecionado&&_negProdSelecionado!=='outro'?config.comissoes.find(c=>c.id===_negProdSelecionado):null;
+  const nome=(prod?prod.produto:'').toLowerCase();
+  return getRegras().find(r=>nome&&r.nome.toLowerCase().split(' ').some(w=>w.length>3&&nome.includes(w)))
+    ||getRegras().find(r=>/novo neg/i.test(r.nome))||getRegras()[0];
+}
+// Padrão: a ponta (originador, se não for sócio) entra com o piso da matriz
+function _cvDefault(){
+  const o=_cvOrig();
+  _cvPart=o&&!isSocioUser(o)?[{userId:o.id,pct:_cvPisoPct()}]:[];
+  const soc=o?(isSocioUser(o)?o:_socioDe(o)):null;
+  if(soc)document.getElementById('neg-socio').value=soc.id;
+}
+function _cvOrigChange(){if(!_cvTocado)_cvDefault();_cvRender();}
+function _cvProdChange(){
+  if(!_cvTocado){document.getElementById('neg-regra').value=_cvRegraSugerida().id;_cvDefault();}
+  _cvRender();
+}
+function _cvInit(n){
+  _cvAberto=true;
+  const socios=users.filter(isSocioUser).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  document.getElementById('neg-regra').innerHTML=getRegras().map(r=>`<option value="${r.id}">${esc(r.nome)}</option>`).join('');
+  document.getElementById('neg-socio').innerHTML='<option value="">— escolha —</option>'+socios.map(u=>`<option value="${u.id}">${esc(u.nome)}</option>`).join('');
+  if(n&&n.comissaoVenda){
+    _cvTocado=true;
+    _cvPart=JSON.parse(JSON.stringify(n.comissaoVenda.participantes||[]));
+    document.getElementById('neg-regra').value=n.comissaoVenda.regraId||_cvRegraSugerida().id;
+    document.getElementById('neg-socio').value=n.comissaoVenda.socioDonoId||'';
+  }else{
+    _cvTocado=false;
+    document.getElementById('neg-regra').value=_cvRegraSugerida().id;
+    _cvDefault();
+  }
+  _cvRender();
+}
+function _cvAdd(){
+  _cvTocado=true;
+  const usados=_cvPart.map(p=>p.userId);
+  const u=users.filter(x=>!isSocioUser(x)&&x.perfil!=='Operador'&&!usados.includes(x.id)).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'))[0];
+  _cvPart.push({userId:u?u.id:null,pct:0});_cvRender();
+}
+function _cvSet(i,campo,v){_cvTocado=true;_cvPart[i][campo]=campo==='pct'?(parseFloat(v)||0):(parseInt(v)||null);_cvRender();}
+function _cvDel(i){_cvTocado=true;_cvPart.splice(i,1);_cvRender();}
+function _cvValidar(){
+  const teto=_cvTetoPct(_cvRegra()),piso=_cvPisoPct(),o=_cvOrig();
+  const soma=_cvPart.reduce((s,p)=>s+(+p.pct||0),0);
+  const ponta=o&&!isSocioUser(o)?_cvPart.find(p=>p.userId===o.id):null;
+  const erros=[];
+  if(soma>teto+1e-9)erros.push(`A soma (${soma}%) passa do teto de ${teto}% da comissão de venda.`);
+  if(o&&!isSocioUser(o)&&piso&&(!ponta||ponta.pct<piso))erros.push(`${o.nome.split(' ')[0]} (originador) está abaixo do piso da matriz: ${piso}%.`);
+  if(_cvPart.some(p=>!p.userId))erros.push('Escolha a pessoa em todas as linhas.');
+  if(!document.getElementById('neg-socio').value)erros.push('Escolha o sócio dono da rede.');
+  return{teto,piso,soma,erros};
+}
+function _cvRender(){
+  const pessoas=users.filter(u=>!isSocioUser(u)&&u.perfil!=='Operador').sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  const {teto,piso,soma,erros}=_cvValidar();
+  const valor=parseFloat(document.getElementById('neg-valor').value)||0;
+  const emR=p=>valor?` <span class="cv-rs">${_brl(valor*p/100)}</span>`:'';
+  const soc=users.find(u=>u.id===parseInt(document.getElementById('neg-socio').value));
+  document.getElementById('neg-cv-info').innerHTML=`Comissão de venda: <b>${teto}% do total</b>${emR(teto)}${piso?` · piso da matriz para a ponta: <b>${piso}%</b>`:''}. Percentuais sobre o total recebido.`;
+  document.getElementById('neg-cv-lista').innerHTML=_cvPart.map((p,i)=>`<div class="cv-linha">
+    <select onchange="_cvSet(${i},'userId',this.value)"><option value="">— pessoa —</option>${pessoas.map(u=>`<option value="${u.id}" ${p.userId===u.id?'selected':''}>${esc(u.nome)} · ${u.perfil}</option>`).join('')}</select>
+    <input type="number" min="0" step="0.5" value="${p.pct}" onchange="_cvSet(${i},'pct',this.value)"><span>%</span>${emR(p.pct)}
+    <button type="button" onclick="_cvDel(${i})" title="Remover">✕</button></div>`).join('')
+    ||'<div class="cv-vazio">Sem rede neste negócio: o sócio fica com toda a comissão de venda.</div>';
+  const resto=Math.max(0,teto-soma);
+  document.getElementById('neg-cv-resumo').innerHTML=`<div class="cv-resumo"><span>${soc?esc(soc.nome):'Sócio dono da rede'} fica com</span><b>${_r2(resto)}%${emR(resto)}</b></div>`
+    +(erros.length?`<div class="cv-erros">${erros.map(e=>'⚠ '+esc(e)).join('<br>')}</div>`:'');
 }
 
 // --- Modal Negócio ---
 function openNegModal(id){
+  _cvAberto=false;
   _negEditId=id;
   const n=id?negocios.find(x=>x.id===id):null;
   document.getElementById('neg-ttl').textContent=n?'Editar Negócio':'Novo Negócio';
@@ -4046,6 +4161,7 @@ function openNegModal(id){
   document.getElementById('neg-valor').value=n&&n.valor?n.valor:'';
   _negTipo=n&&n.tipo?n.tipo:'proprio';
   selectNegTipo(_negTipo);
+  _cvInit(n);
   document.getElementById('ov-neg').classList.add('open');
 }
 function isSocioUser(u){return u&&(u.perfil==='Sócio'||u.perfil==='Sócio-Fundador');}
@@ -4056,7 +4172,10 @@ function saveNeg(){
   const isProdOutro=_negProdSelecionado==='outro';
   const produtoOutro=isProdOutro?document.getElementById('neg-outro-desc').value.trim():'';
   if(isProdOutro&&!produtoOutro){alert('Descreva o tipo de negócio.');return;}
+  const cv=_cvValidar();
+  if(cv.erros.length){alert('Comissão de venda:\n'+cv.erros.join('\n'));return;}
   const obj={
+    comissaoVenda:{regraId:+document.getElementById('neg-regra').value,socioDonoId:parseInt(document.getElementById('neg-socio').value)||null,participantes:_cvPart.map(p=>({userId:p.userId,pct:+p.pct||0}))},
     titulo,
     tipo:_negTipo||'proprio',
     valor:parseFloat(document.getElementById('neg-valor').value)||null,
@@ -4064,7 +4183,7 @@ function saveNeg(){
     originadorId:parseInt(document.getElementById('neg-orig').value)||currentUser.id,
     configProdutoId:isProdOutro?null:(_negProdSelecionado||null),
     produtoOutro:isProdOutro?produtoOutro:null,
-    taxaRede:parseFloat(document.getElementById('neg-taxa').value)||null,
+    taxaRede:cv.soma||null,
     taxaBase:document.getElementById('neg-taxa-base').innerText||null,
     notas:document.getElementById('neg-notas').value.trim(),
   };
@@ -5711,7 +5830,7 @@ function getStateSnapshot(){
     users,projetos,lancamentos,sinergias,conexoes,
     notificacoes,oportunidadesPendentes,
     convidadosExternos,customGroups,interessesPendentes,
-    projetosVitrine,negocios,portfolio,pagamentos,regrasDistrib
+    projetosVitrine,negocios,portfolio,pagamentos,regrasDistrib,config
   };
 }
 
@@ -5732,6 +5851,7 @@ function applyStateSnapshot(d){
   if(d.portfolio)portfolio=d.portfolio;
   if(d.pagamentos)pagamentos=d.pagamentos;
   if(d.regrasDistrib)regrasDistrib=d.regrasDistrib;
+  if(d.config)config={...config,...d.config};
 }
 
 let _syncTimer=null;
@@ -5864,7 +5984,17 @@ function calcDistribuicao(regra,ctx){
   const rows=[];
   L.forEach(l=>{
     const v=amt(l),r={linhaId:l.id,nome:l.nome,destino:l.destino,nivel:nivel(l)};
-    if(l.destino==='vendedor'){
+    if(l.destino==='vendedor'&&ctx.participantes&&ctx.socioDonoId){
+      // Rede definida no negócio: cada um com seu % do total; o sócio dono fica com o que sobrar da comissão de venda
+      let usado=0;
+      ctx.participantes.forEach(p=>{
+        const u=users.find(x=>x.id===p.userId);if(!u)return;
+        const val=_r2(Math.min((+ctx.valor||0)*(+p.pct||0)/100,v-usado));usado=_r2(usado+val);
+        rows.push({...r,linhaId:l.id+'p'+u.id,nome:`${l.nome} · ${p.pct}%`,pessoaId:u.id,pessoaNome:u.nome,valor:val});
+      });
+      const soc=users.find(x=>x.id===ctx.socioDonoId);
+      if(soc&&v-usado>0)rows.push({...r,linhaId:l.id+'s',nome:l.nome+' · sócio dono da rede',pessoaId:soc.id,pessoaNome:soc.nome,valor:_r2(v-usado)});
+    }else if(l.destino==='vendedor'){
       let vend=users.find(u=>u.id===ctx.vendedorId);
       if(!vend){rows.push({...r,pessoaId:null,pessoaNome:'defina o originador',valor:v,aviso:true});return;}
       if(isSocioUser(vend)){rows.push({...r,pessoaId:vend.id,pessoaNome:vend.nome,valor:v});return;}
@@ -5892,7 +6022,8 @@ function calcDistribuicao(regra,ctx){
 
 // Explica a linha em português simples (visão de leitura da regra)
 function _descLinha(rg,r){
-  const l=(rg.linhas||[]).find(x=>x.id===r.linhaId)||(rg.linhas||[]).find(x=>x.id+'s'===r.linhaId);if(!l)return'';
+  const l=(rg.linhas||[]).find(x=>x.id===r.linhaId)||(rg.linhas||[]).find(x=>r.linhaId===x.id+'s'||r.linhaId.startsWith(x.id+'p'));if(!l)return'';
+  if(r.linhaId.startsWith(l.id+'p'))return'% definido no negócio';
   const base=l.base==='total'?'do total':'de '+((rg.linhas.find(x=>x.id===l.base)||{}).nome||'?');
   if(r.linhaId===l.id+'s')return`${l.socioPct}% ${base}, quando o originador não é sócio`;
   let t=l.tipo==='pct'?`${l.pct}% ${base}`:l.tipo==='resto'?`o que sobra ${base}`:l.tipo==='custas'?'custas informadas no recebimento':_brl(l.fixo)+' fixo';
