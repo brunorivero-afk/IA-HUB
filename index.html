@@ -4059,8 +4059,10 @@ function _cvOrig(){return users.find(u=>u.id===parseInt(document.getElementById(
 function _cvRegraSugerida(){
   const prod=_negProdSelecionado&&_negProdSelecionado!=='outro'?config.comissoes.find(c=>c.id===_negProdSelecionado):null;
   const nome=(prod?prod.produto:'').toLowerCase();
-  return getRegras().find(r=>nome&&r.nome.toLowerCase().split(' ').some(w=>w.length>3&&nome.includes(w)))
-    ||getRegras().find(r=>/novo neg/i.test(r.nome))||getRegras()[0];
+  // Regra com mais palavras em comum com o produto (ex.: "Consultoria..." → "Consultoria Tributária")
+  const pontos=r=>nome?r.nome.toLowerCase().split(/[^a-zà-ú]+/).filter(w=>w.length>3&&nome.includes(w)).length:0;
+  const melhor=getRegras().reduce((m,r)=>pontos(r)>(m?pontos(m):0)?r:m,null);
+  return melhor||getRegras().find(r=>/novo neg/i.test(r.nome))||getRegras()[0];
 }
 // Padrão: a ponta (originador, se não for sócio) entra com o piso da matriz
 function _cvDefault(){
