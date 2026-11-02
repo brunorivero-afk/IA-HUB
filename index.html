@@ -271,6 +271,11 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 .imp-erro{color:#b91c1c;font-weight:600;}
 .imp-resumo{margin-top:12px;font-size:13px;}
 .imp-rodape{display:flex;justify-content:flex-end;gap:10px;margin-top:16px;}
+.imp-pessoas{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:6px;max-height:260px;overflow:auto;}
+.imp-pessoa{display:flex;justify-content:space-between;align-items:center;gap:8px;border:1px solid #e5e7eb;border-radius:8px;padding:6px 8px;font-size:12px;}
+.imp-pessoa select{width:190px!important;flex:0 0 190px;padding:4px 6px;border:1px solid #ddd;border-radius:6px;font-size:12px;}
+.imp-sel-novo{border-color:#f59e0b!important;background:#fffbeb;}
+.imp-sel-ok{border-color:#0F6E56!important;background:#f0faf4;}
 .cv-box{border:1.5px solid #e5e7eb;border-radius:10px;padding:12px;margin-bottom:12px;background:#fafaf8;}
 .cv-titulo{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#0a1628;margin-bottom:8px;}
 .cv-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
@@ -3989,7 +3994,7 @@ function _renderClientesView(){
 // Lê .xlsx/.csv no navegador, deixa o sócio dizer o papel de cada coluna,
 // mostra a prévia (nomes reconhecidos, pessoas novas, duplicados) e só então grava.
 const _IMP_ALIAS={vick:'vinicius'};
-const _IMP_PAPEIS={ignorar:'Ignorar',cliente:'Cliente',socio:'Sócio(s)',rede:'Rede',produto:'Produto (marcado com x)',obs:'Observações'};
+const _IMP_PAPEIS={ignorar:'Ignorar',cliente:'Cliente',cnpj:'CNPJ',socio:'Sócio(s)',rede:'Rede',produto:'Produto (marcado com x)',produtoTexto:'Produto (nome escrito)',valor:'Valor estimado',etapa:'Etapa',obs:'Observações'};
 let _imp=null;
 function _impNorm(s){return String(s==null?'':s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/\s+/g,' ').trim();}
 function _impTokens(s){return _impNorm(s).split(/[^a-z0-9]+/).filter(Boolean);}
@@ -4008,11 +4013,13 @@ function _impAcharPessoa(txt,soSocios){
     const hits=cand.filter(x=>{const xt=_impTokens(x.nome);return ws.every(w=>xt.includes(w));});
     return hits.length===1?hits[0]:null;
   }
-  const w=_IMP_ALIAS[ws[0]]||ws[0];
-  const hits=cand.filter(x=>_impTokens(x.nome).includes(w));
-  if(hits.length===1)return hits[0];
-  const primeiro=hits.filter(x=>_impTokens(x.nome)[0]===w);
-  return primeiro.length===1?primeiro[0]:null;
+  // Nome solto ("Fábio", "João") só vale sozinho entre sócios ou por apelido conhecido;
+  // na rede, quem decide é o sócio na tela "Quem é quem"
+  const alias=_IMP_ALIAS[ws[0]];
+  if(!soSocios&&!alias)return null;
+  const w=alias||ws[0];
+  const hits=cand.filter(x=>_impTokens(x.nome)[0]===w);
+  return hits.length===1?hits[0]:null;
 }
 // "Ronaldo / Fábio" → tenta a célula inteira, senão cada parte
 // Na coluna de sócio, tenta primeiro só entre sócios (ex.: "Eduardo" = Eduardo Lagrimante)
@@ -4024,12 +4031,17 @@ function _impPessoas(cell,preferSocio){
 }
 function _impProdutoPorTexto(h){
   const n=_impNorm(h);
-  const regras=[['tribut',/revis.*cr[eé]dit/i],['sicoob',/sicoob/i],['grupag',/grupag/i],['energia',/energia/i],['agua',/[aá]gua/i],['contab',/contab/i],['bpo',/bpo/i],['vgv',/vgv/i],['consult',/consult/i]];
+  const exato=config.comissoes.find(c=>_impNorm(c.produto)===n);if(exato)return exato.id;
+  const regras=[['consult',/consult/i],['passiv',/passiv/i],['tribut',/revis.*cr[eé]dit/i],['sicoob',/sicoob/i],['grupag',/grupag/i],['energia',/energia/i],['agua',/[aá]gua/i],['contab',/contab/i],['bpo',/bpo/i],['vgv',/vgv/i],['consult',/consult/i]];
   for(const [k,re] of regras)if(n.includes(k)){const p=config.comissoes.find(c=>re.test(c.produto));if(p)return p.id;}
   return 'outro';
 }
 function _impPapelPorTexto(h,col,linhas){
   const n=_impNorm(h);
+  if(/cnpj/.test(n))return'cnpj';
+  if(/valor/.test(n))return'valor';
+  if(/etapa|status|fase/.test(n))return'etapa';
+  if(/outro produto|^produto/.test(n))return'produtoTexto';
   if(/negocio|cliente|empresa|razao/.test(n))return'cliente';
   if(/^quem|socio/.test(n))return'socio';
   if(/rede|parceir|indica/.test(n))return'rede';
@@ -4045,6 +4057,7 @@ function abrirImportarPlanilha(){
   _imp=null;
   document.getElementById('imp-corpo').innerHTML=`<h2 style="font-size:16px;font-weight:700;margin-bottom:6px">Importar planilha para o Pipeline</h2>
     <p class="imp-ajuda">Excel (.xlsx) ou CSV. A primeira linha deve ter os nomes das colunas. Nada é gravado antes da prévia.</p>
+    <p class="imp-ajuda" style="margin:6px 0 10px">Não tem planilha pronta? <a href="#" onclick="_impBaixarModelo();return false">⬇ Baixar o modelo do IA Hub</a> (já com os produtos e as etapas atuais).</p>
     <input type="file" accept=".xlsx,.xls,.csv" onchange="_impLer(this.files[0])">
     <div id="imp-status" class="imp-ajuda" style="margin-top:8px"></div>
     <div class="imp-rodape"><button class="btn-sec" onclick="closeOv('ov-imp')">Cancelar</button></div>`;
@@ -4067,6 +4080,31 @@ async function _impLer(file){
     _impRender();
   }catch(e){st.textContent='⚠ '+e.message;}
 }
+// Modelo pronto: as colunas de produto saem da matriz atual, então o modelo nunca fica velho
+async function _impBaixarModelo(){
+  try{await _impLoadXLSX();}catch(e){alert(e.message);return;}
+  const prods=config.comissoes.map(p=>p.produto);
+  const cab=['Cliente','CNPJ','Sócio(s)','Rede',...prods,'Outro produto','Valor estimado','Etapa','Observações'];
+  const ex=['Empresa Exemplo Ltda','00.000.000/0001-00','Bruno','Nome da pessoa / outra pessoa',...prods.map((p,i)=>i<2?'x':''),'','15000','Prospecção','Apague esta linha de exemplo'];
+  const ws=XLSX.utils.aoa_to_sheet([cab,ex]);
+  ws['!cols']=cab.map(h=>({wch:Math.max(12,Math.min(28,h.length+2))}));
+  const ajuda=XLSX.utils.aoa_to_sheet([
+    ['Como preencher'],[''],
+    ['Cliente','Nome do cliente/empresa (obrigatório). Uma linha por cliente.'],
+    ['CNPJ','Opcional.'],
+    ['Sócio(s)','Quem do grupo cuida: Bruno, Diego, Eduardo ou Vick. Dois sócios: Bruno/Diego (dividem a parte do sócio).'],
+    ['Rede','Quem trouxe da rede. Mais de um: separe com /. Ex.: Ronaldo / Henrique. Deixe vazio se foi o próprio sócio.'],
+    ['Produtos','Marque x em cada produto de interesse. Cada x vira um card no pipeline.'],
+    ['Outro produto','Se não estiver na lista, escreva o nome aqui.'],
+    ['Valor estimado','Opcional. Só números, ex.: 15000'],
+    ['Etapa','Opcional: '+NEG_COLS.join(', ')+'. Vazio = Prospecção.'],
+    ['Observações','Livre.'],[''],
+    ['Na importação, o sistema mostra uma prévia e pergunta quem é cada nome da coluna Rede antes de gravar.'],
+  ]);
+  ajuda['!cols']=[{wch:16},{wch:100}];
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Negócios');XLSX.utils.book_append_sheet(wb,ajuda,'Como preencher');
+  XLSX.writeFile(wb,'Modelo_Importacao_IA_Hub.xlsx');
+}
 function _impCol(i,campo,v){_imp.colunas[i][campo]=v;if(campo==='papel'&&v==='produto'&&!_imp.colunas[i].prodId)_imp.colunas[i].prodId=_impProdutoPorTexto(_imp.colunas[i].rotulo);_impRender();}
 function _impSocioDe(n){
   if(n.comissaoVenda&&n.comissaoVenda.socioDonoId)return n.comissaoVenda.socioDonoId;
@@ -4075,21 +4113,38 @@ function _impSocioDe(n){
 // Monta a prévia: uma linha por cliente, com produtos, sócios e rede reconhecidos
 function _impPrevia(){
   const C=_imp.colunas,idx=p=>C.map((c,i)=>c.papel===p?i:-1).filter(i=>i>=0);
-  const iCli=idx('cliente')[0],iSoc=idx('socio'),iRede=idx('rede'),iObs=idx('obs'),iProd=idx('produto');
-  const novos={};
+  const iCli=idx('cliente')[0],iSoc=idx('socio'),iRede=idx('rede'),iObs=idx('obs'),iProd=idx('produto'),iProdTxt=idx('produtoTexto');
+  const iCnpj=idx('cnpj')[0],iValor=idx('valor')[0],iEtapa=idx('etapa')[0];
+  const mapa=_imp.pessoasMap||(_imp.pessoasMap={});
+  const pessoas={};
   const linhas=_imp.dados.map(l=>{
     const cliente=iCli!=null?String(l[iCli]||'').trim():'';
     const pessoasSoc=iSoc.flatMap(i=>_impPessoas(l[i],true));
     const socios=pessoasSoc.filter(p=>p.user&&isSocioUser(p.user)).map(p=>p.user);
-    const rede=[...pessoasSoc.filter(p=>!(p.user&&isSocioUser(p.user))),...iRede.flatMap(i=>_impPessoas(l[i]))]
+    let rede=[...pessoasSoc.filter(p=>!(p.user&&isSocioUser(p.user))),...iRede.flatMap(i=>_impPessoas(l[i]))]
       .filter((p,k,a)=>a.findIndex(q=>_impNorm(q.nome)===_impNorm(p.nome))===k);
-    rede.forEach(p=>{if(!p.user){const k=_impNorm(p.nome);if(!novos[k])novos[k]={nome:p.nome,socio:socios[0]||null};}});
-    const produtos=iProd.filter(i=>_impNorm(l[i])).map(i=>({prodId:C[i].prodId,rotulo:C[i].rotulo}));
+    // "Quem é quem": a escolha do sócio vale sobre o reconhecimento automático
+    rede=rede.map(p=>{
+      const k=_impNorm(p.nome);
+      if(!(k in mapa))mapa[k]=p.user?p.user.id:'novo';
+      if(!pessoas[k])pessoas[k]={k,nome:p.nome,socio:socios[0]||null,auto:p.user||null,usos:0};
+      pessoas[k].usos++;
+      const e=mapa[k];
+      return e==='ignorar'?null:{nome:p.nome,user:e==='novo'?null:users.find(u=>u.id===e)||null};
+    }).filter(Boolean);
+    const produtos=iProd.filter(i=>_impNorm(l[i])).map(i=>({prodId:C[i].prodId,rotulo:C[i].rotulo}))
+      .concat(iProdTxt.map(i=>String(l[i]||'').trim()).filter(Boolean).flatMap(t=>t.split(/\s*[,;\/]\s*/)).filter(Boolean).map(t=>({prodId:_impProdutoPorTexto(t),rotulo:t})));
     const obs=iObs.map(i=>String(l[i]||'').trim()).filter(Boolean).join(' · ');
-    return{cliente,socios,rede,produtos,obs,celRede:iRede.map(i=>String(l[i]||'').trim()).filter(x=>x&&x!=='-').join(' / ')};
+    const valor=iValor!=null?parseFloat(String(l[iValor]||'').replace(/[^\d,.-]/g,'').replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.'))||null:null;
+    const etTxt=iEtapa!=null?_impNorm(l[iEtapa]):'';
+    const etapa=NEG_COLS.find(c=>_impNorm(c)===etTxt)||'Prospecção';
+    return{cliente,cnpj:iCnpj!=null?String(l[iCnpj]||'').trim():'',valor,etapa,socios,rede,produtos,obs,celRede:iRede.map(i=>String(l[i]||'').trim()).filter(x=>x&&x!=='-').join(' / ')};
   }).filter(r=>r.cliente);
-  return{linhas,novos:Object.values(novos)};
+  const lista=Object.values(pessoas).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  return{linhas,pessoas:lista,novos:lista.filter(p=>mapa[p.k]==='novo')};
 }
+let _impPessoasVis=[];
+function _impMapa(i,v){const p=_impPessoasVis[i];if(!p)return;_imp.pessoasMap[p.k]=v==='novo'||v==='ignorar'?v:+v;_impRender();}
 function _impNegociosDe(pv){
   // Mesmo cliente: nomes parecidos ("Saint Barth" = "Condomínio Saint Barth - Península")
   const mesmo=(a,b)=>{const ta=_impTokens(a).filter(w=>w.length>2),tb=_impTokens(b).filter(w=>w.length>2);return(ta.length&&ta.every(w=>tb.includes(w)))||(tb.length&&tb.every(w=>ta.includes(w)));};
@@ -4112,6 +4167,8 @@ function _impRender(){
   const opProd=sel=>config.comissoes.map(p=>`<option value="${p.id}" ${sel===p.id?'selected':''}>${esc(p.produto)}</option>`).join('')+`<option value="outro" ${sel==='outro'?'selected':''}>Outro (usa o nome da coluna)</option>`;
   const nomeP=p=>p.user?`<span class="imp-ok">${esc(p.user.nome.split(' ')[0])}</span>`:`<span class="imp-novo">${esc(p.nome)} (novo)</span>`;
   const semSocio=pv.linhas.filter(r=>!r.socios.length).length;
+  const pessoasOpc=users.filter(u=>u.perfil!=='Operador').sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  _impPessoasVis=pv.pessoas;
   document.getElementById('imp-corpo').innerHTML=`<h2 style="font-size:16px;font-weight:700;margin-bottom:4px">Importar planilha para o Pipeline</h2>
     <div class="imp-ajuda">${esc(_imp.arquivo)} · ${pv.linhas.length} clientes</div>
     <div class="imp-sec">1. O que é cada coluna</div>
@@ -4121,9 +4178,16 @@ function _impRender(){
     <div class="imp-sec">2. Como criar os cards</div>
     <label class="imp-opt"><input type="radio" name="imp-modo" ${_imp.porProduto?'checked':''} onchange="_imp.porProduto=true;_impRender()"> Um card por produto marcado (cada um com sua regra de comissão)</label>
     <label class="imp-opt"><input type="radio" name="imp-modo" ${!_imp.porProduto?'checked':''} onchange="_imp.porProduto=false;_impRender()"> Um card por cliente (demais produtos vão para as notas)</label>
-    ${pv.novos.length?`<label class="imp-opt"><input type="checkbox" ${_imp.criarPessoas?'checked':''} onchange="_imp.criarPessoas=this.checked;_impRender()"> Cadastrar ${pv.novos.length} pessoa(s) nova(s) como Rede do sócio da linha:
-      <span class="imp-ajuda">${pv.novos.map(n=>esc(n.nome)+(n.socio?' → '+esc(n.socio.nome.split(' ')[0]):'')).join(', ')}</span></label>`:''}
-    <div class="imp-sec">3. Prévia</div>
+    ${pv.pessoas.length?`<div class="imp-sec">3. Quem é quem na rede</div>
+    <div class="imp-ajuda" style="margin-bottom:8px">Confira cada nome da planilha. "Cadastrar novo" cria a pessoa como Rede do sócio da linha.</div>
+    <div class="imp-pessoas">${pv.pessoas.map((p,i)=>{const e=_imp.pessoasMap[p.k];return`<div class="imp-pessoa">
+      <span><b>${esc(p.nome)}</b> <span class="imp-ajuda">${p.usos} linha(s)${p.socio?' · '+esc(p.socio.nome.split(' ')[0]):''}</span></span>
+      <select onchange="_impMapa(${i},this.value)" class="${e==='novo'?'imp-sel-novo':e==='ignorar'?'':'imp-sel-ok'}">
+        <option value="novo" ${e==='novo'?'selected':''}>➕ Cadastrar novo</option>
+        <option value="ignorar" ${e==='ignorar'?'selected':''}>Ignorar</option>
+        ${pessoasOpc.map(u=>`<option value="${u.id}" ${e===u.id?'selected':''}>${esc(u.nome)} · ${u.perfil}</option>`).join('')}
+      </select></div>`;}).join('')}</div>`:''}
+    <div class="imp-sec">${pv.pessoas.length?4:3}. Prévia</div>
     <div class="imp-prev"><table><thead><tr><th>Cliente</th><th>Produtos</th><th>Sócio</th><th>Rede</th></tr></thead><tbody>
       ${pv.linhas.map(r=>`<tr><td>${esc(r.cliente)}</td><td>${r.produtos.map(p=>esc(p.prodId==='outro'?p.rotulo:(config.comissoes.find(c=>c.id===p.prodId)||{}).produto||p.rotulo)).join(', ')||'<span class="imp-ajuda">a definir</span>'}</td>
         <td>${r.socios.map(s=>`<span class="imp-ok">${esc(s.nome.split(' ')[0])}</span>`).join(' + ')||'<span class="imp-erro">não reconhecido</span>'}</td>
@@ -4136,12 +4200,12 @@ function _impRender(){
 function _impExecutar(){
   const pv=_impPrevia(),negs=_impNegociosDe(pv).filter(x=>!x.dup);
   if(!negs.length)return;
-  if(!confirm(`Criar ${negs.length} cards no Pipeline${_imp.criarPessoas&&pv.novos.length?` e cadastrar ${pv.novos.length} pessoa(s) na Rede`:''}?`))return;
+  if(!confirm(`Criar ${negs.length} cards no Pipeline${pv.novos.length?` e cadastrar ${pv.novos.length} pessoa(s) na Rede`:''}?`))return;
   const agora=new Date(),hojeBR=agora.toLocaleDateString('pt-BR');
   let seq=Date.now();
   // 1. pessoas novas (Rede vinculada ao sócio da linha)
   const criadas={};
-  if(_imp.criarPessoas)pv.novos.forEach(n=>{
+  pv.novos.forEach(n=>{
     const id=++seq;
     users.push({id,nome:n.nome,perfil:'Rede',status:'Ativo',emp:'',email:'',senha:'',tel:'',seg:'',ativ:'',vinculoId:n.socio?n.socio.id:null,vinculoNome:n.socio?n.socio.nome:'',obs:`Cadastrado pela importação de ${_imp.arquivo}`,desde:hojeBR});
     criadas[_impNorm(n.nome)]=users.find(u=>u.id===id);
@@ -4157,7 +4221,8 @@ function _impExecutar(){
     const orig=rede[0]||soc;
     const notas=[r.obs,r.celRede?'Rede (planilha): '+r.celRede:'',x.outrosProdutos.length?'Também interessa: '+x.outrosProdutos.map(p=>p.prodId==='outro'?p.rotulo:(config.comissoes.find(c=>c.id===p.prodId)||{}).produto).join(', '):'',`Importado de ${_imp.arquivo} em ${hojeBR}`].filter(Boolean).join('\n');
     negocios.push({
-      id:++seq,titulo:x.titulo,tipo:'proprio',status:'Prospecção',valor:null,
+      id:++seq,titulo:x.titulo,tipo:'proprio',status:r.etapa,valor:r.valor,
+      cnpj:r.cnpj||'',fechadoEm:r.etapa==='Fechado'?agora.toISOString().slice(0,10):undefined,
       originadorId:orig?orig.id:currentUser.id,
       configProdutoId:prod?prod.id:null,produtoOutro:prod?null:(x.outro||'A definir'),
       comissaoVenda:{regraId:regra.id,socioDonoId:soc?soc.id:null,cosocios:r.socios.slice(1).map(s=>s.id),
