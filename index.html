@@ -1877,7 +1877,7 @@ function _pedirNovaSenha(){
     let ov=document.getElementById('ov-senha');
     if(!ov){ov=document.createElement('div');ov.className='overlay';ov.id='ov-senha';document.body.appendChild(ov);}
     ov.innerHTML=`<div class="modal" style="width:380px"><h2 style="font-size:16px;margin-bottom:6px">Defina sua senha</h2>
-      <p style="font-size:12px;color:#6b7280;margin-bottom:12px">Mínimo de 10 caracteres. Use uma senha só sua.</p>
+      <p style="font-size:12px;color:#6b7280;margin-bottom:12px">Mínimo de 6 caracteres. Use uma senha só sua.</p>
       <label>Nova senha</label><input type="password" id="ns-1" autocomplete="new-password">
       <label style="margin-top:8px">Repita a senha</label><input type="password" id="ns-2" autocomplete="new-password">
       <div id="ns-err" style="color:#b91c1c;font-size:12px;margin-top:8px"></div>
@@ -1886,7 +1886,7 @@ function _pedirNovaSenha(){
     document.getElementById('ns-cancel').onclick=()=>{ov.classList.remove('open');res(false);};
     document.getElementById('ns-ok').onclick=async()=>{
       const a=document.getElementById('ns-1').value,b=document.getElementById('ns-2').value,er=document.getElementById('ns-err');
-      if(a.length<10){er.textContent='A senha precisa ter pelo menos 10 caracteres.';return;}
+      if(a.length<6){er.textContent='A senha precisa ter pelo menos 6 caracteres.';return;}
       if(a!==b){er.textContent='As duas senhas não são iguais.';return;}
       const {error}=await supaClient.auth.updateUser({password:a});
       if(error){er.textContent='Erro: '+error.message;return;}
