@@ -213,6 +213,13 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 .rg-head{display:flex;gap:8px;align-items:center;margin-bottom:12px;}
 .rg-titulo{flex:1;min-width:0;width:auto;font-size:15px;font-weight:700;color:#0a1628;border:1px solid transparent;border-radius:6px;padding:4px 6px;background:none;}
 .rg-titulo:hover,.rg-titulo:focus{border-color:#ddd;}
+.rg-titulo-txt{flex:1;font-size:15px;font-weight:700;color:#0a1628;}
+.rg-ajuda{font-size:11px;color:#6b7280;background:#f8fafc;border-radius:6px;padding:6px 10px;margin-bottom:10px;}
+.rg-card-edit{border-color:#0a1628;}
+.dist-tab4 .dist-row{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) minmax(0,1fr) 110px;}
+.dist-cab{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:#9ca3af;background:#fafafa;}
+.dist-como{color:#6b7280;}
+@media(max-width:700px){.dist-tab4 .dist-como,.dist-tab4 .dist-cab div:nth-child(2){display:none;}.dist-tab4 .dist-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 100px;}}
 .rg-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;}
 @media(max-width:900px){.rg-grid{grid-template-columns:1fr;}}
 .rg-linha{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 0;border-top:1px dashed #eee;font-size:12px;}
@@ -1098,7 +1105,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <div><label>Data</label><input id="pag-data" type="date"></div>
       <div style="grid-column:1/-1"><label>Observações</label><input id="pag-obs" placeholder="Referência, NF, parcela..."></div>
       <div style="grid-column:1/-1"><label>Regra de distribuição</label><select id="pag-regra" onchange="_pagRecalc(true)"></select></div>
-      <div><label>Quem vendeu</label><select id="pag-vend" onchange="_pagRecalc(true)"></select></div>
+      <div><label>Originador</label><select id="pag-vend" onchange="_pagRecalc(true)"></select></div>
       <div><label>Fomentador</label><select id="pag-fom" onchange="_pagFomChange()"></select>
         <input id="pag-fom-nome" placeholder="Nome do fomentador" style="display:none;margin-top:6px" oninput="_pagRecalc()"></div>
       <div id="pag-custas-wrap"><label>Custas do negócio (R$)</label><input id="pag-custas" type="number" min="0" placeholder="0,00" oninput="_pagRecalc()"></div>
@@ -2726,7 +2733,7 @@ function savePagamento(){
   const ctx=_pagCtx();
   const motivo=document.getElementById('pag-ajuste-motivo').value.trim();
   if(_pagRows.some(r=>r.ajustado)&&!motivo){alert('Informe o motivo do ajuste na divisão.');return;}
-  if(_pagRows.some(r=>r.aviso)&&!confirm('Há linhas sem pessoa definida (ex.: quem vendeu). Salvar mesmo assim?'))return;
+  if(_pagRows.some(r=>r.aviso)&&!confirm('Há linhas sem pessoa definida (ex.: originador). Salvar mesmo assim?'))return;
   const neg=negId?negocios.find(n=>n.id===negId):null;
   // Mantém o status de pagamento das linhas que já existiam
   const antigo=_pagEditId?pagamentos.find(p=>p.id===_pagEditId):null;
@@ -3203,7 +3210,7 @@ function updateSocioResto(){
 function addRedeOriginador(){
   const membros=users.filter(u=>u.perfil!=='Sócio'||(u.perfil==='Sócio'&&parseInt(document.getElementById('p-socio-principal').value)!==u.id));
   const jaAdicionados=_redeOriginadores.map(r=>r.userId);
-  const disponiveis=membros.filter(u=>!jaAdicionados.includes(u.id));
+  const disponiveis=membros.filter(u=>!jaAdicionados.includes(u.id)).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   if(!disponiveis.length){showToast('Todos os membros já foram adicionados.');return;}
   const opts=disponiveis.map(u=>`<option value="${u.id}">${u.nome} (${u.perfil})</option>`).join('');
   const html=`<select id="_tmp-rede-sel" style="padding:7px;border:1px solid #ddd;border-radius:7px;font-size:13px;width:100%"><option value="">— Selecione —</option>${opts}</select>`;
@@ -4015,7 +4022,7 @@ function openNegModal(id){
   const selStatus=document.getElementById('neg-status');
   selStatus.innerHTML=[...NEG_COLS,'Perdido'].map(c=>`<option>${c}</option>`).join('');
   const selOrig=document.getElementById('neg-orig');
-  const origSorted=[...users].sort((a,b)=>a.id===currentUser?.id?-1:b.id===currentUser?.id?1:0);
+  const origSorted=users.filter(u=>u.perfil!=='Operador').sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   selOrig.innerHTML=origSorted.map(u=>`<option value="${u.id}">${u.nome}${u.id===currentUser?.id?' (você)':''}</option>`).join('');
   // chips de produto
   const prodId=n?(n.configProdutoId||n.portafolioId||null):null;
@@ -5798,7 +5805,7 @@ function loadData(){
 // Cada regra é uma lista de linhas. Cada linha calcula sobre o total recebido
 // ou sobre um subtotal, e diz para onde vai o dinheiro.
 const DESTINOS_REGRA={
-  sai:'Sai (não fica no grupo)',grupo:'Subtotal (divide abaixo)',vendedor:'Quem vendeu',
+  sai:'Sai (não fica no grupo)',grupo:'Subtotal (divide abaixo)',vendedor:'Originador',
   fomentador:'Fomentador',pessoa:'Pessoa fixa',pool:'Divisão igual entre pessoas',
   reserva:'Reserva',custo:'Custo / despesa'
 };
@@ -5859,7 +5866,7 @@ function calcDistribuicao(regra,ctx){
     const v=amt(l),r={linhaId:l.id,nome:l.nome,destino:l.destino,nivel:nivel(l)};
     if(l.destino==='vendedor'){
       let vend=users.find(u=>u.id===ctx.vendedorId);
-      if(!vend){rows.push({...r,pessoaId:null,pessoaNome:'defina quem vendeu',valor:v,aviso:true});return;}
+      if(!vend){rows.push({...r,pessoaId:null,pessoaNome:'defina o originador',valor:v,aviso:true});return;}
       if(isSocioUser(vend)){rows.push({...r,pessoaId:vend.id,pessoaNome:vend.nome,valor:v});return;}
       if(l.pagarParceiro)vend=_parceiroDe(vend);
       const soc=_socioDe(vend);
@@ -5883,10 +5890,23 @@ function calcDistribuicao(regra,ctx){
   return rows;
 }
 
-function _distribTabela(rows,editavel){
+// Explica a linha em português simples (visão de leitura da regra)
+function _descLinha(rg,r){
+  const l=(rg.linhas||[]).find(x=>x.id===r.linhaId)||(rg.linhas||[]).find(x=>x.id+'s'===r.linhaId);if(!l)return'';
+  const base=l.base==='total'?'do total':'de '+((rg.linhas.find(x=>x.id===l.base)||{}).nome||'?');
+  if(r.linhaId===l.id+'s')return`${l.socioPct}% ${base}, quando o originador não é sócio`;
+  let t=l.tipo==='pct'?`${l.pct}% ${base}`:l.tipo==='resto'?`o que sobra ${base}`:l.tipo==='custas'?'custas informadas no recebimento':_brl(l.fixo)+' fixo';
+  if(l.destino==='vendedor'&&+l.socioPct>0)t+=` (se for sócio, fica com tudo)`;
+  if(l.destino==='fomentador')t+=', só se houver fomentador';
+  if(l.destino==='pool')t+=`, dividido igual`;
+  return t;
+}
+function _distribTabela(rows,editavel,regra){
   if(!rows.length)return'<div style="font-size:12px;color:#aaa">Regra sem linhas.</div>';
   const pagar=rows.filter(_distEhPagavel).reduce((s,r)=>s+r.valor,0);
-  return`<div class="dist-tab">
+  const comoCol=regra?r=>`<div class="dist-como">${esc(_descLinha(regra,r))}</div>`:()=>'';
+  return`<div class="dist-tab ${regra?'dist-tab4':''}">
+    ${regra?`<div class="dist-row dist-cab"><div>Etapa</div><div>Como calcula</div><div>Para quem</div><div class="dist-val">No exemplo</div></div>`:''}
     ${rows.map((r,i)=>{
       const quem=r.retido?`<span class="dist-dest">${DESTINOS_REGRA[r.destino]||''}</span>`:
         `<span class="${r.aviso?'dist-aviso':''}">${esc(r.pessoaNome||'')}</span>`;
@@ -5894,27 +5914,45 @@ function _distribTabela(rows,editavel){
         ?`<input type="number" step="0.01" value="${r.valor}" onchange="_pagAjustar(${i},this.value)" class="${r.ajustado?'dist-ajustado':''}" title="${r.ajustado?'Calculado: '+_brl(r.valorCalc):''}">`
         :`<b>${_brl(r.valor)}</b>`;
       return`<div class="dist-row ${r.subtotal?'dist-sub':''} ${r.retido&&!r.subtotal?'dist-ret':''}" style="padding-left:${10+r.nivel*18}px">
-        <div class="dist-nome">${esc(r.nome)}</div><div class="dist-quem">${quem}</div><div class="dist-val">${val}</div></div>`;
+        <div class="dist-nome">${esc(r.nome)}</div>${comoCol(r)}<div class="dist-quem">${quem}</div><div class="dist-val">${val}</div></div>`;
     }).join('')}
-    <div class="dist-row dist-tot"><div class="dist-nome">Total a pagar a pessoas</div><div class="dist-quem"></div><div class="dist-val"><b>${_brl(pagar)}</b></div></div>
+    <div class="dist-row dist-tot"><div class="dist-nome">Total a pagar a pessoas</div>${regra?'<div></div>':''}<div class="dist-quem"></div><div class="dist-val"><b>${_brl(pagar)}</b></div></div>
   </div>`;
 }
 
 // ---------- Config: editor de regras ----------
-let _simRegra={};
+let _simRegra={},_rgEditando={};
+function _rgSimCtl(rg,pessoas){
+  const sim=_simRegra[rg.id];
+  const temCustas=rg.linhas.some(l=>l.tipo==='custas'),temFom=rg.linhas.some(l=>l.destino==='fomentador');
+  return`<div class="rg-sim-ctl">
+    <label>Exemplo com R$ <input type="number" value="${sim.valor}" onchange="_simRegra[${rg.id}].valor=+this.value;_renderCfgRegras()"></label>
+    <label>Originador <select onchange="_simRegra[${rg.id}].vendedorId=+this.value||null;_renderCfgRegras()"><option value="">— escolha —</option>${pessoas.map(u=>`<option value="${u.id}" ${sim.vendedorId===u.id?'selected':''}>${esc(u.nome)} · ${u.perfil}</option>`).join('')}</select></label>
+    ${temCustas?`<label>Custas R$ <input type="number" value="${sim.custas}" onchange="_simRegra[${rg.id}].custas=+this.value;_renderCfgRegras()"></label>`:''}
+    ${temFom?`<label class="rg-mini"><input type="checkbox" ${sim.fom?'checked':''} onchange="_simRegra[${rg.id}].fom=this.checked;_renderCfgRegras()"> com fomentador</label>`:''}
+  </div>`;
+}
 function _renderCfgRegras(){
   const el=document.getElementById('cfg-regras');if(!el)return;
-  const pessoas=users.filter(u=>u.perfil!=='Operador').sort((a,b)=>a.nome.localeCompare(b.nome));
-  const socios=users.filter(isSocioUser);
+  const pessoas=users.filter(u=>u.perfil!=='Operador').sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  const socios=users.filter(isSocioUser).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   el.innerHTML=getRegras().map((rg,ri)=>{
     const sim=_simRegra[rg.id]||(_simRegra[rg.id]={valor:10000,vendedorId:null,custas:0,fom:false});
+    const rows=calcDistribuicao(rg,{valor:sim.valor,vendedorId:sim.vendedorId,custas:sim.custas,fomentadorNome:sim.fom?'Fomentador (exemplo)':''});
+    // Visão de leitura: só a cascata explicada, sem campos de edição
+    if(!_rgEditando[rg.id])return`<div class="rg-card">
+      <div class="rg-head"><div class="rg-titulo-txt">${esc(rg.nome)}</div>
+        <button class="btn-s btn-sm" onclick="_rgEditando[${rg.id}]=true;_renderCfgRegras()">✏ Editar</button></div>
+      ${_rgSimCtl(rg,pessoas)}
+      ${_distribTabela(rows,false,rg)}
+    </div>`;
     const linhas=(rg.linhas||[]).map((l,li)=>{
       const bases=`<option value="total">Total recebido</option>`+rg.linhas.filter(x=>x.id!==l.id&&x.destino==='grupo').map(x=>`<option value="${x.id}" ${l.base===x.id?'selected':''}>${esc(x.nome)}</option>`).join('');
       let extra='';
       if(l.destino==='pessoa')extra=`<select onchange="_rgSet(${ri},${li},'pessoaId',+this.value)"><option value="">— pessoa —</option>${pessoas.map(u=>`<option value="${u.id}" ${l.pessoaId===u.id?'selected':''}>${esc(u.nome)}</option>`).join('')}</select>`;
       if(l.destino==='pool')extra=`<div class="rg-pool">${socios.concat(pessoas.filter(u=>!isSocioUser(u)&&(l.poolIds||[]).includes(u.id))).map(u=>`<label><input type="checkbox" ${(l.poolIds||[]).includes(u.id)?'checked':''} onchange="_rgPool(${ri},${li},${u.id},this.checked)">${esc(u.nome.split(' ')[0])}</label>`).join('')}</div>`;
-      if(l.destino==='vendedor')extra=`<label class="rg-mini">Sócio responsável fica com <input class="rg-num" type="number" value="${l.socioPct||0}" onchange="_rgSet(${ri},${li},'socioPct',+this.value)">% da base quando quem vende não é sócio</label>
-        <label class="rg-mini"><input type="checkbox" ${l.pagarParceiro?'checked':''} onchange="_rgSet(${ri},${li},'pagarParceiro',this.checked)"> Se quem vendeu for da Rede, pagar ao Parceiro dela</label>`;
+      if(l.destino==='vendedor')extra=`<label class="rg-mini">Sócio responsável fica com <input class="rg-num" type="number" value="${l.socioPct||0}" onchange="_rgSet(${ri},${li},'socioPct',+this.value)">% da base quando o originador não é sócio</label>
+        <label class="rg-mini"><input type="checkbox" ${l.pagarParceiro?'checked':''} onchange="_rgSet(${ri},${li},'pagarParceiro',this.checked)"> Se o originador for da Rede, pagar ao Parceiro dela</label>`;
       return`<div class="rg-linha" style="margin-left:${l.base==='total'?0:22}px">
         <input class="rg-nome" value="${esc(l.nome)}" onchange="_rgSet(${ri},${li},'nome',this.value)">
         <select title="Calcula sobre" onchange="_rgSet(${ri},${li},'base',this.value)">${bases}</select>
@@ -5927,25 +5965,17 @@ function _renderCfgRegras(){
         ${extra?`<div class="rg-extra">${extra}</div>`:''}
       </div>`;
     }).join('');
-    const temCustas=rg.linhas.some(l=>l.tipo==='custas'),temFom=rg.linhas.some(l=>l.destino==='fomentador');
-    const rows=calcDistribuicao(rg,{valor:sim.valor,vendedorId:sim.vendedorId,custas:sim.custas,fomentadorNome:sim.fom?'Fomentador (exemplo)':''});
-    return`<div class="rg-card">
+    return`<div class="rg-card rg-card-edit">
       <div class="rg-head">
         <input class="rg-titulo" value="${esc(rg.nome)}" onchange="_rgNome(${ri},this.value)">
-        <button class="btn-s btn-sm" onclick="_rgAddLinha(${ri})">+ Linha</button>
+        <button class="btn-s btn-sm" onclick="_rgAddLinha(${ri})">+ Etapa</button>
         <button class="btn-d btn-sm" onclick="_rgDel(${ri})">Excluir regra</button>
+        <button class="btn-p btn-sm" onclick="delete _rgEditando[${rg.id}];_renderCfgRegras()">✓ Concluir</button>
       </div>
+      <div class="rg-ajuda">Cada etapa: <b>nome</b> · calcula sobre (<b>total</b> ou um subtotal) · <b>quanto</b> · <b>para onde vai</b>. As alterações valem para os próximos recebimentos.</div>
       <div class="rg-grid">
-        <div>${linhas||'<div style="color:#aaa;font-size:12px">Sem linhas.</div>'}</div>
-        <div class="rg-sim">
-          <div class="rg-sim-ctl">
-            <label>Simular com R$ <input type="number" value="${sim.valor}" onchange="_simRegra[${rg.id}].valor=+this.value;_renderCfgRegras()"></label>
-            <label>Quem vendeu <select onchange="_simRegra[${rg.id}].vendedorId=+this.value||null;_renderCfgRegras()"><option value="">—</option>${pessoas.map(u=>`<option value="${u.id}" ${sim.vendedorId===u.id?'selected':''}>${esc(u.nome)} · ${u.perfil}</option>`).join('')}</select></label>
-            ${temCustas?`<label>Custas R$ <input type="number" value="${sim.custas}" onchange="_simRegra[${rg.id}].custas=+this.value;_renderCfgRegras()"></label>`:''}
-            ${temFom?`<label class="rg-mini"><input type="checkbox" ${sim.fom?'checked':''} onchange="_simRegra[${rg.id}].fom=this.checked;_renderCfgRegras()"> com fomentador</label>`:''}
-          </div>
-          ${_distribTabela(rows,false)}
-        </div>
+        <div>${linhas||'<div style="color:#aaa;font-size:12px">Sem etapas.</div>'}</div>
+        <div class="rg-sim">${_rgSimCtl(rg,pessoas)}${_distribTabela(rows,false)}</div>
       </div>
     </div>`;
   }).join('')+`<button onclick="_rgAdd()" class="rg-nova">+ Nova regra de distribuição</button>`;
@@ -5964,7 +5994,8 @@ function _rgDelLinha(ri,li){
 }
 function _rgAdd(){
   const nome=prompt('Nome da regra (ex.: Revisão de Créditos Tributários):');if(!nome||!nome.trim())return;
-  getRegras().push({id:Date.now(),nome:nome.trim(),linhas:[{id:'a',nome:'Vendedor',base:'total',tipo:'pct',pct:20,destino:'vendedor',socioPct:0,pagarParceiro:true}]});
+  const novoId=Date.now();_rgEditando[novoId]=true;
+  getRegras().push({id:novoId,nome:nome.trim(),linhas:[{id:'a',nome:'Vendedor',base:'total',tipo:'pct',pct:20,destino:'vendedor',socioPct:0,pagarParceiro:true}]});
   _rgSalvar();
 }
 function _rgDel(ri){
