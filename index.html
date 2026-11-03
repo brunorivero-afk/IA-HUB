@@ -2038,7 +2038,7 @@ function renderReceitas(){
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 10px">
       <select id="fin-neg-port-fil" class="pip-sel" style="max-width:220px" onchange="document.getElementById('fin-neg-lista').innerHTML=_buildPagamentosList()">
-        <option value="">Todos os negócios</option>${portfolio.map(p=>`<option value="${p.id}">${esc(p.nome)}</option>`).join('')}
+        <option value="">Todos os produtos</option>${_prodOpcoes(pagamentos.map(p=>negocios.find(n=>n.id===p.negId)).filter(Boolean)).map(o=>`<option value="${esc(o.key)}">${esc(o.label)}</option>`).join('')}
       </select>
       <select id="fin-neg-socio-fil" class="pip-sel" style="max-width:220px" onchange="document.getElementById('fin-neg-lista').innerHTML=_buildPagamentosList()">
         <option value="">Todos os sócios</option>${users.filter(isSocioUser).map(u=>`<option value="${u.id}">${esc(u.nome)}</option>`).join('')}
@@ -2047,10 +2047,10 @@ function renderReceitas(){
     <div id="fin-neg-lista">${_buildPagamentosList()}</div>`;
 }
 function _buildPagamentosList(){
-  const portFil=parseInt((document.getElementById('fin-neg-port-fil')||{}).value)||0;
+  const prodFil=(document.getElementById('fin-neg-port-fil')||{}).value||'';
   const socioFil=parseInt((document.getElementById('fin-neg-socio-fil')||{}).value)||0;
   let list=pagamentos;
-  if(portFil)list=list.filter(p=>p.portafolioId===portFil);
+  if(prodFil)list=list.filter(p=>{const n=negocios.find(x=>x.id===p.negId);return n&&_negProdKey(n)===prodFil;});
   if(socioFil)list=list.filter(p=>(p.comissoes||[]).some(c=>c.socioId===socioFil));
   if(!list.length)return`<div style="text-align:center;padding:40px;color:#9ca3af;font-size:14px">Nenhum pagamento registrado ainda.</div>`;
   return`<div style="display:flex;flex-direction:column;gap:8px">
@@ -2302,12 +2302,12 @@ function abrirFichaCliente(negId){
 }
 
 function abrirInativos(){
-  const portFil=_pipFilter!=='all'?_pipFilter:null;
+  const prodFil=_pipFilter!=='all'?_pipFilter:null;
   let lista=negocios.filter(n=>n.status==='Perdido');
-  if(portFil)lista=lista.filter(n=>n.portafolioId===portFil);
+  if(prodFil)lista=lista.filter(n=>_negProdKey(n)===prodFil);
   lista=lista.slice().sort((a,b)=>(b.id||0)-(a.id||0));
   const html=`
-    <h2 style="margin:0 0 16px;font-size:17px;color:#0a1628">Clientes Inativos${portFil?` — ${esc(portfolio.find(p=>p.id===portFil)?.nome||'')}`:''}</h2>
+    <h2 style="margin:0 0 16px;font-size:17px;color:#0a1628">Clientes Inativos${prodFil?` — ${esc(_prodLabel(prodFil))}`:''}</h2>
     ${lista.length?`<div style="display:flex;flex-direction:column;gap:8px">
       ${lista.map(n=>{
         const orig=n.originadorId?users.find(u=>u.id===n.originadorId):null;
@@ -2700,7 +2700,7 @@ function _renderPortfolioView(){
             <div style="display:flex;gap:10px;font-size:12px;margin-top:6px;padding-top:8px;border-top:1px solid #f0f0f0">
               <span style="color:#0059a9;font-weight:600">${ativos} ativo${ativos!==1?'s':''}</span>
               <span style="color:#6b7280">${clientes.length} total</span>
-              <button onclick="event.stopPropagation();_pipFilter=${p.id};_pipSubtab='clientes';renderPipeline()" style="margin-left:auto;border:none;background:none;color:#854F0B;font-size:12px;cursor:pointer;font-weight:600">Ver clientes →</button>
+              <span style="margin-left:auto;color:#9ca3af;font-size:11px">cadastro antigo</span>
             </div>
           </div>`;
         }).join('')}
@@ -2721,14 +2721,13 @@ function _renderClientesView(){
     if(!n.fechadoEm)return false;
     try{const d=new Date(n.fechadoEm);return d.getMonth()===mesAtual&&d.getFullYear()===anoAtual;}catch(e){return false;}
   });
-  const portAtual=_pipFilter!=='all'?portfolio.find(p=>p.id===_pipFilter):null;
 
   return`<div style="height:100%;display:flex;flex-direction:column;overflow:hidden">
     <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;padding:0 16px 8px;flex-wrap:wrap">
-      <select onchange="_pipFilter=this.value==='all'?'all':+this.value;renderPipeline()"
+      <select onchange="_pipFilter=this.value;renderPipeline()"
         style="max-width:160px;padding:6px 10px;border:1.5px solid #e5e7eb;border-radius:20px;font-size:12px;font-weight:600;color:#0a1628;background:#fff;cursor:pointer">
-        <option value="all" ${_pipFilter==='all'?'selected':''}>Todos os negócios</option>
-        ${portfolio.map(p=>`<option value="${p.id}" ${_pipFilter===p.id?'selected':''}>${esc(p.nome)}</option>`).join('')}
+        <option value="all" ${_pipFilter==='all'?'selected':''}>Todos os produtos</option>
+        ${_prodOpcoes(negocios).map(o=>`<option value="${esc(o.key)}" ${_pipFilter===o.key?'selected':''}>${esc(o.label)} (${o.qtd})</option>`).join('')}
       </select>
       <div style="display:flex;gap:8px;overflow-x:auto;flex-shrink:0">
         <div style="background:#f0f4ff;border-radius:10px;padding:7px 12px;white-space:nowrap">
@@ -3080,6 +3079,16 @@ function _dashParadosHtml(){
 
 // ===================== PIPELINE: FILTROS, EXCEL E RELATÓRIO =====================
 // Um só filtro alimenta a tela, o Excel e o relatório: o que você vê é o que sai.
+// Produto do negócio como chave de filtro: matriz (p<id>) ou nome livre (o:<nome>)
+function _negProdKey(n){return n.configProdutoId?'p'+n.configProdutoId:'o:'+_impNorm(n.produtoOutro||'Outro');}
+function _prodLabel(k){
+  if(k.startsWith('p'))return(config.comissoes.find(c=>'p'+c.id===k)||{}).produto||'Produto';
+  const n=negocios.find(x=>_negProdKey(x)===k);return n?(n.produtoOutro||'Outro'):k.slice(2);
+}
+function _prodOpcoes(lista){
+  const q={};lista.forEach(n=>{const k=_negProdKey(n);q[k]=(q[k]||0)+1;});
+  return Object.entries(q).map(([key,qtd])=>({key,qtd,label:_prodLabel(key)})).sort((a,b)=>b.qtd-a.qtd||a.label.localeCompare(b.label,'pt-BR'));
+}
 function _negRede(n){
   const ids=((n.comissaoVenda&&n.comissaoVenda.participantes)||[]).map(p=>p.userId);
   const o=users.find(u=>u.id===n.originadorId);
@@ -3087,7 +3096,7 @@ function _negRede(n){
   return[...new Set(ids)];
 }
 function _pipFiltrados(aplicaParados){
-  let l=_pipFilter==='all'?negocios:negocios.filter(n=>n.portafolioId===_pipFilter);
+  let l=_pipFilter==='all'?negocios:negocios.filter(n=>_negProdKey(n)===_pipFilter);
   if(_pipSocio!=='all')l=l.filter(n=>_negSocios(n).includes(_pipSocio));
   if(_pipRede!=='all')l=l.filter(n=>_negRede(n).includes(_pipRede));
   if(aplicaParados&&_pipParados)l=l.filter(_negParado);
@@ -3102,7 +3111,7 @@ function _pipTituloFiltro(){
   const p=[];
   if(_pipSocio!=='all')p.push('Sócio: '+((users.find(u=>u.id===_pipSocio)||{}).nome||''));
   if(_pipRede!=='all')p.push('Rede: '+((users.find(u=>u.id===_pipRede)||{}).nome||''));
-  if(_pipFilter!=='all')p.push((portfolio.find(x=>x.id===_pipFilter)||{}).nome||'');
+  if(_pipFilter!=='all')p.push(_prodLabel(_pipFilter));
   if(_pipParados)p.push('só parados');
   return p.length?p.join(' · '):'Todos os negócios';
 }
