@@ -1832,6 +1832,14 @@ function injectLogos(){
 // ===================== LOGIN =====================
 // Login pelo Supabase Auth: a senha nunca passa pelos dados do IA Hub, e o banco
 // só entrega os dados para quem está na lista iahub_socios.
+// Traduz os erros do Supabase Auth (antes tudo virava "senha incorreta")
+function _authMsg(e){
+  const c=(e&&(e.code||''))+' '+(e&&e.message||'');
+  if(/email_not_confirmed|not confirmed/i.test(c))return'Este e-mail ainda não foi confirmado no Supabase. Peça ao Bruno para marcar a conta como confirmada.';
+  if(/rate|too many|security purposes/i.test(c))return'Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente de novo.';
+  if(/invalid_credentials|invalid login/i.test(c))return'E-mail ou senha incorretos (ou ainda não existe conta para este e-mail).';
+  return'Erro: '+(e&&e.message||'desconhecido');
+}
 function _loginErro(msg){const e=document.getElementById('login-err');e.textContent=msg;e.style.display=msg?'block':'none';}
 async function doLogin(){
   const email=document.getElementById('l-email').value.trim().toLowerCase();
@@ -1840,7 +1848,7 @@ async function doLogin(){
   if(!supaClient){_loginErro('Sem conexão com o servidor.');return;}
   _loginErro('');
   const {error}=await supaClient.auth.signInWithPassword({email,password:senha});
-  if(error){_loginErro('E-mail ou senha incorretos.');return;}
+  if(error){_loginErro(_authMsg(error));return;}
   document.getElementById('l-senha').value='';
   await _entrarComSessao();
 }
@@ -1868,7 +1876,7 @@ async function esqueciSenha(){
   const email=document.getElementById('l-email').value.trim().toLowerCase();
   if(!email){_loginErro('Digite seu e-mail acima e clique de novo em "Esqueci minha senha".');return;}
   const {error}=await supaClient.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});
-  _loginErro(error?'Não consegui enviar: '+error.message:'');
+  _loginErro(error?_authMsg(error):'');
   if(!error)showToast('📧 Se o e-mail for de um sócio, chega um link para criar a nova senha.');
 }
 // Convite ou "esqueci a senha": o link do e-mail abre o site já logado e pede a nova senha
@@ -6267,6 +6275,8 @@ function exportPDFLista(tipo){
 const SUPA_URL='https://pxcqyzbgfbwwkazmonzx.supabase.co';
 const SUPA_KEY='sb_publishable_6QT2f_wCkTmpfoO_EEZlpA_BCcC8Fv8';
 // GEMINI_KEY armazenada em localStorage — nunca hardcoded no fonte
+// Guardado antes do Supabase iniciar: ele limpa o # do endereço (tokens/erros do link do e-mail)
+const _hashInicial=location.hash;
 let supaClient=null;
 try{supaClient=supabase.createClient(SUPA_URL,SUPA_KEY);}catch(e){console.warn('Supabase init failed',e);}
 
@@ -7850,7 +7860,16 @@ injectLogos();
     return;
   }
   // Link de convite/recuperação chega com #type=invite|recovery: pede a senha nova antes de entrar
-  const tipoLink=new URLSearchParams(location.hash.slice(1)).get('type');
+  const hashLink=new URLSearchParams(_hashInicial.slice(1));
+  const tipoLink=hashLink.get('type');
+  // Link do e-mail que falhou (expirado, já usado, aberto por antivírus do e-mail): explica em vez de calar
+  if(hashLink.get('error')){
+    const cod=hashLink.get('error_code')||'';
+    history.replaceState(null,'',location.pathname);
+    showScreen('login');
+    _loginErro(cod==='otp_expired'?'Esse link de senha expirou ou já foi usado. Digite seu e-mail e clique em "Esqueci minha senha" para receber outro (abra só o mais recente).':'O link do e-mail não funcionou: '+(hashLink.get('error_description')||cod));
+    return;
+  }
   if(supaClient){
     const {data:{session}}=await supaClient.auth.getSession();
     if(session){
