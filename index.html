@@ -194,17 +194,17 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 }
 
 /* ===== ACOMPANHAMENTO (próximo passo, prioridade, funil) ===== */
-.pc{border-radius:8px;padding:8px 9px;cursor:grab;flex-shrink:0;}
+.pc{border-radius:8px;padding:6px 8px;cursor:grab;flex-shrink:0;}
 .pc-quente{box-shadow:inset 0 0 0 1px #f9731655;}
 .pc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;}
-.pc-cli{font-size:13px;font-weight:600;color:#0a1628;line-height:1.3;}
+.pc-cli{font-size:12px;font-weight:600;color:#0a1628;line-height:1.3;}
 .pc-acoes{display:flex;gap:2px;opacity:0;transition:opacity .15s;flex-shrink:0;}
 .pc:hover .pc-acoes{opacity:1;}
 .pc-acoes button{border:none;background:#f1f5f9;border-radius:5px;cursor:pointer;font-size:11px;padding:2px 5px;color:#0a1628;}
-.pc-meta{display:flex;align-items:center;gap:6px;margin-top:5px;min-width:0;}
-.pc-prod{font-size:10px;font-weight:600;border:1px solid;border-radius:10px;padding:1px 7px;white-space:nowrap;}
+.pc-meta{display:flex;align-items:center;flex-wrap:wrap;gap:2px 6px;margin-top:3px;min-width:0;}
+.pc-prod{font-size:10px;font-weight:600;border:1px solid;border-radius:10px;padding:1px 7px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;}
 .pc-quem{font-size:11px;color:#9ca3af;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.pc-passo{display:flex;justify-content:space-between;gap:6px;font-size:11px;margin-top:6px;padding:3px 6px;border-radius:5px;background:#f8fafc;color:#475569;cursor:pointer;}
+.pc-passo{display:flex;justify-content:space-between;gap:6px;font-size:11px;margin-top:4px;padding:2px 6px;border-radius:5px;background:#f8fafc;color:#475569;cursor:pointer;}
 .pc-passo span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .pc-passo b{white-space:nowrap;}
 .pc-atrasado{background:#fef2f2;color:#b91c1c;}
@@ -2863,7 +2863,7 @@ function _renderClientesView(){
       <span style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn-p pip-btn-sec" onclick="abrirInativos()">📋 Inativos</button>
         <button class="btn-p pip-btn-sec" onclick="abrirImportarPlanilha()">⬆ Importar</button>
-        <button class="btn-p pip-btn-sec" onclick="exportarPipelineExcel()" title="Baixa em Excel o que está filtrado na tela">⬇ Excel</button>
+        <button class="btn-p pip-btn-sec" onclick="exportarPipelineExcel()" title="Exporta para Excel o que está filtrado na tela">⬇ Exportar</button>
         <button class="btn-p pip-btn-sec" onclick="relatorioPipeline()" title="Relatório do que está filtrado (imprimir ou salvar em PDF)">🖨 Relatório</button>
         <button class="btn-p" style="font-size:12px;padding:6px 14px" onclick="openNegModal(null)">+ Novo negócio</button>
       </span>
@@ -2886,7 +2886,7 @@ function _pipKanbanHtml(negFilt){
   return`<div style="flex:1;display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;min-height:0;padding:0 16px 12px">
     ${NEG_COLS.map(col=>{
       const cards=negFilt.filter(n=>(n.status||'Prospecção')===col);
-      return`<div style="flex:0 0 220px;display:flex;flex-direction:column;min-height:0">
+      return`<div style="flex:1 1 0;min-width:150px;display:flex;flex-direction:column;min-height:0">
         <div style="background:${NEG_COL_COLOR[col]};color:#fff;border-radius:8px 8px 0 0;padding:8px 12px;font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
           <span>${col}</span><span style="background:rgba(255,255,255,.25);border-radius:10px;padding:1px 7px">${cards.length}</span>
         </div>
