@@ -247,6 +247,10 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 .ap-sub{font-size:11px;color:#9ca3af;}
 .ap-val{font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums;}
 .ap-pago{opacity:.55;}
+.senha-wrap{position:relative;}
+.senha-wrap input{padding-right:40px!important;}
+.senha-olho{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:none;background:none;cursor:pointer;font-size:16px;padding:4px;line-height:1;opacity:.7;}
+.senha-olho:hover{opacity:1;}
 .pip-parado{margin-top:6px;font-size:10px;font-weight:600;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:2px 6px;}
 .pip-atualizei{font-size:10px;color:#0F6E56;background:none;border:none;cursor:pointer;padding:0;font-weight:600;}
 .pip-sel{max-width:140px;padding:6px 10px;border:1.5px solid #e5e7eb;border-radius:20px;font-size:12px;font-weight:600;color:#0a1628;background:#fff;cursor:pointer;}
@@ -1840,6 +1844,16 @@ function _authMsg(e){
   if(/invalid_credentials|invalid login/i.test(c))return'E-mail ou senha incorretos (ou ainda não existe conta para este e-mail).';
   return'Erro: '+(e&&e.message||'desconhecido');
 }
+// Botão 👁 para ver a senha enquanto digita
+function _olhoSenha(id){
+  const inp=typeof id==='string'?document.getElementById(id):id;
+  if(!inp||inp.dataset.olho)return;inp.dataset.olho='1';
+  const w=document.createElement('div');w.className='senha-wrap';
+  inp.parentNode.insertBefore(w,inp);w.appendChild(inp);
+  const b=document.createElement('button');b.type='button';b.className='senha-olho';b.title='Mostrar senha';b.textContent='👁';
+  b.onclick=()=>{const ver=inp.type==='password';inp.type=ver?'text':'password';b.textContent=ver?'🙈':'👁';b.title=ver?'Ocultar senha':'Mostrar senha';inp.focus();};
+  w.appendChild(b);
+}
 function _loginErro(msg){const e=document.getElementById('login-err');e.textContent=msg;e.style.display=msg?'block':'none';}
 async function doLogin(){
   const email=document.getElementById('l-email').value.trim().toLowerCase();
@@ -1891,6 +1905,7 @@ function _pedirNovaSenha(){
       <div id="ns-err" style="color:#b91c1c;font-size:12px;margin-top:8px"></div>
       <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px"><button class="btn-sec" id="ns-cancel">Cancelar</button><button class="btn-p" id="ns-ok">Salvar senha</button></div></div>`;
     ov.classList.add('open');
+    ['ns-1','ns-2'].forEach(_olhoSenha);
     document.getElementById('ns-cancel').onclick=()=>{ov.classList.remove('open');res(false);};
     document.getElementById('ns-ok').onclick=async()=>{
       const a=document.getElementById('ns-1').value,b=document.getElementById('ns-2').value,er=document.getElementById('ns-err');
@@ -7848,6 +7863,7 @@ function removeVitInteresse(projId,idx){
 // ===================== INIT =====================
 loadData();
 injectLogos();
+_olhoSenha('l-senha');
 (async()=>{
   const investToken=new URLSearchParams(location.search).get('invest');
   if(investToken){
