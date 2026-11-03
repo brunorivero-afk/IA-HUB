@@ -193,6 +193,67 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
   .panel.active{padding:16px;}
 }
 
+/* ===== ACOMPANHAMENTO (próximo passo, prioridade, funil) ===== */
+.pc{border-radius:8px;padding:8px 9px;cursor:grab;flex-shrink:0;}
+.pc-quente{box-shadow:inset 0 0 0 1px #f9731655;}
+.pc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;}
+.pc-cli{font-size:13px;font-weight:600;color:#0a1628;line-height:1.3;}
+.pc-acoes{display:flex;gap:2px;opacity:0;transition:opacity .15s;flex-shrink:0;}
+.pc:hover .pc-acoes{opacity:1;}
+.pc-acoes button{border:none;background:#f1f5f9;border-radius:5px;cursor:pointer;font-size:11px;padding:2px 5px;color:#0a1628;}
+.pc-meta{display:flex;align-items:center;gap:6px;margin-top:5px;min-width:0;}
+.pc-prod{font-size:10px;font-weight:600;border:1px solid;border-radius:10px;padding:1px 7px;white-space:nowrap;}
+.pc-quem{font-size:11px;color:#9ca3af;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pc-passo{display:flex;justify-content:space-between;gap:6px;font-size:11px;margin-top:6px;padding:3px 6px;border-radius:5px;background:#f8fafc;color:#475569;cursor:pointer;}
+.pc-passo span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pc-passo b{white-space:nowrap;}
+.pc-atrasado{background:#fef2f2;color:#b91c1c;}
+.pc-hoje{background:#fffbeb;color:#b45309;}
+.pc-sem{background:none;border:1px dashed #cbd5e1;color:#94a3b8;justify-content:center;}
+.pc-passo:hover{filter:brightness(.97);}
+.pip-modo{display:flex;border:1.5px solid #e5e7eb;border-radius:20px;overflow:hidden;}
+.pip-modo button{border:none;background:#fff;font-size:12px;font-weight:600;color:#6b7280;padding:5px 12px;cursor:pointer;}
+.pip-modo button.on{background:#0a1628;color:#fff;}
+.pip-cont{font-size:12px;color:#6b7280;white-space:nowrap;}
+.pip-sel-on{border-color:#d97706!important;color:#b45309!important;}
+.pcl-head,.pcl-row{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.6fr) minmax(0,1fr) minmax(0,1.3fr);gap:10px;align-items:center;}
+.pcl-head{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:#9ca3af;padding:6px 10px;}
+.pcl-row{background:#fff;border:1px solid #eee;border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;}
+.pcl-cli{display:flex;flex-direction:column;gap:2px;}
+.pcl-prods{display:flex;flex-wrap:wrap;gap:4px;}
+.pcl-prod{border:none;color:#fff;font-size:10px;font-weight:600;border-radius:10px;padding:2px 8px;cursor:pointer;}
+.pcl-quem{color:#6b7280;}
+.na-rap{border:1px solid #ddd;background:#fff;border-radius:14px;font-size:11px;padding:3px 9px;cursor:pointer;}
+.na-rap:hover{border-color:#0a1628;}
+.na-prios{display:flex;gap:6px;}
+.na-prio{flex:1;border:1.5px solid #e5e7eb;background:#fff;border-radius:8px;font-size:12px;padding:6px;cursor:pointer;}
+.na-prio.on{border-color:#0a1628;background:#0a1628;color:#fff;}
+.acomp-box{border:1.5px solid #e5e7eb;border-radius:10px;padding:12px;margin-bottom:12px;background:#fafaf8;}
+.acomp-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:8px;}
+.acomp-box label{font-size:11px;color:#6b7280;margin-bottom:3px;display:block;}
+.ms-wrap{background:#fff;border:1px solid #eee;border-radius:10px;padding:14px;margin-bottom:14px;}
+.ms-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+.ms-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+@media(max-width:1000px){.ms-grid{grid-template-columns:1fr 1fr;}}
+.ms-tit{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
+.ms-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 6px;padding:5px 6px;border-radius:6px;cursor:pointer;font-size:12px;}
+.ms-item:hover{background:#f8fafc;}
+.ms-cli{font-weight:600;color:#0a1628;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ms-passo{grid-column:1;color:#6b7280;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ms-data{grid-row:1;grid-column:2;font-size:11px;color:#9ca3af;}
+.ms-mais{border:none;background:none;color:#0059a9;font-size:11px;font-weight:600;cursor:pointer;padding:4px 6px;}
+.dash-aviso{color:#64748b;font-weight:700;}
+.fun-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:16px;}
+@media(max-width:900px){.fun-grid{grid-template-columns:1fr;}}
+.fun-linha{display:grid;grid-template-columns:130px minmax(0,1fr) 36px 110px 110px;gap:8px;align-items:center;font-size:12px;margin-bottom:6px;}
+.fun-bar{background:#f1f5f9;border-radius:4px;height:14px;}
+.fun-bar div{height:14px;border-radius:4px;}
+.fun-conv{color:#0F6E56;font-weight:600;font-size:11px;}
+.fun-dias{color:#9ca3af;font-size:11px;}
+.fun-sub{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#0a1628;margin-bottom:8px;}
+[data-theme="dark"] .ms-wrap,[data-theme="dark"] .pcl-row{background:#1a2035;border-color:#1e2a42;}
+[data-theme="dark"] .pc-cli,[data-theme="dark"] .ms-cli{color:#e2e8f0;}
+
 /* ===== DISTRIBUIÇÃO EM CASCATA ===== */
 .dist-tab{border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;font-size:12px;background:#fff;}
 .dist-row{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 110px;gap:8px;align-items:center;padding:6px 10px;border-top:1px solid #f3f4f6;}
@@ -1039,11 +1100,29 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       </div>
       <div>
         <label style="font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:4px">Etapa</label>
-        <select id="neg-status" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px"></select>
+        <select id="neg-status" onchange="_negStatusChange()" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px"></select>
       </div>
       <div>
         <label style="font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:4px">Originador</label>
         <select id="neg-orig" onchange="_cvOrigChange()" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px"></select>
+      </div>
+    </div>
+
+    <!-- Acompanhamento: próximo passo, prioridade, motivo de perda -->
+    <div class="acomp-box">
+      <div class="cv-titulo">Acompanhamento</div>
+      <div id="neg-acomp-ativo">
+        <div class="acomp-grid">
+          <div><label>Próximo passo</label><input id="neg-passo" placeholder="Ex.: enviar proposta"></div>
+          <div><label>Até quando</label><input id="neg-passo-data" type="date"></div>
+        </div>
+        <label style="margin-top:8px">Prioridade</label>
+        <div class="na-prios" id="neg-prios"></div>
+      </div>
+      <div id="neg-perda-wrap" style="display:none">
+        <label>Motivo da perda *</label>
+        <select id="neg-perda"></select>
+        <input id="neg-perda-obs" placeholder="Detalhe (opcional)" style="margin-top:6px">
       </div>
     </div>
 
@@ -1689,11 +1768,11 @@ function renderDashboard(){
   const socios=users.filter(isSocioUser).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   const linhaSocio=s=>{
     const meus=negocios.filter(n=>_negSocios(n).includes(s.id));
-    const at=meus.filter(_negAtivo),par=meus.filter(_negParado);
+    const at=meus.filter(_negAtivo),atr=meus.filter(n=>_negSit(n)==='atrasado'),sem=meus.filter(n=>_negSit(n)==='sempasso');
     const fech=meus.filter(n=>fechadosMes.includes(n)).length;
     const receber=aPagar.filter(x=>x.r.pessoaId===s.id).reduce((t,x)=>t+x.r.valor,0);
-    return`<tr onclick="_pipSocio=${s.id};_pipParados=false;_pipSubtab='clientes';showTab('negocios')" style="cursor:pointer">
-      <td><b>${esc(s.nome.split(' ')[0])}</b></td><td>${at.length}</td><td class="${par.length?'dash-alerta':''}">${par.length}</td><td>${fech}</td><td>${receber?_brl(receber):'—'}</td></tr>`;
+    return`<tr style="cursor:pointer"><td onclick="_pipSocio=${s.id};_pipSit='todas';showTab('negocios')"><b>${esc(s.nome.split(' ')[0])}</b></td><td onclick="_pipSocio=${s.id};_pipSit='todas';showTab('negocios')">${at.length}</td>
+      <td class="${atr.length?'dash-alerta':''}" onclick="_pipSocio=${s.id};_pipSit='atrasado';showTab('negocios')">${atr.length}</td><td class="${sem.length?'dash-aviso':''}" onclick="_pipSocio=${s.id};_pipSit='sempasso';showTab('negocios')">${sem.length}</td><td>${fech}</td><td>${receber?_brl(receber):'—'}</td></tr>`;
   };
   const porProd={};
   ativos.forEach(n=>{const p=n.configProdutoId?(config.comissoes.find(c=>c.id===n.configProdutoId)||{}).produto:(n.produtoOutro||'Outro');porProd[p]=(porProd[p]||0)+1;});
@@ -1705,12 +1784,12 @@ function renderDashboard(){
     <div class="dash-kpis">
       ${kpi('A pagar',_brl(aPagar.reduce((s,x)=>s+x.r.valor,0)),`${new Set(aPagar.map(x=>_apChave(x.r))).size} pessoa(s)`,"_finSubtab='apagar';showTab('financeiro')")}
       ${kpi('Recebido no mês',_brl(recMes),'',"showTab('receitas')")}
-      ${kpi('Pipeline ativo',ativos.length+' cards',clientesAtivos+' clientes',"_pipParados=false;_pipSocio='all';_pipRede='all';_pipSubtab='clientes';showTab('negocios')")}
+      ${kpi('Pipeline ativo',ativos.length+' cards',clientesAtivos+' clientes',"_pipSocio='all';_pipRede='all';_pipSubtab='clientes';showTab('negocios')")}
       ${kpi('Fechados no mês',fechadosMes.length,'',"")}
     </div>
     <div class="dash-grid">
       <div class="dash-box"><div class="dash-tit">Por sócio</div>
-        <table class="dash-tab"><thead><tr><th></th><th>Ativos</th><th>Parados</th><th>Fechados no mês</th><th>A receber</th></tr></thead>
+        <table class="dash-tab"><thead><tr><th></th><th>Ativos</th><th>Atrasados</th><th>Sem próximo passo</th><th>Fechados no mês</th><th>A receber</th></tr></thead>
         <tbody>${socios.map(linhaSocio).join('')}</tbody></table></div>
       <div class="dash-box"><div class="dash-tit">Pipeline por produto</div>
         ${Object.entries(porProd).sort((a,b)=>b[1]-a[1]).map(([p,q])=>`<div class="dash-prod"><span>${esc(p)}</span><div class="dash-prod-bar"><div style="width:${Math.round(q/maxProd*100)}%"></div></div><b>${q}</b></div>`).join('')||'<div class="imp-ajuda">Sem negócios ativos.</div>'}
@@ -1720,7 +1799,42 @@ function renderDashboard(){
         <div class="dash-rede"><b>${redeParada.length}</b> sem nenhum negócio ativo</div>
         ${redeParada.length?`<div class="imp-ajuda" style="margin-top:6px">${redeParada.slice(0,12).map(u=>esc(u.nome)).join(', ')}${redeParada.length>12?'…':''}</div>`:''}
       </div>
-    </div>`;
+    </div>
+    ${_dashFunilHtml()}`;
+}
+
+// Funil do Dashboard: quantos chegaram a cada etapa, % que avança e tempo médio parado em cada uma
+let _dashFunSocio='all',_dashFunProd='all';
+function _dashFunilHtml(){
+  let l=negocios;
+  if(_dashFunSocio!=='all')l=l.filter(n=>_negSocios(n).includes(_dashFunSocio));
+  if(_dashFunProd!=='all')l=l.filter(n=>_negProdKey(n)===_dashFunProd);
+  const f=_funil(l),motivos=f.pop().motivos,max=Math.max(1,f[0].chegou);
+  const perdidos=Object.values(motivos).reduce((a,b)=>a+b,0);
+  const socios=users.filter(isSocioUser).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  return`<div class="dash-box" style="margin-top:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+      <div class="dash-tit" style="margin:0">Funil de conversão</div>
+      <div style="display:flex;gap:6px">
+        <select class="pip-sel" onchange="_dashFunSocio=this.value==='all'?'all':+this.value;renderDashboard()"><option value="all">Todos os sócios</option>${socios.map(u=>`<option value="${u.id}" ${_dashFunSocio===u.id?'selected':''}>${esc(u.nome.split(' ')[0])}</option>`).join('')}</select>
+        <select class="pip-sel" onchange="_dashFunProd=this.value;renderDashboard()"><option value="all">Todos os produtos</option>${_prodOpcoes(negocios).map(o=>`<option value="${esc(o.key)}" ${_dashFunProd===o.key?'selected':''}>${esc(o.label)}</option>`).join('')}</select>
+      </div>
+    </div>
+    <div class="fun-grid">
+      <div>${f.map((x,i)=>`<div class="fun-linha">
+          <span class="fun-etapa">${x.etapa}</span>
+          <div class="fun-bar"><div style="width:${Math.max(2,Math.round(x.chegou/max*100))}%;background:${NEG_COL_COLOR[x.etapa]}"></div></div>
+          <b>${x.chegou}</b>
+          <span class="fun-conv">${x.conv!=null?`→ ${x.conv}% avançam`:''}</span>
+          <span class="fun-dias">${x.dias!=null?`${x.dias} dias em média`:''}</span>
+        </div>`).join('')}
+        <div class="imp-ajuda" style="margin-top:6px">Conta quem chegou a cada etapa. O tempo médio aparece conforme os cards mudam de etapa daqui para a frente.</div>
+      </div>
+      <div><div class="fun-sub">Motivos de perda ${perdidos?`(${perdidos})`:''}</div>
+        ${Object.entries(motivos).sort((a,b)=>b[1]-a[1]).map(([m,q])=>`<div class="rec-linha"><span>${esc(m)}</span><b>${q}</b></div>`).join('')||'<div class="imp-ajuda">Nenhum negócio perdido ainda.</div>'}
+      </div>
+    </div>
+  </div>`;
 }
 
 // ===================== HELPERS =====================
@@ -2631,8 +2745,8 @@ let _negEditId=null;
 let _negPartTemp=[];
 let _negProdSelecionado=null;
 let _negTipo='proprio';
-let _pipSubtab='portfolio';
-let _pipFilter='all',_pipParados=false,_pipSocio='all',_pipRede='all';
+let _pipSubtab='clientes';
+let _pipFilter='all',_pipSit='todas',_pipSocio='all',_pipRede='all',_pipModo='cards';
 
 let _portEditId=null;
 
@@ -2645,8 +2759,13 @@ function negDrop(e,col){
   if(!_negDragId)return;
   const i=negocios.findIndex(n=>n.id===_negDragId);
   if(i===-1){_negDragId=null;return;}
-  negocios[i].status=col;negocios[i].atualizadoEm=new Date().toISOString();
+  const n=negocios[i],mudou=(n.status||'Prospecção')!==col;
+  if(mudou)_negRegistrarEtapa(n,col);
+  n.status=col;n.atualizadoEm=new Date().toISOString();
+  if(col==='Fechado'&&!n.fechadoEm)n.fechadoEm=_dataLocal();
   saveData();renderPipeline();_negDragId=null;
+  // Mudou de etapa: já pede o próximo passo (se ainda está ativo)
+  if(mudou&&_negAtivo(n))_negAtualizar(n.id,'agora em '+col);
 }
 
 function renderPipeline(){
@@ -2710,85 +2829,108 @@ function _renderPortfolioView(){
 
 function _renderClientesView(){
   const hoje=new Date();const mesAtual=hoje.getMonth(),anoAtual=hoje.getFullYear();
-  const qtdParados=_pipFiltrados(false).filter(_negParado).length;
-  const negFilt=_pipFiltrados(true);
+  const base=_pipFiltrados(false);
+  const negFilt=_negOrdenar(_pipFiltrados(true));
   const sociosPip=users.filter(isSocioUser).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   const redePip=_pipPessoasRede();
-  const ativos=negFilt.filter(n=>n.status!=='Fechado'&&n.status!=='Perdido');
-  const fechadosMes=negFilt.filter(n=>{
-    if(n.status!=='Fechado')return false;
-    if(!n.fechadoEm)return false;
+  const ativos=base.filter(_negAtivo);
+  const fechadosMes=base.filter(n=>{
+    if(n.status!=='Fechado'||!n.fechadoEm)return false;
     try{const d=new Date(n.fechadoEm);return d.getMonth()===mesAtual&&d.getFullYear()===anoAtual;}catch(e){return false;}
   });
-
+  const qtdSit=s=>base.filter(n=>s==='quente'?_negAtivo(n)&&_negPrio(n)==='quente':s==='atencao'?_negAtencao(n):_negSit(n)===s).length;
+  const sitOps=[['todas','Todas as situações'],['atencao','⚠ Precisam de ação'],['atrasado','Atrasados'],['hoje','Para hoje'],['semana','Esta semana'],['sempasso','Sem próximo passo'],['quente','🔥 Quentes']];
   return`<div style="height:100%;display:flex;flex-direction:column;overflow:hidden">
-    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;padding:0 16px 8px;flex-wrap:wrap">
-      <select onchange="_pipFilter=this.value;renderPipeline()"
-        style="max-width:160px;padding:6px 10px;border:1.5px solid #e5e7eb;border-radius:20px;font-size:12px;font-weight:600;color:#0a1628;background:#fff;cursor:pointer">
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;padding:0 16px 8px;flex-wrap:wrap">
+      <select onchange="_pipFilter=this.value;renderPipeline()" class="pip-sel" style="max-width:170px">
         <option value="all" ${_pipFilter==='all'?'selected':''}>Todos os produtos</option>
         ${_prodOpcoes(negocios).map(o=>`<option value="${esc(o.key)}" ${_pipFilter===o.key?'selected':''}>${esc(o.label)} (${o.qtd})</option>`).join('')}
       </select>
-      <div style="display:flex;gap:8px;overflow-x:auto;flex-shrink:0">
-        <div style="background:#f0f4ff;border-radius:10px;padding:7px 12px;white-space:nowrap">
-          <span style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase">Em pipeline </span>
-          <span style="font-size:14px;font-weight:700;color:#0a1628">${ativos.length}</span>
-        </div>
-        <div style="background:#f0faf4;border-radius:10px;padding:7px 12px;white-space:nowrap">
-          <span style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase">Fechados mês </span>
-          <span style="font-size:14px;font-weight:700;color:#0F6E56">${fechadosMes.length}</span>
-        </div>
-      </div>
       <select onchange="_pipSocio=this.value==='all'?'all':+this.value;renderPipeline()" class="pip-sel">
         <option value="all">Todos os sócios</option>${sociosPip.map(u=>`<option value="${u.id}" ${_pipSocio===u.id?'selected':''}>${esc(u.nome.split(' ')[0])}</option>`).join('')}
       </select>
       <select onchange="_pipRede=this.value==='all'?'all':+this.value;renderPipeline()" class="pip-sel">
         <option value="all">Toda a rede</option>${redePip.map(u=>`<option value="${u.id}" ${_pipRede===u.id?'selected':''}>${esc(u.nome)}</option>`).join('')}
       </select>
-      <button class="pip-btn-parados ${_pipParados?'on':''}" onclick="_pipParados=!_pipParados;renderPipeline()">⏰ Parados ${qtdParados}</button>
-      <button class="btn-p" style="font-size:12px;padding:6px 14px;background:#fef2f2;color:#991b1b;border:1.5px solid #991b1b" onclick="abrirInativos()">📋 Inativos</button>
-      <button class="btn-p pip-btn-sec" onclick="abrirImportarPlanilha()">⬆ Importar</button>
-      <button class="btn-p pip-btn-sec" onclick="exportarPipelineExcel()" title="Baixa em Excel o que está filtrado na tela">⬇ Excel</button>
-      <button class="btn-p pip-btn-sec" onclick="relatorioPipeline()" title="Relatório do que está filtrado (imprimir ou salvar em PDF)">🖨 Relatório</button>
-      <button class="btn-p" style="font-size:12px;padding:6px 14px;margin-left:auto;flex-shrink:0" onclick="openNegModal(null)">+ Novo negócio</button>
+      <select onchange="_pipSit=this.value;renderPipeline()" class="pip-sel ${_pipSit!=='todas'?'pip-sel-on':''}" style="max-width:190px">
+        ${sitOps.map(([k,t])=>`<option value="${k}" ${_pipSit===k?'selected':''}>${t}${k!=='todas'?` (${qtdSit(k)})`:''}</option>`).join('')}
+      </select>
+      <div class="pip-modo">
+        <button class="${_pipModo==='cards'?'on':''}" onclick="_pipModo='cards';renderPipeline()">Etapas</button>
+        <button class="${_pipModo==='clientes'?'on':''}" onclick="_pipModo='clientes';renderPipeline()">Por cliente</button>
+      </div>
+      <span class="pip-cont">${ativos.length} ativos · ${fechadosMes.length} fechados no mês</span>
+      <span style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn-p pip-btn-sec" onclick="abrirInativos()">📋 Inativos</button>
+        <button class="btn-p pip-btn-sec" onclick="abrirImportarPlanilha()">⬆ Importar</button>
+        <button class="btn-p pip-btn-sec" onclick="exportarPipelineExcel()" title="Baixa em Excel o que está filtrado na tela">⬇ Excel</button>
+        <button class="btn-p pip-btn-sec" onclick="relatorioPipeline()" title="Relatório do que está filtrado (imprimir ou salvar em PDF)">🖨 Relatório</button>
+        <button class="btn-p" style="font-size:12px;padding:6px 14px" onclick="openNegModal(null)">+ Novo negócio</button>
+      </span>
     </div>
-    <div style="flex:1;display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;min-height:0;padding:0 16px 12px">
-      ${NEG_COLS.map(col=>{
-        const cards=negFilt.filter(n=>(n.status||'Prospecção')===col);
-        return`<div style="flex:0 0 210px;display:flex;flex-direction:column;min-height:0">
-          <div style="background:${NEG_COL_COLOR[col]};color:#fff;border-radius:8px 8px 0 0;padding:8px 12px;font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
-            <span>${col}</span><span style="background:rgba(255,255,255,.25);border-radius:10px;padding:1px 7px">${cards.length}</span>
-          </div>
-          <div style="background:#f9f9f7;border-radius:0 0 8px 8px;flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:8px"
-               ondragover="negDragOver(event)" ondragleave="negDragLeave(event)" ondrop="negDrop(event,'${col}')">
-            ${cards.length?cards.map(n=>{
-              const orig=n.originadorId?users.find(u=>u.id===n.originadorId):null;
-              const cfgProd=n.configProdutoId?config.comissoes.find(c=>c.id===n.configProdutoId):null;
-              const empProd=cfgProd?_cfgEmpresa(cfgProd.empresaId):null;
-              const prodLabel=cfgProd?cfgProd.produto:(n.produtoOutro||null);
-              return`<div draggable="true" ondragstart="negDragStart(event,${n.id})" ondragend="negDragEnd(event)"
-                       class="pip-card" style="border-radius:8px;padding:10px;cursor:grab;flex-shrink:0;border-left:3px solid ${NEG_COL_COLOR[col]}"
-                       onclick="openNegModal(${n.id})">
-                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:4px">
-                  <div style="font-size:13px;font-weight:600;color:#0a1628;line-height:1.3">${esc(n.titulo)}</div>
-                  ${n.tipo==='nao-proprio'?`<span style="flex-shrink:0;font-size:9px;font-weight:700;color:#92400e;background:#fef3c7;border:1px solid #f59e0b44;border-radius:8px;padding:1px 6px;white-space:nowrap">NÃO-PRÓPRIO</span>`:`<span style="flex-shrink:0;font-size:9px;font-weight:700;color:#fff;background:#0a1628;border-radius:8px;padding:1px 6px;white-space:nowrap">PRÓPRIO</span>`}
-                </div>
-                ${prodLabel?`<div style="margin-bottom:5px"><span style="display:inline-flex;align-items:center;gap:4px;background:${empProd?empProd.cor+'15':'#f3f4f6'};border:1px solid ${empProd?empProd.cor+'44':'#d1d5db'};border-radius:12px;padding:2px 8px;font-size:10px;font-weight:700;color:${empProd?empProd.cor:'#374151'}">${esc(prodLabel)}</span></div>`:''}
-                ${n.valor?`<div style="font-size:13px;font-weight:700;color:#0F6E56;margin-bottom:4px">R$ ${(n.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:0})}</div>`:''}
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
-                  ${orig?`<div style="font-size:11px;color:#9ca3af">✦ ${orig.nome.split(' ')[0]}</div>`:'<div></div>'}
-                  ${n.taxaRede?`<div style="font-size:10px;color:#6b7280;background:#f3f4f6;border-radius:6px;padding:1px 6px">${n.taxaRede}%</div>`:''}
-                </div>
-                ${_negParado(n)?`<div class="pip-parado">⏰ ${_diasParado(n)} dias sem atualização</div>`:''}
-                <div style="margin-top:6px;padding-top:6px;border-top:1px solid #f0f0f0;display:flex;justify-content:space-between">
-                  ${_negAtivo(n)?`<button onclick="event.stopPropagation();_negMarcarAtualizado(${n.id})" class="pip-atualizei" title="Registrar andamento">✓ Atualizei</button>`:'<span></span>'}
-                  <button onclick="event.stopPropagation();abrirFichaCliente(${n.id})" style="font-size:10px;color:#0059a9;background:none;border:none;cursor:pointer;padding:0;font-weight:600">👤 Ver cliente</button>
-                </div>
-              </div>`;
-            }).join(''):`<div style="color:#9ca3af;font-size:12px;text-align:center;padding:24px 8px">Arraste aqui</div>`}
-          </div>
-        </div>`;
-      }).join('')}
-    </div>
+    ${_pipModo==='clientes'?_pipPorClienteHtml(negFilt):_pipKanbanHtml(negFilt)}
+  </div>`;
+}
+function _pipQuem(n){
+  const s=_negSocios(n).map(id=>(users.find(u=>u.id===id)||{}).nome).filter(Boolean).map(x=>x.split(' ')[0]);
+  const r=_negRede(n).map(id=>(users.find(u=>u.id===id)||{}).nome).filter(Boolean).map(x=>x.split(' ')[0]);
+  return[s.join('+'),r.join(', ')].filter(Boolean).join(' · ');
+}
+function _pipPassoHtml(n){
+  if(!_negAtivo(n))return'';
+  const s=_negSit(n);
+  if(s==='sempasso')return`<div class="pc-passo pc-sem" onclick="event.stopPropagation();_negAtualizar(${n.id})">＋ definir próximo passo</div>`;
+  return`<div class="pc-passo pc-${s}" onclick="event.stopPropagation();_negAtualizar(${n.id})" title="${esc(n.proximoPasso||'')}"><span>${esc(n.proximoPasso||'')}</span><b>${s==='hoje'?'hoje':_dataBR(n.proximoPassoData)}</b></div>`;
+}
+function _pipKanbanHtml(negFilt){
+  return`<div style="flex:1;display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;min-height:0;padding:0 16px 12px">
+    ${NEG_COLS.map(col=>{
+      const cards=negFilt.filter(n=>(n.status||'Prospecção')===col);
+      return`<div style="flex:0 0 220px;display:flex;flex-direction:column;min-height:0">
+        <div style="background:${NEG_COL_COLOR[col]};color:#fff;border-radius:8px 8px 0 0;padding:8px 12px;font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
+          <span>${col}</span><span style="background:rgba(255,255,255,.25);border-radius:10px;padding:1px 7px">${cards.length}</span>
+        </div>
+        <div style="background:#f9f9f7;border-radius:0 0 8px 8px;flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px"
+             ondragover="negDragOver(event)" ondragleave="negDragLeave(event)" ondrop="negDrop(event,'${col}')">
+          ${cards.length?cards.map(n=>{
+            const prod=_prodLabel(_negProdKey(n));
+            const cfg=n.configProdutoId?config.comissoes.find(c=>c.id===n.configProdutoId):null;
+            const cor=cfg?_cfgEmpresa(cfg.empresaId).cor:'#64748b';
+            const pr=PRIOS[_negPrio(n)];
+            return`<div draggable="true" ondragstart="negDragStart(event,${n.id})" ondragend="negDragEnd(event)"
+                     class="pip-card pc ${_negPrio(n)==='quente'?'pc-quente':''}" style="border-left:3px solid ${NEG_COL_COLOR[col]}" onclick="openNegModal(${n.id})">
+              <div class="pc-top"><span class="pc-cli">${pr.ico?pr.ico+' ':''}${esc(n.titulo)}</span>
+                <span class="pc-acoes"><button title="Registrar andamento" onclick="event.stopPropagation();_negAtualizar(${n.id})">✓</button><button title="Ver cliente" onclick="event.stopPropagation();abrirFichaCliente(${n.id})">👤</button></span></div>
+              <div class="pc-meta"><span class="pc-prod" style="color:${cor};border-color:${cor}55;background:${cor}12">${esc(prod)}</span><span class="pc-quem">${esc(_pipQuem(n))}</span></div>
+              ${_pipPassoHtml(n)}
+            </div>`;
+          }).join(''):`<div style="color:#9ca3af;font-size:12px;text-align:center;padding:24px 8px">Arraste aqui</div>`}
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+// Um cliente por linha, com os produtos dentro (cada produto = um card, cor da etapa)
+function _pipPorClienteHtml(negFilt){
+  const g={};
+  negFilt.forEach(n=>{const k=_impNorm(n.titulo);(g[k]=g[k]||{titulo:n.titulo,negs:[]}).negs.push(n);});
+  const linhas=Object.values(g).map(c=>{
+    const ativos=c.negs.filter(_negAtivo);
+    const prox=_negOrdenar(ativos.filter(n=>n.proximoPassoData))[0]||null;
+    const melhorPrio=Math.min(...c.negs.map(n=>PRIOS[_negPrio(n)].ord));
+    return{...c,prox,melhorPrio,semPasso:ativos.filter(n=>!n.proximoPassoData).length,
+      ordData:prox?prox.proximoPassoData:'9999'};
+  }).sort((a,b)=>a.melhorPrio-b.melhorPrio||a.ordData.localeCompare(b.ordData)||a.titulo.localeCompare(b.titulo,'pt-BR'));
+  const icoPrio=o=>Object.values(PRIOS).find(p=>p.ord===o).ico;
+  return`<div style="flex:1;overflow-y:auto;padding:0 16px 16px">
+    <div class="pcl-head"><span>Cliente</span><span>Produtos (cor = etapa)</span><span>Quem cuida</span><span>Próximo passo</span></div>
+    ${linhas.map(c=>`<div class="pcl-row">
+      <div class="pcl-cli">${icoPrio(c.melhorPrio)?icoPrio(c.melhorPrio)+' ':''}<b>${esc(c.titulo)}</b><span class="imp-ajuda">${c.negs.length} produto(s)</span></div>
+      <div class="pcl-prods">${c.negs.map(n=>`<button class="pcl-prod" style="background:${NEG_COL_COLOR[n.status]||'#9ca3af'}" title="${esc(n.status||'Prospecção')}" onclick="openNegModal(${n.id})">${esc(_prodLabel(_negProdKey(n)))}</button>`).join('')}</div>
+      <div class="pcl-quem">${esc(_pipQuem(c.negs[0]))}</div>
+      <div>${c.prox?`<div class="pc-passo pc-${_negSit(c.prox)}" onclick="_negAtualizar(${c.prox.id})"><span>${esc(c.prox.proximoPasso)}</span><b>${_negSit(c.prox)==='hoje'?'hoje':_dataBR(c.prox.proximoPassoData)}</b></div>`:''}
+        ${c.semPasso?`<div class="pc-passo pc-sem" onclick="_negAtualizar(${c.negs.find(n=>_negAtivo(n)&&!n.proximoPassoData).id})">＋ ${c.semPasso} sem próximo passo</div>`:''}</div>
+    </div>`).join('')||'<div class="imp-ajuda" style="padding:20px">Nenhum negócio com esse filtro.</div>'}
   </div>`;
 }
 
@@ -3037,43 +3179,123 @@ function _impExecutar(){
   showToast(`✅ ${negs.length} cards importados`);
 }
 
-// ===================== LEMBRETES: CARD PARADO =====================
+// ===================== ACOMPANHAMENTO: PRÓXIMO PASSO, PRIORIDADE, FUNIL =====================
+// Todo negócio ativo deve ter um próximo passo com data. É isso que faz o pipeline andar:
+// a "situação" de cada card sai daí (atrasado, hoje, esta semana, sem próximo passo).
 const DIAS_PARADO=7;
+const PRIOS={quente:{rot:'Quente',ico:'🔥',ord:0},morno:{rot:'Morno',ico:'',ord:1},frio:{rot:'Frio',ico:'❄️',ord:2}};
+const MOTIVOS_PERDA=['Sem retorno do cliente','Preço / condição','Adiado / sem timing','Ficou com concorrente','Sem perfil para o produto','Outro'];
+const SIT={atrasado:{rot:'Atrasado',cor:'#b91c1c'},hoje:{rot:'Hoje',cor:'#b45309'},semana:{rot:'Esta semana',cor:'#0a1628'},futuro:{rot:'Mais adiante',cor:'#6b7280'},sempasso:{rot:'Sem próximo passo',cor:'#9ca3af'},fechado:{rot:'Encerrado',cor:'#9ca3af'}};
 function _negAtivo(n){return!['Fechado','Pagamento Realizado','Perdido'].includes(n.status||'Prospecção');}
 function _diasParado(n){
   const ts=n.atualizadoEm?Date.parse(n.atualizadoEm):(typeof n.id==='number'&&n.id>1e12?n.id:NaN);
   return isNaN(ts)?0:Math.floor((Date.now()-ts)/864e5);
 }
-function _negParado(n){return _negAtivo(n)&&_diasParado(n)>DIAS_PARADO;}
+function _dataLocal(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function _maisDias(n){const d=new Date();d.setDate(d.getDate()+n);return _dataLocal(d);}
+function _negSit(n){
+  if(!_negAtivo(n))return'fechado';
+  const d=n.proximoPassoData;if(!d)return'sempasso';
+  const h=_dataLocal();
+  return d<h?'atrasado':d===h?'hoje':d<=_maisDias(7)?'semana':'futuro';
+}
+function _negAtencao(n){const s=_negSit(n);return s==='atrasado'||s==='sempasso';}
+const _negParado=_negAtencao;// nome antigo, mesma ideia: precisa de ação
+function _negPrio(n){return PRIOS[n.prioridade]?n.prioridade:'morno';}
+function _dataBR(iso){if(!iso)return'';const[a,m,d]=iso.split('-');return`${d}/${m}`;}
+// Quente primeiro, depois o passo mais urgente (sem passo vai para o fim), depois nome
+function _negOrdenar(l){
+  return l.slice().sort((a,b)=>PRIOS[_negPrio(a)].ord-PRIOS[_negPrio(b)].ord
+    ||String(a.proximoPassoData||'9999').localeCompare(String(b.proximoPassoData||'9999'))
+    ||String(a.titulo).localeCompare(String(b.titulo),'pt-BR'));
+}
 function _negSocios(n){
   const ids=[_impSocioDe(n),...((n.comissaoVenda&&n.comissaoVenda.cosocios)||[])].filter(Boolean);
   return [...new Set(ids)];
 }
-function _negMarcarAtualizado(id){
+// Histórico de etapas: base do funil (conversão e tempo em cada etapa)
+function _negRegistrarEtapa(n,nova){
+  if(!n.historicoEtapas||!n.historicoEtapas.length)n.historicoEtapas=[{etapa:n.status||'Prospecção',em:n.atualizadoEm||new Date(typeof n.id==='number'&&n.id>1e12?n.id:Date.now()).toISOString(),estimado:true}];
+  if((n.historicoEtapas[n.historicoEtapas.length-1]||{}).etapa!==nova)n.historicoEtapas.push({etapa:nova,em:new Date().toISOString(),por:currentUser&&currentUser.id});
+}
+
+// ---------- Atualização rápida (botão ✓ no card e ao arrastar de etapa) ----------
+let _naId=null;
+function _negAtualizar(id,aviso){
   const n=negocios.find(x=>x.id===id);if(!n)return;
-  const nota=prompt(`O que andou em "${n.titulo}"? (vai para as notas do card)`);
-  if(nota===null)return;
-  const hoje=new Date().toLocaleDateString('pt-BR');
-  if(nota.trim())n.notas=(n.notas?n.notas+'\n':'')+`${hoje} · ${currentUser.nome.split(' ')[0]}: ${nota.trim()}`;
+  _naId=id;
+  let ov=document.getElementById('ov-na');
+  if(!ov){ov=document.createElement('div');ov.className='overlay';ov.id='ov-na';document.body.appendChild(ov);}
+  const p=_negPrio(n);
+  ov.innerHTML=`<div class="modal" style="width:440px">
+    <h2 style="font-size:16px;margin-bottom:2px">${esc(n.titulo)}</h2>
+    <div class="imp-ajuda" style="margin-bottom:12px">${esc(_prodLabel(_negProdKey(n)))} · ${esc(n.status||'Prospecção')}${aviso?' · '+esc(aviso):''}</div>
+    <label>O que aconteceu? <span class="imp-ajuda">(vai para as notas)</span></label>
+    <input id="na-nota" placeholder="Ex.: reunião feita, pediu proposta">
+    <label style="margin-top:10px">Próximo passo *</label>
+    <input id="na-passo" value="${esc(n.proximoPasso||'')}" placeholder="Ex.: enviar proposta de Energia">
+    <label style="margin-top:10px">Até quando *</label>
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+      <input id="na-data" type="date" value="${n.proximoPassoData||_maisDias(3)}" style="width:auto">
+      ${[['Amanhã',1],['+3 dias',3],['+1 semana',7],['+15 dias',15]].map(([t,d])=>`<button type="button" class="na-rap" onclick="document.getElementById('na-data').value='${_maisDias(d)}'">${t}</button>`).join('')}
+    </div>
+    <label style="margin-top:10px">Prioridade</label>
+    <div class="na-prios">${Object.entries(PRIOS).map(([k,v])=>`<button type="button" class="na-prio ${p===k?'on':''}" data-p="${k}" onclick="document.querySelectorAll('.na-prio').forEach(b=>b.classList.toggle('on',b===this))">${v.ico} ${v.rot}</button>`).join('')}</div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
+      <button class="btn-sec" onclick="closeOv('ov-na')">Agora não</button>
+      <button class="btn-p" onclick="_negAtualizarSalvar()">Salvar</button>
+    </div></div>`;
+  ov.classList.add('open');
+  setTimeout(()=>document.getElementById('na-nota').focus(),50);
+}
+function _negAtualizarSalvar(){
+  const n=negocios.find(x=>x.id===_naId);if(!n)return;
+  const passo=document.getElementById('na-passo').value.trim(),data=document.getElementById('na-data').value;
+  if(!passo||!data){alert('Informe o próximo passo e a data.');return;}
+  const nota=document.getElementById('na-nota').value.trim();
+  if(nota)n.notas=(n.notas?n.notas+'\n':'')+`${new Date().toLocaleDateString('pt-BR')} · ${currentUser.nome.split(' ')[0]}: ${nota}`;
+  n.proximoPasso=passo;n.proximoPassoData=data;
+  n.prioridade=(document.querySelector('.na-prio.on')||{}).dataset?.p||_negPrio(n);
   n.atualizadoEm=new Date().toISOString();
-  saveData();renderPipeline();
+  closeOv('ov-na');saveData();_rerenderAtual();
 }
-function _paradosPorSocio(){
-  const cont={};
-  negocios.filter(_negParado).forEach(n=>{const s=_negSocios(n);(s.length?s:[0]).forEach(id=>cont[id]=(cont[id]||0)+1);});
-  return cont;
-}
+
+// ---------- Avisos de entrada e Minha semana ----------
 function _lembreteLogin(){
-  const meus=negocios.filter(n=>_negParado(n)&&_negSocios(n).includes(currentUser.id)).length;
-  if(meus)setTimeout(()=>showToast(`⏰ Você tem ${meus} negócio(s) sem atualização há mais de ${DIAS_PARADO} dias`),800);
+  const meus=negocios.filter(n=>_negSocios(n).includes(currentUser.id));
+  const atr=meus.filter(n=>_negSit(n)==='atrasado').length,hj=meus.filter(n=>_negSit(n)==='hoje').length,sem=meus.filter(n=>_negSit(n)==='sempasso').length;
+  const p=[atr&&`${atr} atrasado(s)`,hj&&`${hj} para hoje`,sem&&`${sem} sem próximo passo`].filter(Boolean);
+  if(p.length)setTimeout(()=>showToast('📋 Sua semana: '+p.join(' · ')),800);
 }
 function _dashParadosHtml(){
-  const cont=_paradosPorSocio(),total=negocios.filter(_negParado).length;
-  if(!total)return'';
-  const nomes=Object.entries(cont).sort((a,b)=>b[1]-a[1]).map(([id,q])=>{const u=users.find(x=>x.id===+id);return`<span class="dash-parado-chip">${u?esc(u.nome.split(' ')[0]):'Sem sócio'}: <b>${q}</b></span>`;}).join('');
-  return`<div class="dash-parados" onclick="_pipParados=true;_pipSubtab='clientes';showTab('negocios')">
-    <div><b>⏰ ${total} negócio(s) sem atualização há mais de ${DIAS_PARADO} dias</b><div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px">${nomes}</div></div>
-    <span class="dash-parado-ver">Ver no pipeline →</span></div>`;
+  if(!currentUser)return'';
+  const meus=_negOrdenar(negocios.filter(n=>_negAtivo(n)&&_negSocios(n).includes(currentUser.id)));
+  const grupo=s=>meus.filter(n=>_negSit(n)===s);
+  const item=n=>`<div class="ms-item" onclick="_negAtualizar(${n.id})"><span class="ms-cli">${PRIOS[_negPrio(n)].ico} ${esc(n.titulo)}</span><span class="ms-passo">${esc(n.proximoPasso||'definir próximo passo')}</span><span class="ms-data">${_dataBR(n.proximoPassoData)}</span></div>`;
+  const bloco=(s,lim)=>{const g=grupo(s);return`<div class="ms-bloco"><div class="ms-tit" style="color:${SIT[s].cor}">${SIT[s].rot} <b>${g.length}</b></div>
+    ${g.slice(0,lim).map(item).join('')||'<div class="imp-ajuda">Nada aqui.</div>'}
+    ${g.length>lim?`<button class="ms-mais" onclick="_pipSit='${s}';_pipSocio=${currentUser.id};_pipSubtab='clientes';showTab('negocios')">ver todos (${g.length}) →</button>`:''}</div>`;};
+  return`<div class="ms-wrap"><div class="ms-head"><div class="dash-tit" style="margin:0">Minha semana · ${esc(currentUser.nome.split(' ')[0])}</div>
+    <span class="imp-ajuda">clique num negócio para registrar o andamento e o próximo passo</span></div>
+    <div class="ms-grid">${bloco('atrasado',6)}${bloco('hoje',6)}${bloco('semana',6)}${bloco('sempasso',4)}</div></div>`;
+}
+
+// ---------- Funil de conversão ----------
+// Quem chegou a cada etapa (pelo histórico; cards antigos contam como tendo passado pelas anteriores)
+function _funil(lista){
+  const etapas=NEG_COLS;
+  const chegou=etapas.map(()=>0),tempos=etapas.map(()=>[]);
+  const motivos={};
+  lista.forEach(n=>{
+    const hist=(n.historicoEtapas||[]).filter(h=>etapas.includes(h.etapa));
+    let maxIdx=Math.max(etapas.indexOf(n.status),...hist.map(h=>etapas.indexOf(h.etapa)));
+    if(n.status==='Perdido'){motivos[n.motivoPerda||'Sem motivo informado']=(motivos[n.motivoPerda||'Sem motivo informado']||0)+1;if(maxIdx<0)maxIdx=0;}
+    for(let i=0;i<=maxIdx;i++)chegou[i]++;
+    const h=n.historicoEtapas||[];
+    for(let i=0;i<h.length-1;i++){const k=etapas.indexOf(h[i].etapa);if(k>=0&&!h[i].estimado)tempos[k].push((Date.parse(h[i+1].em)-Date.parse(h[i].em))/864e5);}
+  });
+  return etapas.map((e,i)=>({etapa:e,chegou:chegou[i],conv:i<etapas.length-1&&chegou[i]?Math.round(chegou[i+1]/chegou[i]*100):null,
+    dias:tempos[i].length?Math.round(tempos[i].reduce((a,b)=>a+b,0)/tempos[i].length):null})).concat([{motivos}]);
 }
 
 // ===================== PIPELINE: FILTROS, EXCEL E RELATÓRIO =====================
@@ -3098,7 +3320,7 @@ function _pipFiltrados(aplicaParados){
   let l=_pipFilter==='all'?negocios:negocios.filter(n=>_negProdKey(n)===_pipFilter);
   if(_pipSocio!=='all')l=l.filter(n=>_negSocios(n).includes(_pipSocio));
   if(_pipRede!=='all')l=l.filter(n=>_negRede(n).includes(_pipRede));
-  if(aplicaParados&&_pipParados)l=l.filter(_negParado);
+  if(aplicaParados&&_pipSit!=='todas')l=l.filter(n=>_pipSit==='quente'?_negAtivo(n)&&_negPrio(n)==='quente':_pipSit==='atencao'?_negAtencao(n):_negSit(n)===_pipSit);
   return l;
 }
 // Só quem aparece em algum negócio entra na lista de rede (lista curta)
@@ -3111,7 +3333,7 @@ function _pipTituloFiltro(){
   if(_pipSocio!=='all')p.push('Sócio: '+((users.find(u=>u.id===_pipSocio)||{}).nome||''));
   if(_pipRede!=='all')p.push('Rede: '+((users.find(u=>u.id===_pipRede)||{}).nome||''));
   if(_pipFilter!=='all')p.push(_prodLabel(_pipFilter));
-  if(_pipParados)p.push('só parados');
+  if(_pipSit!=='todas')p.push(_pipSit==='quente'?'só quentes':_pipSit==='atencao'?'precisam de ação':(SIT[_pipSit]||{}).rot||'');
   return p.length?p.join(' · '):'Todos os negócios';
 }
 function _negLinhaRel(n){
@@ -3122,7 +3344,8 @@ function _negLinhaRel(n){
   const notas=String(n.notas||'').split('\n').map(s=>s.trim()).filter(Boolean);
   return{cliente:n.titulo,cnpj:n.cnpj||'',produto:prod,etapa:n.status||'Prospecção',
     socios:_negSocios(n).map(nome).join(' + '),rede,valor:n.valor||null,
-    dias:_negAtivo(n)?_diasParado(n):'',parado:_negParado(n),
+    dias:_negAtivo(n)?_diasParado(n):'',parado:_negAtencao(n),sit:(SIT[_negSit(n)]||{}).rot||'',
+    passo:n.proximoPasso||'',passoData:n.proximoPassoData?n.proximoPassoData.split('-').reverse().join('/'):'',prio:PRIOS[_negPrio(n)].rot,motivo:n.motivoPerda||'',
     atualizado:n.atualizadoEm?new Date(n.atualizadoEm).toLocaleDateString('pt-BR'):(n.criado||''),
     ultimaNota:notas.filter(s=>!/^Importado de /.test(s)).slice(-1)[0]||''};
 }
@@ -3134,10 +3357,10 @@ async function exportarPipelineExcel(){
   const lista=_pipOrdenados();
   if(!lista.length){alert('Nada para exportar com esse filtro.');return;}
   try{await _impLoadXLSX();}catch(e){alert(e.message);return;}
-  const cab=['Cliente','CNPJ','Produto','Etapa','Sócio(s)','Rede (% comissão)','Valor estimado','Dias sem atualização','Última atualização','Última nota'];
-  const linhas=lista.map(n=>{const r=_negLinhaRel(n);return[r.cliente,r.cnpj,r.produto,r.etapa,r.socios,r.rede,r.valor,r.dias,r.atualizado,r.ultimaNota];});
+  const cab=['Cliente','CNPJ','Produto','Etapa','Prioridade','Próximo passo','Até','Situação','Sócio(s)','Rede (% comissão)','Valor estimado','Última atualização','Última nota','Motivo da perda'];
+  const linhas=lista.map(n=>{const r=_negLinhaRel(n);return[r.cliente,r.cnpj,r.produto,r.etapa,r.prio,r.passo,r.passoData,r.sit,r.socios,r.rede,r.valor,r.atualizado,r.ultimaNota,r.motivo];});
   const ws=XLSX.utils.aoa_to_sheet([cab,...linhas]);
-  ws['!cols']=[{wch:32},{wch:20},{wch:28},{wch:14},{wch:22},{wch:30},{wch:14},{wch:12},{wch:14},{wch:50}];
+  ws['!cols']=[{wch:32},{wch:20},{wch:28},{wch:14},{wch:10},{wch:34},{wch:10},{wch:16},{wch:22},{wch:30},{wch:14},{wch:14},{wch:50},{wch:24}];
   ws['!autofilter']={ref:XLSX.utils.encode_range({s:{r:0,c:0},e:{r:linhas.length,c:cab.length-1}})};
   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Pipeline');
   const sufixo=_pipTituloFiltro().replace(/[^\wÀ-ú ]+/g,' ').replace(/\s+/g,'_').slice(0,50);
@@ -3165,11 +3388,11 @@ function relatorioPipeline(){
     @media print{body{padding:0}@page{margin:12mm;size:A4 landscape}h2{page-break-after:avoid}tr{page-break-inside:avoid}}</style></head><body>
     <h1>Pipeline — ${esc(_pipTituloFiltro())}</h1><div class="sub">IA Hub · gerado em ${hoje}</div>
     <div class="kpis"><div class="k">Cards<b>${rows.length}</b></div><div class="k">Clientes<b>${clientes}</b></div>
-      <div class="k">Ativos<b>${ativos.length}</b></div><div class="k">Parados +${DIAS_PARADO} dias<b>${parados}</b></div>
+      <div class="k">Ativos<b>${ativos.length}</b></div><div class="k">Precisam de ação<b>${parados}</b></div>
       ${valorAtivo?`<div class="k">Valor estimado (ativos)<b>${brl(valorAtivo)}</b></div>`:''}</div>
-    ${porEtapa.map(g=>`<h2>${g.et} (${g.itens.length})</h2><table><thead><tr><th>Cliente</th><th>Produto</th><th>Sócio(s)</th><th>Rede</th><th>Valor</th><th>Atualizado</th><th>Última nota</th></tr></thead><tbody>
+    ${porEtapa.map(g=>`<h2>${g.et} (${g.itens.length})</h2><table><thead><tr><th>Cliente</th><th>Produto</th><th>Sócio(s)</th><th>Rede</th><th>Valor</th><th>Próximo passo</th><th>Última nota</th></tr></thead><tbody>
       ${g.itens.map(({r})=>`<tr><td><b>${esc(r.cliente)}</b></td><td>${esc(r.produto)}</td><td>${esc(r.socios)}</td><td>${esc(r.rede)}</td><td>${brl(r.valor)}</td>
-        <td class="${r.parado?'p':''}">${esc(r.atualizado)}${r.parado?` (${r.dias} dias)`:''}</td><td class="n">${esc(r.ultimaNota)}</td></tr>`).join('')}</tbody></table>`).join('')}
+        <td class="${r.parado?'p':''}">${r.passo?esc(r.passo)+' · '+esc(r.passoData):(r.sit==='Encerrado'?'':'sem próximo passo')}</td><td class="n">${esc(r.ultimaNota)}</td></tr>`).join('')}</tbody></table>`).join('')}
     <script>window.onload=function(){window.print();}<\/script></body></html>`);
   win.document.close();
 }
@@ -3404,7 +3627,20 @@ function openNegModal(id){
   _negTipo=n&&n.tipo?n.tipo:'proprio';
   selectNegTipo(_negTipo);
   _cvInit(n);
+  // Acompanhamento
+  document.getElementById('neg-passo').value=n?n.proximoPasso||'':'';
+  document.getElementById('neg-passo-data').value=n?n.proximoPassoData||'':_maisDias(3);
+  const pAtual=n?_negPrio(n):'morno';
+  document.getElementById('neg-prios').innerHTML=Object.entries(PRIOS).map(([k,v])=>`<button type="button" class="na-prio ${pAtual===k?'on':''}" data-p="${k}" onclick="document.querySelectorAll('#neg-prios .na-prio').forEach(b=>b.classList.toggle('on',b===this))">${v.ico} ${v.rot}</button>`).join('');
+  document.getElementById('neg-perda').innerHTML='<option value="">— escolha —</option>'+MOTIVOS_PERDA.map(m=>`<option ${n&&n.motivoPerda===m?'selected':''}>${m}</option>`).join('');
+  document.getElementById('neg-perda-obs').value=n?n.motivoPerdaObs||'':'';
+  _negStatusChange();
   document.getElementById('ov-neg').classList.add('open');
+}
+function _negStatusChange(){
+  const st=document.getElementById('neg-status').value;
+  document.getElementById('neg-perda-wrap').style.display=st==='Perdido'?'':'none';
+  document.getElementById('neg-acomp-ativo').style.display=['Fechado','Pagamento Realizado','Perdido'].includes(st)?'none':'';
 }
 function isSocioUser(u){return u&&(u.perfil==='Sócio'||u.perfil==='Sócio-Fundador');}
 function saveNeg(){
@@ -3416,7 +3652,16 @@ function saveNeg(){
   if(isProdOutro&&!produtoOutro){alert('Descreva o tipo de negócio.');return;}
   const cv=_cvValidar();
   if(cv.erros.length){alert('Comissão de venda:\n'+cv.erros.join('\n'));return;}
+  const stNovo=document.getElementById('neg-status').value;
+  const ativoNovo=!['Fechado','Pagamento Realizado','Perdido'].includes(stNovo);
+  const passo=document.getElementById('neg-passo').value.trim(),passoData=document.getElementById('neg-passo-data').value;
+  if(ativoNovo&&(!passo||!passoData)){alert('Defina o próximo passo e a data. É isso que faz o negócio andar.');document.getElementById('neg-passo').focus();return;}
+  const motivo=document.getElementById('neg-perda').value;
+  if(stNovo==='Perdido'&&!motivo){alert('Escolha o motivo da perda.');return;}
   const obj={
+    proximoPasso:ativoNovo?passo:'',proximoPassoData:ativoNovo?passoData:'',
+    prioridade:(document.querySelector('#neg-prios .na-prio.on')||{}).dataset?.p||'morno',
+    motivoPerda:stNovo==='Perdido'?motivo:'',motivoPerdaObs:stNovo==='Perdido'?document.getElementById('neg-perda-obs').value.trim():'',
     comissaoVenda:{regraId:+document.getElementById('neg-regra').value,socioDonoId:parseInt(document.getElementById('neg-socio').value)||null,cosocios:document.getElementById('neg-cosocio').value?[+document.getElementById('neg-cosocio').value]:[],participantes:_cvPart.map(p=>({userId:p.userId,pct:+p.pct||0}))},
     titulo,
     tipo:_negTipo||'proprio',
@@ -3435,11 +3680,12 @@ function saveNeg(){
   }
   if(_negEditId){
     const i=negocios.findIndex(x=>x.id===_negEditId);
+    if((negocios[i].status||'Prospecção')!==obj.status)_negRegistrarEtapa(negocios[i],obj.status);
     negocios[i]={...negocios[i],...obj};
   } else {
-    negocios.push({...obj,id:Date.now(),criado:new Date().toLocaleDateString('pt-BR')});
+    negocios.push({...obj,id:Date.now(),criado:new Date().toLocaleDateString('pt-BR'),historicoEtapas:[{etapa:obj.status,em:new Date().toISOString(),por:currentUser.id}]});
   }
-  closeOv('ov-neg');saveData();renderPipeline();
+  closeOv('ov-neg');saveData();_rerenderAtual();
 }
 function removeNeg(id){
   if(!confirm('Remover este negócio?'))return;
