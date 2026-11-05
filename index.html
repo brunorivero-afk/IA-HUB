@@ -1793,7 +1793,7 @@ async function _entrarComSessao(){
   const u=users.find(x=>x.id===+soc.user_id);
   if(!u){_loginErro('Seu cadastro de sócio não foi encontrado nos dados.');return false;}
   currentUser=u;
-  _limpezaDadosV1();_migrarEtapasV2();
+  _limpezaDadosV1();_migrarEtapasV2();_migrarProdutoIAHub();
   setupMain();showScreen('main');showTab('rede');_lembreteLogin();
   _vigiarVersao();
   return true;
@@ -4278,6 +4278,21 @@ function _migrarEtapasV2(){
   config.etapasV2=new Date().toISOString();
   saveData();
   if(q)setTimeout(()=>showToast(`🔄 ${q} negócio(s) de "Negociação" agora estão em "Proposta"`),2000);
+}
+
+// Produto "IA Hub" (pedido 05/11/2026): entra na matriz e recebe os cards importados como "IA Hub". Roda 1 vez.
+function _migrarProdutoIAHub(){
+  if(config.produtoIAHub)return;
+  let prod=config.comissoes.find(c=>/ia\s*hub/i.test(c.produto));
+  if(!prod){
+    prod={id:Date.now(),produto:'IA Hub',empresaId:3,taxa:null,taxaBase:'valor recebido',splitInterno:'',recorrencia:'depende',obs:'Negócios intermediados pelo IA Hub'};
+    config.comissoes.push(prod);
+  }
+  let q=0;
+  negocios.forEach(n=>{if(!n.configProdutoId&&/ia\s*hub/i.test(n.produtoOutro||'')){n.configProdutoId=prod.id;n.produtoOutro=null;q++;}});
+  config.produtoIAHub=new Date().toISOString();
+  saveData();
+  if(q)setTimeout(()=>showToast(`🏷 Produto "IA Hub" criado na matriz e ${q} card(s) ligados a ele`),3000);
 }
 
 // ===================== REGRAS DE DISTRIBUIÇÃO (cascata) =====================
