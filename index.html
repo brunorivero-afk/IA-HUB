@@ -254,6 +254,26 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 [data-theme="dark"] .ms-wrap,[data-theme="dark"] .pcl-row{background:#1a2035;border-color:#1e2a42;}
 [data-theme="dark"] .pc-cli,[data-theme="dark"] .ms-cli{color:#e2e8f0;}
 
+/* ===== CARTEIRA (clientes recorrentes e fechamento do mês) ===== */
+.cart-head,.cart-row{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1.1fr) minmax(0,1fr) minmax(0,1.1fr) minmax(0,.8fr) 50px 90px;gap:10px;align-items:center;}
+.cart-head.fm-cols,.cart-row.fm-cols{grid-template-columns:minmax(0,1.8fr) minmax(0,1.1fr) minmax(0,.9fr) minmax(0,1fr) 100px;}
+.cart-head{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:#9ca3af;padding:6px 10px;}
+.cart-row{background:#fff;border:1px solid #eee;border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;}
+.cart-sit{font-size:10px;font-weight:700;border-radius:10px;padding:1px 7px;margin-left:4px;}
+.cart-ativo{background:#dcfce7;color:#166534;}
+.cart-pausado{background:#fef3c7;color:#92400e;}
+.cart-encerrado{background:#f1f5f9;color:#64748b;}
+.fm-kpi{font-size:12px;color:#6b7280;background:#fff;border:1px solid #eee;border-radius:8px;padding:6px 10px;}
+.fm-kpi b{color:#0a1628;margin-left:4px;}
+.fm-pend{border-color:#fde68a;background:#fffbeb;}
+.fm-ok{background:#f0faf4;border-color:#bbf7d0;}
+.fm-input{width:100%;padding:5px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px;}
+.acomp-recorr{font-size:12px;color:#475569;margin-bottom:8px;}
+.acomp-recorr label{display:flex;align-items:center;gap:6px;font-size:12px;color:#0a1628;margin:0;}
+.acomp-recorr input{width:auto!important;}
+.pc-antigos{border:1px dashed #94a3b8;background:none;border-radius:6px;font-size:11px;color:#475569;padding:5px;cursor:pointer;margin-top:4px;}
+[data-theme="dark"] .cart-row,[data-theme="dark"] .fm-kpi{background:#1a2035;border-color:#1e2a42;}
+
 /* ===== DISTRIBUIÇÃO EM CASCATA ===== */
 .dist-tab{border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;font-size:12px;background:#fff;}
 .dist-row{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 110px;gap:8px;align-items:center;padding:6px 10px;border-top:1px solid #f3f4f6;}
@@ -1111,6 +1131,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <!-- Acompanhamento: próximo passo, prioridade, motivo de perda -->
     <div class="acomp-box">
       <div class="cv-titulo">Acompanhamento</div>
+      <div id="neg-recorr-info" class="acomp-recorr"></div>
       <div id="neg-acomp-ativo">
         <div class="acomp-grid">
           <div><label>Próximo passo</label><input id="neg-passo" placeholder="Ex.: enviar proposta"></div>
@@ -1120,7 +1141,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
         <div class="na-prios" id="neg-prios"></div>
       </div>
       <div id="neg-perda-wrap" style="display:none">
-        <label>Motivo da perda *</label>
+        <label>Motivo da inativação *</label>
         <select id="neg-perda"></select>
         <input id="neg-perda-obs" placeholder="Detalhe (opcional)" style="margin-top:6px">
       </div>
@@ -1592,7 +1613,7 @@ async function _entrarComSessao(){
   const u=users.find(x=>x.id===+soc.user_id);
   if(!u){_loginErro('Seu cadastro de sócio não foi encontrado nos dados.');return false;}
   currentUser=u;
-  _limpezaDadosV1();
+  _limpezaDadosV1();_migrarEtapasV2();
   setupMain();showScreen('main');showTab('rede');_lembreteLogin();
   _vigiarVersao();
   return true;
@@ -1783,7 +1804,7 @@ function renderDashboard(){
   el.innerHTML=`
     <div class="dash-kpis">
       ${kpi('A pagar',_brl(aPagar.reduce((s,x)=>s+x.r.valor,0)),`${new Set(aPagar.map(x=>_apChave(x.r))).size} pessoa(s)`,"_finSubtab='apagar';showTab('financeiro')")}
-      ${kpi('Recebido no mês',_brl(recMes),'',"showTab('receitas')")}
+      ${kpi('Recebido no mês',_brl(recMes),(()=>{const p=_recClientesAtivos().filter(x=>x.situacao!=='encerrado').reduce((s,x)=>s+x.previsao,0);return p?'de '+_brl(p)+' previsto':'';})(),"showTab('receitas')")}
       ${kpi('Pipeline ativo',ativos.length+' cards',clientesAtivos+' clientes',"_pipSocio='all';_pipRede='all';_pipSubtab='clientes';showTab('negocios')")}
       ${kpi('Fechados no mês',fechadosMes.length,'',"")}
     </div>
@@ -1830,11 +1851,99 @@ function _dashFunilHtml(){
         </div>`).join('')}
         <div class="imp-ajuda" style="margin-top:6px">Conta quem chegou a cada etapa. O tempo médio aparece conforme os cards mudam de etapa daqui para a frente.</div>
       </div>
-      <div><div class="fun-sub">Motivos de perda ${perdidos?`(${perdidos})`:''}</div>
-        ${Object.entries(motivos).sort((a,b)=>b[1]-a[1]).map(([m,q])=>`<div class="rec-linha"><span>${esc(m)}</span><b>${q}</b></div>`).join('')||'<div class="imp-ajuda">Nenhum negócio perdido ainda.</div>'}
+      <div><div class="fun-sub">Motivos de inativação ${perdidos?`(${perdidos})`:''}</div>
+        ${Object.entries(motivos).sort((a,b)=>b[1]-a[1]).map(([m,q])=>`<div class="rec-linha"><span>${esc(m)}</span><b>${q}</b></div>`).join('')||'<div class="imp-ajuda">Nenhum negócio inativo ainda.</div>'}
       </div>
     </div>
   </div>`;
+}
+
+// ===================== CARTEIRA: CLIENTES RECORRENTES E FECHAMENTO DO MÊS =====================
+// Cliente recorrente = negócio recorrente que já recebeu (ou está em Pagamento Realizado).
+// O valor muda todo mês: o fechamento mostra a previsão (média dos últimos 3 meses) e pede o valor real.
+const DIAS_PAUSADO=60;
+let _recModo='recebimentos',_recMes=null;
+function _mesRot(m){return new Date(m+'-15').toLocaleDateString('pt-BR',{month:'long',year:'numeric'});}
+function _recDoNeg(n){return pagamentos.filter(p=>p.negId===n.id).sort((a,b)=>String(a.data).localeCompare(String(b.data)));}
+function _recClientesAtivos(){
+  return negocios.filter(n=>_negRecorrente(n)&&(n.status==='Pagamento Realizado'||pagamentos.some(p=>p.negId===n.id))).map(n=>{
+    const recs=_recDoNeg(n);
+    const porMes={};recs.forEach(p=>{const m=String(p.data||'').slice(0,7);if(m)porMes[m]=(porMes[m]||0)+(+p.valorRecebido||0);});
+    const meses=Object.keys(porMes).sort();
+    const ult3=meses.slice(-3).map(m=>porMes[m]);
+    const ultimo=recs[recs.length-1]||null;
+    const diasSem=ultimo?Math.floor((Date.now()-Date.parse(ultimo.data))/864e5):null;
+    const situacao=n.recorrenciaEncerrada?'encerrado':(diasSem!=null&&diasSem>DIAS_PAUSADO?'pausado':'ativo');
+    return{n,porMes,meses:meses.length,ultimo,diasSem,situacao,previsao:ult3.length?_r2(ult3.reduce((a,b)=>a+b,0)/ult3.length):0};
+  });
+}
+// Cria um recebimento pelo negócio, usando a regra e a rede definidas nele (mesma conta do lançamento manual)
+function _criarRecebimentoNeg(n,valor,data,obs){
+  const cv=n.comissaoVenda||null;
+  const prod=n.configProdutoId?config.comissoes.find(c=>c.id===n.configProdutoId):null;
+  const regra=getRegras().find(r=>cv&&r.id===cv.regraId)||_regraParaProduto(prod);
+  const ctx={valor,vendedorId:n.originadorId,fomentadorId:null,fomentadorNome:'',custas:0,
+    participantes:cv?cv.participantes:null,socioDonoId:cv?cv.socioDonoId:null,cosocios:cv?cv.cosocios||[]:[]};
+  const distribuicao=calcDistribuicao(regra,ctx).map(r=>({...r,pago:false}));
+  pagamentos.push({id:Date.now()+Math.floor(Math.random()*1000),negId:n.id,descCliente:n.titulo,portafolioId:n.portafolioId||null,
+    valorRecebido:valor,data,obs:obs||'',regraId:regra.id,vendedorId:ctx.vendedorId,fomentadorId:null,fomentadorNome:'',custas:0,
+    ajusteMotivo:'',distribuicao,comissaoVenda:cv,cosocios:ctx.cosocios,
+    comissoes:distribuicao.filter(_distEhPagavel).map(r=>({socioId:r.pessoaId,valor:r.valor}))});
+  _negMarcarPago(n,data);
+}
+function _recDataDoMes(m){const h=_dataLocal();if(h.startsWith(m))return h;const[a,mm]=m.split('-').map(Number);return _dataLocal(new Date(a,mm,0));}
+function _recLancar(negId){
+  const n=negocios.find(x=>x.id===negId);if(!n)return;
+  const inp=document.getElementById('fm-val-'+negId);
+  const valor=parseFloat(String(inp&&inp.value||'').replace(',','.'));
+  if(!valor||valor<=0){alert('Informe o valor recebido no mês.');inp&&inp.focus();return;}
+  _criarRecebimentoNeg(n,valor,_recDataDoMes(_recMes),'Fechamento de '+_mesRot(_recMes));
+  saveData();renderReceitas();showToast(`✅ ${n.titulo}: ${_brl(valor)} lançado`);
+}
+function _recEncerrar(negId){
+  const n=negocios.find(x=>x.id===negId);if(!n)return;
+  if(n.recorrenciaEncerrada){if(!confirm(`Reativar a recorrência de ${n.titulo}?`))return;delete n.recorrenciaEncerrada;}
+  else{if(!confirm(`${n.titulo} deixou de ser cliente? Ele sai do fechamento mensal (o histórico fica).`))return;n.recorrenciaEncerrada=_dataLocal();}
+  saveData();renderReceitas();
+}
+const _SIT_CLI={ativo:{rot:'Ativo',cls:'cart-ativo'},pausado:{rot:'Pausado',cls:'cart-pausado'},encerrado:{rot:'Encerrado',cls:'cart-encerrado'}};
+function _recAtivosHtml(){
+  const lista=_recClientesAtivos().sort((a,b)=>['ativo','pausado','encerrado'].indexOf(a.situacao)-['ativo','pausado','encerrado'].indexOf(b.situacao)||String(a.n.titulo).localeCompare(String(b.n.titulo),'pt-BR'));
+  const qtd=s=>lista.filter(x=>x.situacao===s).length;
+  return`<div class="imp-ajuda" style="margin:4px 0 10px">${qtd('ativo')} ativo(s) · ${qtd('pausado')} pausado(s) — sem recebimento há mais de ${DIAS_PAUSADO} dias · ${qtd('encerrado')} encerrado(s)</div>
+    <div class="cart-head"><span>Cliente</span><span>Produto</span><span>Quem cuida</span><span>Último recebimento</span><span>Média 3 meses</span><span>Meses</span><span></span></div>
+    ${lista.map(x=>`<div class="cart-row">
+      <div><b>${esc(x.n.titulo)}</b> <span class="cart-sit ${_SIT_CLI[x.situacao].cls}">${_SIT_CLI[x.situacao].rot}</span></div>
+      <div>${esc(_prodLabel(_negProdKey(x.n)))}</div>
+      <div class="imp-ajuda">${esc(_pipQuem(x.n))}</div>
+      <div>${x.ultimo?`${_brl(x.ultimo.valorRecebido)} <span class="imp-ajuda">${String(x.ultimo.data).split('-').reverse().join('/')}</span>`:'<span class="imp-ajuda">aguardando 1º</span>'}</div>
+      <div>${x.previsao?_brl(x.previsao):'—'}</div>
+      <div>${x.meses}</div>
+      <div style="text-align:right"><button class="btn-s btn-sm" onclick="_recEncerrar(${x.n.id})">${x.situacao==='encerrado'?'Reativar':'Encerrar'}</button></div>
+    </div>`).join('')||'<div class="imp-ajuda" style="padding:20px">Nenhum cliente recorrente ainda. Eles aparecem aqui quando um negócio recorrente chega a "Pagamento Realizado".</div>'}`;
+}
+function _recFechamentoHtml(){
+  if(!_recMes)_recMes=_dataLocal().slice(0,7);
+  const lista=_recClientesAtivos().filter(x=>x.situacao!=='encerrado').sort((a,b)=>String(a.n.titulo).localeCompare(String(b.n.titulo),'pt-BR'));
+  const linhas=lista.map(x=>({...x,lancado:x.porMes[_recMes]||0}));
+  const previsto=linhas.reduce((s,x)=>s+x.previsao,0),lancado=linhas.reduce((s,x)=>s+x.lancado,0);
+  const pend=linhas.filter(x=>!x.lancado);
+  const meses=[...Array(6)].map((_,i)=>{const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-i);return _dataLocal(d).slice(0,7);});
+  return`<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:4px 0 12px">
+      <select class="pip-sel" style="max-width:200px" onchange="_recMes=this.value;renderReceitas()">${meses.map(m=>`<option value="${m}" ${m===_recMes?'selected':''}>${_mesRot(m)}</option>`).join('')}</select>
+      <span class="fm-kpi">Previsto <b>${_brl(previsto)}</b></span>
+      <span class="fm-kpi">Lançado <b>${_brl(lancado)}</b></span>
+      <span class="fm-kpi ${pend.length?'fm-pend':''}">Pendentes <b>${pend.length}</b> de ${linhas.length}</span>
+    </div>
+    <div class="cart-head fm-cols"><span>Cliente</span><span>Produto</span><span>Previsão</span><span>Valor do mês</span><span></span></div>
+    ${linhas.map(x=>`<div class="cart-row fm-cols ${x.lancado?'fm-ok':''}">
+      <div><b>${esc(x.n.titulo)}</b>${x.situacao==='pausado'?' <span class="cart-sit cart-pausado">Pausado</span>':''}<div class="imp-ajuda">${esc(_pipQuem(x.n))}</div></div>
+      <div>${esc(_prodLabel(_negProdKey(x.n)))}</div>
+      <div class="imp-ajuda">${x.previsao?_brl(x.previsao):'sem histórico'}</div>
+      <div>${x.lancado?`<b>✅ ${_brl(x.lancado)}</b>`:`<input id="fm-val-${x.n.id}" class="fm-input" type="number" step="0.01" placeholder="${x.previsao?String(x.previsao):'valor'}" onkeydown="if(event.key==='Enter')_recLancar(${x.n.id})">`}</div>
+      <div style="text-align:right">${x.lancado?`<span class="imp-ajuda">lançado</span>`:`<button class="btn-p" style="font-size:12px;padding:5px 12px" onclick="_recLancar(${x.n.id})">Lançar</button>`}</div>
+    </div>`).join('')||'<div class="imp-ajuda" style="padding:20px">Nenhum cliente recorrente para fechar neste mês.</div>'}
+    <div class="imp-ajuda" style="margin-top:10px">Ao lançar, o valor vira um recebimento com a comissão da rede já calculada (ver em "Recebimentos" e em Financeiro › A pagar).</div>`;
 }
 
 // ===================== HELPERS =====================
@@ -2130,6 +2239,7 @@ function renderReceitas(){
   const porMes=meses.map(m=>({m,v:soma(pagamentos.filter(p=>(p.data||'').startsWith(m)))}));
   const maxMes=Math.max(1,...porMes.map(x=>x.v));
   const nomeMes=m=>new Date(m+'-15').toLocaleDateString('pt-BR',{month:'short'}).replace('.','');
+  const prevMes=_recClientesAtivos().filter(x=>x.situacao!=='encerrado').reduce((s,x)=>s+x.previsao,0);
   el.innerHTML=`
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
       <div class="section-hdr" style="margin:0;border-bottom:none">Receitas</div>
@@ -2139,11 +2249,15 @@ function renderReceitas(){
       </div>
     </div>
     <div class="fin-saldo-bar" style="margin-bottom:14px">
-      <div class="fin-saldo-item"><div class="fin-saldo-label">Recebido no mês</div><div class="fin-saldo-val val-in">${_brl(soma(pagamentos.filter(p=>(p.data||'').startsWith(mes))))}</div></div>
+      <div class="fin-saldo-item"><div class="fin-saldo-label">Recebido no mês</div><div class="fin-saldo-val val-in">${_brl(soma(pagamentos.filter(p=>(p.data||'').startsWith(mes))))}</div>${prevMes?`<div class="imp-ajuda">previsto ${_brl(prevMes)}</div>`:''}</div>
       <div class="fin-saldo-item"><div class="fin-saldo-label">Recebido em ${ano}</div><div class="fin-saldo-val val-in">${_brl(soma(pagamentos.filter(p=>(p.data||'').startsWith(ano))))}</div></div>
       <div class="fin-saldo-item"><div class="fin-saldo-label">Distribuído a pessoas</div><div class="fin-saldo-val val-out">${_brl(totalDist)}</div></div>
       <div class="fin-saldo-item"><div class="fin-saldo-label">Fica no grupo</div><div class="fin-saldo-val">${_brl(totalRec-totalDist-totalSai)}</div></div>
     </div>
+    <div class="pip-modo" style="display:inline-flex;margin-bottom:12px">
+      ${[['recebimentos','Recebimentos'],['ativos','Clientes ativos'],['fechamento','Fechamento do mês']].map(([k,t])=>`<button class="${_recModo===k?'on':''}" onclick="_recModo='${k}';renderReceitas()">${t}</button>`).join('')}
+    </div>
+    ${_recModo==='recebimentos'?`
     <div class="rec-resumo">
       <div class="rec-bloco"><div class="rec-tit">Últimos 6 meses</div>
         <div class="rec-barras">${porMes.map(x=>`<div class="rec-barra" title="${_brl(x.v)}"><div style="height:${Math.round(x.v/maxMes*70)}px"></div><span>${nomeMes(x.m)}</span></div>`).join('')}</div></div>
@@ -2158,7 +2272,7 @@ function renderReceitas(){
         <option value="">Todos os sócios</option>${users.filter(isSocioUser).map(u=>`<option value="${u.id}">${esc(u.nome)}</option>`).join('')}
       </select>
     </div>
-    <div id="fin-neg-lista">${_buildPagamentosList()}</div>`;
+    <div id="fin-neg-lista">${_buildPagamentosList()}</div>`:(_recModo==='ativos'?_recAtivosHtml():_recFechamentoHtml())}`;
 }
 function _buildPagamentosList(){
   const prodFil=(document.getElementById('fin-neg-port-fil')||{}).value||'';
@@ -2325,6 +2439,7 @@ function savePagamento(){
   };
   if(_pagEditId){const i=pagamentos.findIndex(p=>p.id===_pagEditId);pagamentos[i]={...pagamentos[i],...obj};}
   else pagamentos.push({...obj,id:Date.now()});
+  if(neg)_negMarcarPago(neg,obj.data);
   closeOv('ov-pag');saveData();_rerenderAtual();
 }
 function removePagamento(id){
@@ -2429,7 +2544,7 @@ function abrirInativos(){
           <div>
             <div style="font-size:13px;font-weight:600;color:#0a1628">${esc(n.titulo)}</div>
             ${(()=>{const cp=n.configProdutoId?config.comissoes.find(c=>c.id===n.configProdutoId):null;const lbl=cp?cp.produto:(n.produtoOutro||null);return lbl?`<div style="font-size:11px;color:#6b7280">${esc(lbl)}</div>`:''})()}
-            ${n.notas?`<div style="font-size:12px;color:#6b7280;margin-top:4px">${esc(n.notas)}</div>`:''}
+            <div style="font-size:12px;color:#991b1b;margin-top:4px">${esc(n.motivoPerda||"Motivo não informado")}${n.motivoPerdaObs?" · "+esc(n.motivoPerdaObs):""}</div>
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
             ${orig?`<span style="font-size:11px;color:#9ca3af">✦ ${orig.nome.split(' ')[0]}</span>`:''}
@@ -2729,7 +2844,10 @@ function saveLanc(){
 function removeLanc(id){if(!confirm('Remover?'))return;lancamentos=lancamentos.filter(l=>l.id!==id);renderFinanceiro();saveData();}
 
 // ===================== PIPELINE DE NEGÓCIOS =====================
-const NEG_COLS=['Prospecção','Proposta','Negociação','Fechado','Pagamento Realizado'];
+// Pipeline universal (04/11/2026): Proposta já inclui a negociação; Fechado = disse sim, formalizando.
+// 'Perdido' continua sendo o valor gravado, mas aparece para o usuário como "Inativo".
+const NEG_COLS=['Prospecção','Proposta','Fechado','Pagamento Realizado'];
+const _etapaRot=e=>e==='Perdido'?'Inativo':e;
 const NEG_COL_COLOR={
   'Prospecção':'#64748b','Proposta':'#854F0B',
   'Negociação':'#0059a9','Fechado':'#0F6E56',
@@ -2885,7 +3003,11 @@ function _pipPassoHtml(n){
 function _pipKanbanHtml(negFilt){
   return`<div style="flex:1;display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;min-height:0;padding:0 16px 12px">
     ${NEG_COLS.map(col=>{
-      const cards=negFilt.filter(n=>(n.status||'Prospecção')===col);
+      const todos=negFilt.filter(n=>(n.status||'Prospecção')===col);
+      // Pagamento Realizado: só os últimos 30 dias no quadro; os demais seguem em Receitas
+      const limite=Date.now()-DIAS_COLUNA_PAGO*864e5;
+      const cards=col==='Pagamento Realizado'?todos.filter(n=>{const d=Date.parse(_negDesdeEtapa(n));return isNaN(d)||d>=limite;}):todos;
+      const antigos=todos.length-cards.length;
       return`<div style="flex:1 1 0;min-width:150px;display:flex;flex-direction:column;min-height:0">
         <div style="background:${NEG_COL_COLOR[col]};color:#fff;border-radius:8px 8px 0 0;padding:8px 12px;font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
           <span>${col}</span><span style="background:rgba(255,255,255,.25);border-radius:10px;padding:1px 7px">${cards.length}</span>
@@ -2905,6 +3027,7 @@ function _pipKanbanHtml(negFilt){
               ${_pipPassoHtml(n)}
             </div>`;
           }).join(''):`<div style="color:#9ca3af;font-size:12px;text-align:center;padding:24px 8px">Arraste aqui</div>`}
+          ${antigos?`<button class="pc-antigos" onclick="_recModo='ativos';showTab('receitas')">+ ${antigos} há mais de ${DIAS_COLUNA_PAGO} dias → Receitas</button>`:''}
         </div>
       </div>`;
     }).join('')}
@@ -3081,7 +3204,7 @@ function _impPrevia(){
     const obs=iObs.map(i=>String(l[i]||'').trim()).filter(Boolean).join(' · ');
     const valor=iValor!=null?parseFloat(String(l[iValor]||'').replace(/[^\d,.-]/g,'').replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.'))||null:null;
     const etTxt=iEtapa!=null?_impNorm(l[iEtapa]):'';
-    const etapa=NEG_COLS.find(c=>_impNorm(c)===etTxt)||'Prospecção';
+    const etapa=NEG_COLS.find(c=>_impNorm(c)===etTxt)||(/negocia/.test(etTxt)?'Proposta':/inativ|perdid/.test(etTxt)?'Perdido':'Prospecção');
     return{cliente,cnpj:iCnpj!=null?String(l[iCnpj]||'').trim():'',valor,etapa,socios,rede,produtos,obs,celRede:iRede.map(i=>String(l[i]||'').trim()).filter(x=>x&&x!=='-').join(' / ')};
   }).filter(r=>r.cliente);
   const lista=Object.values(pessoas).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
@@ -3179,6 +3302,34 @@ function _impExecutar(){
   showToast(`✅ ${negs.length} cards importados`);
 }
 
+// Recorrência por produto: "sempre" (Sicoob, GruPag, Energia...), "depende" (o negócio diz) ou "único"
+const RECORR_ROT={sempre:'🔁 Sempre recorrente',depende:'❔ Depende do negócio',unico:'① Pagamento único'};
+function _prodRecorrencia(prod){
+  if(!prod)return'depende';
+  if(prod.recorrencia&&RECORR_ROT[prod.recorrencia])return prod.recorrencia;
+  const n=_impNorm(prod.produto);
+  if(/consult/.test(n))return'unico';
+  if(/sicoob|grupag|energia|agua|contab|bpo/.test(n))return'sempre';
+  return'depende';
+}
+function _negRecorrencia(n){return _prodRecorrencia(n&&n.configProdutoId?config.comissoes.find(c=>c.id===n.configProdutoId):null);}
+function _negRecorrente(n){const r=_negRecorrencia(n);return r==='sempre'||(r==='depende'&&!!n.recorrente);}
+
+// Primeiro recebimento de um negócio: o card vai sozinho para "Pagamento Realizado"
+function _negMarcarPago(n,data){
+  if(!n||['Pagamento Realizado','Perdido'].includes(n.status))return;
+  _negRegistrarEtapa(n,'Pagamento Realizado');
+  n.status='Pagamento Realizado';n.pagoEm=data||_dataLocal();
+  if(!n.fechadoEm)n.fechadoEm=n.pagoEm;
+  n.atualizadoEm=new Date().toISOString();
+}
+// Data em que o card entrou na etapa atual (pelo histórico)
+function _negDesdeEtapa(n){
+  const h=(n.historicoEtapas||[]).filter(x=>x.etapa===n.status).slice(-1)[0];
+  return(h&&h.em)||n.pagoEm||n.fechadoEm||n.atualizadoEm||'';
+}
+const DIAS_COLUNA_PAGO=30;
+
 // ===================== ACOMPANHAMENTO: PRÓXIMO PASSO, PRIORIDADE, FUNIL =====================
 // Todo negócio ativo deve ter um próximo passo com data. É isso que faz o pipeline andar:
 // a "situação" de cada card sai daí (atrasado, hoje, esta semana, sem próximo passo).
@@ -3186,7 +3337,7 @@ const DIAS_PARADO=7;
 const PRIOS={quente:{rot:'Quente',ico:'🔥',ord:0},morno:{rot:'Morno',ico:'',ord:1},frio:{rot:'Frio',ico:'❄️',ord:2}};
 const MOTIVOS_PERDA=['Sem retorno do cliente','Preço / condição','Adiado / sem timing','Ficou com concorrente','Sem perfil para o produto','Outro'];
 const SIT={atrasado:{rot:'Atrasado',cor:'#b91c1c'},hoje:{rot:'Hoje',cor:'#b45309'},semana:{rot:'Esta semana',cor:'#0a1628'},futuro:{rot:'Mais adiante',cor:'#6b7280'},sempasso:{rot:'Sem próximo passo',cor:'#9ca3af'},fechado:{rot:'Encerrado',cor:'#9ca3af'}};
-function _negAtivo(n){return!['Fechado','Pagamento Realizado','Perdido'].includes(n.status||'Prospecção');}
+function _negAtivo(n){return!['Pagamento Realizado','Perdido'].includes(n.status||'Prospecção');}
 function _diasParado(n){
   const ts=n.atualizadoEm?Date.parse(n.atualizadoEm):(typeof n.id==='number'&&n.id>1e12?n.id:NaN);
   return isNaN(ts)?0:Math.floor((Date.now()-ts)/864e5);
@@ -3342,7 +3493,7 @@ function _negLinhaRel(n){
   const cv=n.comissaoVenda||{};
   const rede=(cv.participantes||[]).map(p=>`${nome(p.userId)} ${p.pct}%`).join(', ')||(()=>{const o=users.find(u=>u.id===n.originadorId);return o&&!isSocioUser(o)?o.nome:'';})();
   const notas=String(n.notas||'').split('\n').map(s=>s.trim()).filter(Boolean);
-  return{cliente:n.titulo,cnpj:n.cnpj||'',produto:prod,etapa:n.status||'Prospecção',
+  return{cliente:n.titulo,cnpj:n.cnpj||'',produto:prod,etapa:_etapaRot(n.status||'Prospecção'),
     socios:_negSocios(n).map(nome).join(' + '),rede,valor:n.valor||null,
     dias:_negAtivo(n)?_diasParado(n):'',parado:_negAtencao(n),sit:(SIT[_negSit(n)]||{}).rot||'',
     passo:n.proximoPasso||'',passoData:n.proximoPassoData?n.proximoPassoData.split('-').reverse().join('/'):'',prio:PRIOS[_negPrio(n)].rot,motivo:n.motivoPerda||'',
@@ -3357,7 +3508,7 @@ async function exportarPipelineExcel(){
   const lista=_pipOrdenados();
   if(!lista.length){alert('Nada para exportar com esse filtro.');return;}
   try{await _impLoadXLSX();}catch(e){alert(e.message);return;}
-  const cab=['Cliente','CNPJ','Produto','Etapa','Prioridade','Próximo passo','Até','Situação','Sócio(s)','Rede (% comissão)','Valor estimado','Última atualização','Última nota','Motivo da perda'];
+  const cab=['Cliente','CNPJ','Produto','Etapa','Prioridade','Próximo passo','Até','Situação','Sócio(s)','Rede (% comissão)','Valor estimado','Última atualização','Última nota','Motivo da inativação'];
   const linhas=lista.map(n=>{const r=_negLinhaRel(n);return[r.cliente,r.cnpj,r.produto,r.etapa,r.prio,r.passo,r.passoData,r.sit,r.socios,r.rede,r.valor,r.atualizado,r.ultimaNota,r.motivo];});
   const ws=XLSX.utils.aoa_to_sheet([cab,...linhas]);
   ws['!cols']=[{wch:32},{wch:20},{wch:28},{wch:14},{wch:10},{wch:34},{wch:10},{wch:16},{wch:22},{wch:30},{wch:14},{wch:14},{wch:50},{wch:24}];
@@ -3374,7 +3525,7 @@ function relatorioPipeline(){
   const ativos=rows.filter(x=>_negAtivo(x.n));
   const parados=rows.filter(x=>x.r.parado).length;
   const valorAtivo=ativos.reduce((s,x)=>s+(+x.n.valor||0),0);
-  const porEtapa=[...NEG_COLS,'Perdido'].map(et=>({et,itens:rows.filter(x=>x.r.etapa===et)})).filter(g=>g.itens.length);
+  const porEtapa=[...NEG_COLS,'Perdido'].map(et=>({et,itens:rows.filter(x=>x.r.etapa===_etapaRot(et))})).filter(g=>g.itens.length);
   const clientes=new Set(rows.map(x=>_impNorm(x.r.cliente))).size;
   const hoje=new Date().toLocaleDateString('pt-BR');
   const win=window.open('','_blank','width=1000,height=800');
@@ -3390,7 +3541,7 @@ function relatorioPipeline(){
     <div class="kpis"><div class="k">Cards<b>${rows.length}</b></div><div class="k">Clientes<b>${clientes}</b></div>
       <div class="k">Ativos<b>${ativos.length}</b></div><div class="k">Precisam de ação<b>${parados}</b></div>
       ${valorAtivo?`<div class="k">Valor estimado (ativos)<b>${brl(valorAtivo)}</b></div>`:''}</div>
-    ${porEtapa.map(g=>`<h2>${g.et} (${g.itens.length})</h2><table><thead><tr><th>Cliente</th><th>Produto</th><th>Sócio(s)</th><th>Rede</th><th>Valor</th><th>Próximo passo</th><th>Última nota</th></tr></thead><tbody>
+    ${porEtapa.map(g=>`<h2>${_etapaRot(g.et)} (${g.itens.length})</h2><table><thead><tr><th>Cliente</th><th>Produto</th><th>Sócio(s)</th><th>Rede</th><th>Valor</th><th>Próximo passo</th><th>Última nota</th></tr></thead><tbody>
       ${g.itens.map(({r})=>`<tr><td><b>${esc(r.cliente)}</b></td><td>${esc(r.produto)}</td><td>${esc(r.socios)}</td><td>${esc(r.rede)}</td><td>${brl(r.valor)}</td>
         <td class="${r.parado?'p':''}">${r.passo?esc(r.passo)+' · '+esc(r.passoData):(r.sit==='Encerrado'?'':'sem próximo passo')}</td><td class="n">${esc(r.ultimaNota)}</td></tr>`).join('')}</tbody></table>`).join('')}
     <script>window.onload=function(){window.print();}<\/script></body></html>`);
@@ -3496,7 +3647,7 @@ function selectNegProd(id){
     infoEl.innerHTML='';
     if(id!=='outro')document.getElementById('neg-taxa').value='';
   }
-  if(_cvAberto)_cvProdChange();
+  if(_cvAberto){_cvProdChange();_negRecorrUI();}
 }
 
 // --- Comissão de venda do negócio ---
@@ -3600,7 +3751,7 @@ function openNegModal(id){
   document.getElementById('neg-ttl').textContent=n?'Editar Negócio':'Novo Negócio';
   document.getElementById('neg-del-btn').style.display=id?'':'none';
   const selStatus=document.getElementById('neg-status');
-  selStatus.innerHTML=[...NEG_COLS,'Perdido'].map(c=>`<option>${c}</option>`).join('');
+  selStatus.innerHTML=NEG_COLS.map(c=>`<option>${c}</option>`).join('')+'<option value="Perdido">Inativo</option>';
   const selOrig=document.getElementById('neg-orig');
   const origSorted=users.filter(u=>u.perfil!=='Operador').sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   selOrig.innerHTML=origSorted.map(u=>`<option value="${u.id}">${u.nome}${u.id===currentUser?.id?' (você)':''}</option>`).join('');
@@ -3634,13 +3785,24 @@ function openNegModal(id){
   document.getElementById('neg-prios').innerHTML=Object.entries(PRIOS).map(([k,v])=>`<button type="button" class="na-prio ${pAtual===k?'on':''}" data-p="${k}" onclick="document.querySelectorAll('#neg-prios .na-prio').forEach(b=>b.classList.toggle('on',b===this))">${v.ico} ${v.rot}</button>`).join('');
   document.getElementById('neg-perda').innerHTML='<option value="">— escolha —</option>'+MOTIVOS_PERDA.map(m=>`<option ${n&&n.motivoPerda===m?'selected':''}>${m}</option>`).join('');
   document.getElementById('neg-perda-obs').value=n?n.motivoPerdaObs||'':'';
+  _negRecorrMarcado=!!(n&&n.recorrente);_negRecorrUI();
   _negStatusChange();
   document.getElementById('ov-neg').classList.add('open');
+}
+// Linha de recorrência no cadastro: o produto decide, ou o negócio marca quando "depende"
+let _negRecorrMarcado=false;
+function _negRecorrUI(){
+  const el=document.getElementById('neg-recorr-info');if(!el)return;
+  const prod=_negProdSelecionado&&_negProdSelecionado!=='outro'?config.comissoes.find(c=>c.id===_negProdSelecionado):null;
+  const r=_prodRecorrencia(prod);
+  el.innerHTML=r==='depende'
+    ?`<label><input type="checkbox" id="neg-recorr" ${_negRecorrMarcado?'checked':''} onchange="_negRecorrMarcado=this.checked"> 🔁 Este negócio é recorrente (recebe todo mês)</label>`
+    :`<span>${RECORR_ROT[r]}${prod?' · definido no produto':''}</span>`;
 }
 function _negStatusChange(){
   const st=document.getElementById('neg-status').value;
   document.getElementById('neg-perda-wrap').style.display=st==='Perdido'?'':'none';
-  document.getElementById('neg-acomp-ativo').style.display=['Fechado','Pagamento Realizado','Perdido'].includes(st)?'none':'';
+  document.getElementById('neg-acomp-ativo').style.display=['Pagamento Realizado','Perdido'].includes(st)?'none':'';
 }
 function isSocioUser(u){return u&&(u.perfil==='Sócio'||u.perfil==='Sócio-Fundador');}
 function saveNeg(){
@@ -3653,13 +3815,14 @@ function saveNeg(){
   const cv=_cvValidar();
   if(cv.erros.length){alert('Comissão de venda:\n'+cv.erros.join('\n'));return;}
   const stNovo=document.getElementById('neg-status').value;
-  const ativoNovo=!['Fechado','Pagamento Realizado','Perdido'].includes(stNovo);
+  const ativoNovo=!['Pagamento Realizado','Perdido'].includes(stNovo);
   const passo=document.getElementById('neg-passo').value.trim(),passoData=document.getElementById('neg-passo-data').value;
   if(ativoNovo&&(!passo||!passoData)){alert('Defina o próximo passo e a data. É isso que faz o negócio andar.');document.getElementById('neg-passo').focus();return;}
   const motivo=document.getElementById('neg-perda').value;
-  if(stNovo==='Perdido'&&!motivo){alert('Escolha o motivo da perda.');return;}
+  if(stNovo==='Perdido'&&!motivo){alert('Escolha o motivo da inativação.');return;}
   const obj={
     proximoPasso:ativoNovo?passo:'',proximoPassoData:ativoNovo?passoData:'',
+    recorrente:_negRecorrMarcado,
     prioridade:(document.querySelector('#neg-prios .na-prio.on')||{}).dataset?.p||'morno',
     motivoPerda:stNovo==='Perdido'?motivo:'',motivoPerdaObs:stNovo==='Perdido'?document.getElementById('neg-perda-obs').value.trim():'',
     comissaoVenda:{regraId:+document.getElementById('neg-regra').value,socioDonoId:parseInt(document.getElementById('neg-socio').value)||null,cosocios:document.getElementById('neg-cosocio').value?[+document.getElementById('neg-cosocio').value]:[],participantes:_cvPart.map(p=>({userId:p.userId,pct:+p.pct||0}))},
@@ -3940,6 +4103,16 @@ function _limpezaDadosV1(){
   console.info('Limpeza V1',res);
   const partes=[res.associados&&`${res.associados} Associado→Parceiro`,res.unidos.length&&`${res.unidos.length} duplicado(s) unido(s)`,res.emails&&`${res.emails} e-mail(s) provisório(s) apagado(s)`,res.operadores&&'usuário Operador removido'].filter(Boolean);
   setTimeout(()=>showToast('🧹 Limpeza feita: '+(partes.join(' · ')||'dados antigos removidos')),1200);
+}
+
+// Pipeline universal (04/11/2026): a etapa "Negociação" deixou de existir e vira "Proposta". Roda 1 vez.
+function _migrarEtapasV2(){
+  if(config.etapasV2)return;
+  let q=0;
+  negocios.forEach(n=>{if(n.status==='Negociação'){_negRegistrarEtapa(n,'Proposta');n.status='Proposta';q++;}});
+  config.etapasV2=new Date().toISOString();
+  saveData();
+  if(q)setTimeout(()=>showToast(`🔄 ${q} negócio(s) de "Negociação" agora estão em "Proposta"`),2000);
 }
 
 // ===================== REGRAS DE DISTRIBUIÇÃO (cascata) =====================
@@ -4328,6 +4501,10 @@ function renderConfig(){
             onchange="config.comissoes[${i}].taxa=this.value?parseFloat(this.value):null;saveData();showToast('Taxa atualizada')">
           <span style="font-size:12px;color:#888">% rede</span>
         </div>
+        <select title="Recorrência" onchange="config.comissoes[${i}].recorrencia=this.value;saveData();showToast('Recorrência atualizada')"
+          style="padding:5px 8px;border:1px solid #ddd;border-radius:7px;font-size:12px">
+          ${Object.entries(RECORR_ROT).map(([k,t])=>`<option value="${k}" ${_prodRecorrencia(c)===k?'selected':''}>${t}</option>`).join('')}
+        </select>
         <button onclick="removeConfigProduto(${i})" style="color:#c0392b;background:none;border:none;cursor:pointer;font-size:16px;padding:0 4px;margin-left:auto">×</button>
       </div>
       ${c.splitInterno?`<div style="margin-top:8px;padding:6px 10px;background:#f9fafb;border-radius:6px;font-size:11px;color:#666">
