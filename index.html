@@ -798,6 +798,9 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
         <div id="con-parceiros" style="margin-bottom:20px"></div>
         <div class="section-hdr" style="margin-top:0">Rede</div>
         <div id="con-inner-mbr"></div>
+        <div class="section-hdr" style="margin-top:20px">Contatos</div>
+        <div style="font-size:12px;color:#888;margin:-4px 0 10px">Pessoas guardadas no sistema, fora da rede e sem comissão.</div>
+        <div id="con-contatos"></div>
       </div>
     </div>
     <!-- FINANCEIRO (só sócios) -->
@@ -838,7 +841,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <div class="full" id="u-perfil-wrap">
         <label>Perfil na rede *</label>
         <div class="u-perfis" id="u-perfis"></div>
-        <select id="u-perfil" style="display:none"><option>Sócio</option><option selected>Parceiro</option><option>Rede</option></select>
+        <select id="u-perfil" style="display:none"><option>Sócio</option><option selected>Parceiro</option><option>Rede</option><option>Contato</option></select>
       </div>
       <div class="full" id="u-vinculo-wrap"><label>Vinculado a (quem trouxe) *</label>
         <select id="u-vinculo"><option value="">— Nenhum —</option></select>
@@ -1922,7 +1925,7 @@ function showTab(name){
   if(tbtn)tbtn.classList.add('active');
   if(name==='rede')renderDashboard();
   if(name==='receitas')renderReceitas();
-  if(name==='rede-membros'){renderSocios();renderParceiros();renderRedeMembros();}
+  if(name==='rede-membros'){renderSocios();renderParceiros();renderRedeMembros();renderContatosMembros();}
   if(name==='financeiro')renderFinanceiro();
   if(name==='negocios')renderPipeline();
   if(name==='vitrine')renderVitrine();
@@ -1979,7 +1982,7 @@ function renderDashboard(){
   ativos.forEach(n=>{const p=n.configProdutoId?(config.comissoes.find(c=>c.id===n.configProdutoId)||{}).produto:(n.produtoOutro||'Outro');porProd[p]=(porProd[p]||0)+1;});
   const maxProd=Math.max(1,...Object.values(porProd));
   const redeIds=new Set(ativos.flatMap(_negRede));
-  const redeTotal=users.filter(u=>!isSocioUser(u)&&u.perfil!=='Operador');
+  const redeTotal=users.filter(u=>!isSocioUser(u)&&u.perfil!=='Operador'&&u.perfil!=='Contato');
   const redeParada=redeTotal.filter(u=>!redeIds.has(u.id));
   el.innerHTML=`
     <div class="dash-kpis">
@@ -2135,7 +2138,7 @@ function destroyChart(id){if(chartInstances[id]){chartInstances[id].destroy();de
 // Perfil na rede (botões) + "Vinculado a": Parceiro → um sócio; Rede → sócio, parceiro ou outra pessoa da rede
 function _usrPerfisRender(){
   const el=document.getElementById('u-perfis'),sel=document.getElementById('u-perfil');if(!el||!sel)return;
-  el.innerHTML=['Sócio','Parceiro','Rede'].map(p=>`<button type="button" class="u-perfil-btn ${sel.value===p?'on':''}" onclick="_usrPerfil('${p}')">${p}</button>`).join('');
+  el.innerHTML=['Sócio','Parceiro','Rede','Contato'].map(p=>`<button type="button" class="u-perfil-btn ${sel.value===p?'on':''}" onclick="_usrPerfil('${p}')">${p}</button>`).join('');
 }
 function _usrPerfil(p){
   const sel=document.getElementById('u-perfil');sel.value=p;
@@ -2146,7 +2149,8 @@ function fillVinculoSelect(selectedId){
   const sel=document.getElementById('u-vinculo');if(!sel)return;
   const perfil=(document.getElementById('u-perfil')||{}).value||'Parceiro';
   const wrap=document.getElementById('u-vinculo-wrap'),hint=document.getElementById('u-vinculo-hint');
-  if(perfil==='Sócio'){sel.innerHTML='<option value="">— Nenhum —</option>';if(wrap)wrap.style.display='none';return;}
+  // Sócio e Contato não têm vínculo (Contato: pessoa guardada no sistema, fora da rede e sem comissão)
+  if(perfil==='Sócio'||perfil==='Contato'){sel.innerHTML='<option value="">— Nenhum —</option>';if(wrap)wrap.style.display='none';return;}
   if(wrap)wrap.style.display='';
   const aceita=perfil==='Parceiro'?(u=>isSocioUser(u)):(u=>isSocioUser(u)||u.perfil==='Parceiro'||u.perfil==='Rede');
   const lista=users.filter(u=>u.id!==editUsrId&&u.perfil!=='Operador'&&aceita(u)).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
@@ -2233,6 +2237,7 @@ function renderMembros(){
   if(typeof renderSocios==='function')renderSocios();
   if(typeof renderParceiros==='function')renderParceiros();
   if(typeof renderRedeMembros==='function')renderRedeMembros();
+  if(typeof renderContatosMembros==='function')renderContatosMembros();
 }
 
 
@@ -3873,7 +3878,7 @@ function _cvInit(n){
 function _cvAdd(){
   _cvTocado=true;
   const usados=_cvPart.map(p=>p.userId);
-  const u=users.filter(x=>!isSocioUser(x)&&x.perfil!=='Operador'&&!usados.includes(x.id)).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'))[0];
+  const u=users.filter(x=>!isSocioUser(x)&&x.perfil!=='Operador'&&x.perfil!=='Contato'&&!usados.includes(x.id)).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'))[0];
   _cvPart.push({userId:u?u.id:null,pct:0});_cvRender();
 }
 function _cvSet(i,campo,v){_cvTocado=true;_cvPart[i][campo]=campo==='pct'?(parseFloat(v)||0):(parseInt(v)||null);_cvRender();}
@@ -3891,7 +3896,7 @@ function _cvValidar(){
   return{teto,piso,soma,erros};
 }
 function _cvRender(){
-  const pessoas=users.filter(u=>!isSocioUser(u)&&u.perfil!=='Operador').sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  const pessoas=users.filter(u=>!isSocioUser(u)&&u.perfil!=='Operador'&&u.perfil!=='Contato').sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   const {teto,piso,soma,erros}=_cvValidar();
   const valor=parseFloat(document.getElementById('neg-valor').value)||0;
   const emR=p=>valor?` <span class="cv-rs">${_brl(valor*p/100)}</span>`:'';
@@ -3918,7 +3923,7 @@ function openNegModal(id){
   const selStatus=document.getElementById('neg-status');
   selStatus.innerHTML=NEG_COLS.map(c=>`<option>${c}</option>`).join('')+'<option value="Perdido">Inativo</option>';
   const selOrig=document.getElementById('neg-orig');
-  const origSorted=users.filter(u=>u.perfil!=='Operador').sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  const origSorted=users.filter(u=>u.perfil!=='Operador'&&(u.perfil!=='Contato'||(n&&u.id===n.originadorId))).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   selOrig.innerHTML=origSorted.map(u=>`<option value="${u.id}">${u.nome}${u.id===currentUser?.id?' (você)':''}</option>`).join('');
   // chips de produto
   const prodId=n?(n.configProdutoId||n.portafolioId||null):null;
@@ -4072,6 +4077,19 @@ function excluirMembro(id){
 }
 
 
+
+// Contatos: pessoas guardadas no sistema, fora da rede e sem comissão
+function renderContatosMembros(){
+  const el=document.getElementById('con-contatos');if(!el)return;
+  const lista=users.filter(u=>u.perfil==='Contato').sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  if(!lista.length){el.innerHTML=`<div style="color:#aaa;font-size:13px">Nenhum contato ainda. Em "+ Adicionar", escolha o perfil Contato.</div>`;return;}
+  el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">${lista.map(u=>`
+    <div style="border:1.5px solid #cbd5e1;border-radius:10px;padding:12px 14px;cursor:pointer" onclick="openEditUsr(${u.id})">
+      <div style="font-size:13px;font-weight:600;color:#0a1628;margin-bottom:4px">${esc(u.nome)}</div>
+      <div style="font-size:12px;color:#888">${esc(u.emp||'—')}</div>
+      ${u.tel?`<div style="font-size:11px;color:#64748b;margin-top:4px">${esc(u.tel)}</div>`:''}
+    </div>`).join('')}</div>`;
+}
 
 function renderRedeMembros(){
   const el=document.getElementById('con-inner-mbr');if(!el)return;
