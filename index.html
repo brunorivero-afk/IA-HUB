@@ -895,6 +895,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
       <div class="full"><label>Observações internas</label><textarea id="u-obs" placeholder="Visível apenas para sócios..."></textarea></div>
     </div>
     <div class="modal-btns">
+      <button class="btn-s" id="btn-excluir-usr" style="margin-right:auto;color:#dc2626;border-color:#fca5a5;display:none" onclick="_excluirContato()">🗑 Excluir contato</button>
       <button class="btn-s" onclick="closeOv('ov-usr')">Cancelar</button>
       <button class="btn-p" onclick="saveUsr()">Salvar</button>
     </div>
@@ -2267,6 +2268,7 @@ function updateSpecFields(){
 }
 function openAddUsr(){
   editUsrId=null;
+  document.getElementById('btn-excluir-usr').style.display='none';
   document.getElementById('usr-modal-ttl').textContent='Novo membro';
   ['u-nome','u-emp','u-email','u-tel','u-pix','u-seg','u-ativ','u-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
   ['u-spec-medico-val','u-spec-adv-val','u-spec-cont-val','u-spec-eng-val','u-spec-corr-val','u-spec-consul-val','u-spec-dent-val','u-spec-psico-val'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
@@ -2303,7 +2305,21 @@ function openEditUsr(id){
   const specMap={eng:'especEng',corr:'especCorr',consul:'especConsul',dent:'especDent',psico:'especPsico'};
   Object.entries(specMap).forEach(([k,f])=>{const el=document.getElementById('u-spec-'+k+'-val');if(el)el.value=u[f]||'';});
   updateSpecFields();
+  document.getElementById('btn-excluir-usr').style.display=u.perfil==='Contato'?'':'none';
   document.getElementById('ov-usr').classList.add('open');
+}
+// Exclui um contato. Se ele já estiver ligado a negócio, recebimento ou rede, não apaga (avisa onde está).
+function _excluirContato(){
+  const u=users.find(x=>x.id===editUsrId);if(!u||u.perfil!=='Contato')return;
+  const usos=[];
+  const negs=negocios.filter(n=>n.originadorId===u.id||((n.comissaoVenda||{}).participantes||[]).some(p=>p.userId===u.id));
+  if(negs.length)usos.push(negs.length+' negócio(s): '+negs.slice(0,3).map(n=>n.titulo).join(', '));
+  if(pagamentos.some(p=>p.vendedorId===u.id||(p.distribuicao||[]).some(r=>r.pessoaId===u.id)))usos.push('recebimentos');
+  const vinc=users.filter(x=>x.vinculoId===u.id);if(vinc.length)usos.push('vínculo de '+vinc.map(x=>x.nome).join(', '));
+  if(usos.length){alert(`${u.nome} não pode ser excluído porque está ligado a:\n\n• ${usos.join('\n• ')}\n\nTire essas ligações antes ou deixe o status como Inativo.`);return;}
+  if(!confirm(`Excluir o contato ${u.nome}?`))return;
+  users=users.filter(x=>x.id!==u.id);
+  saveData();closeOv('ov-usr');renderContatosMembros();showToast(`🗑 ${u.nome} excluído`);
 }
 function onUsrPerfilChange(){
   // Se Contato selecionado: avisa que ao salvar irá para contatos[]
