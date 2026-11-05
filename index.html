@@ -786,20 +786,25 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     </div>
     <!-- CONEXÕES -->
     <div class="panel" id="tab-rede-membros">
-      <!-- Painel Rede -->
-      <div id="con-pnl-rede">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
-          <div style="font-size:13px;color:#888">Sócios, parceiros e rede BIdaTX</div>
-          <button class="btn-p" id="btn-novo-membro" onclick="openAddUsr()">+ Adicionar</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+        <div class="pip-modo" id="con-subabas">
+          <button id="con-sub-rede" class="on" onclick="_conSub('rede')">Rede</button>
+          <button id="con-sub-contatos" onclick="_conSub('contatos')">Contatos <span id="con-qtd-contatos"></span></button>
         </div>
+        <button class="btn-p" id="btn-novo-membro" onclick="openAddUsr()">+ Adicionar</button>
+      </div>
+      <!-- Painel Rede: sócios, parceiros e rede (quem recebe comissão) -->
+      <div id="con-pnl-rede">
         <div class="section-hdr" style="margin-top:0">Sócios</div>
         <div id="con-socios" style="margin-bottom:20px"></div>
         <div class="section-hdr" style="margin-top:0">Parceiros</div>
         <div id="con-parceiros" style="margin-bottom:20px"></div>
         <div class="section-hdr" style="margin-top:0">Rede</div>
         <div id="con-inner-mbr"></div>
-        <div class="section-hdr" style="margin-top:20px">Contatos</div>
-        <div style="font-size:12px;color:#888;margin:-4px 0 10px">Pessoas guardadas no sistema, fora da rede e sem comissão.</div>
+      </div>
+      <!-- Painel Contatos: pessoas guardadas no sistema, fora da rede e sem comissão -->
+      <div id="con-pnl-contatos" hidden>
+        <div style="font-size:12px;color:#888;margin:0 0 12px">Pessoas guardadas no sistema, fora da rede e sem comissão. Para incluir, use "+ Adicionar" e escolha o perfil Contato.</div>
         <div id="con-contatos"></div>
       </div>
     </div>
@@ -1796,7 +1801,7 @@ async function _entrarComSessao(){
   const u=users.find(x=>x.id===+soc.user_id);
   if(!u){_loginErro('Seu cadastro de sócio não foi encontrado nos dados.');return false;}
   currentUser=u;
-  _limpezaDadosV1();_migrarEtapasV2();_migrarProdutoIAHub();
+  _limpezaDadosV1();_migrarEtapasV2();_migrarProdutoIAHub();_resgatarContatosLocais();
   setupMain();showScreen('main');showTab('rede');_lembreteLogin();
   _vigiarVersao();
   return true;
@@ -1925,7 +1930,7 @@ function showTab(name){
   if(tbtn)tbtn.classList.add('active');
   if(name==='rede')renderDashboard();
   if(name==='receitas')renderReceitas();
-  if(name==='rede-membros'){renderSocios();renderParceiros();renderRedeMembros();renderContatosMembros();}
+  if(name==='rede-membros'){renderSocios();renderParceiros();renderRedeMembros();renderContatosMembros();_conSub(_conAba);}
   if(name==='financeiro')renderFinanceiro();
   if(name==='negocios')renderPipeline();
   if(name==='vitrine')renderVitrine();
@@ -2266,7 +2271,7 @@ function openAddUsr(){
   ['u-nome','u-emp','u-email','u-tel','u-pix','u-seg','u-ativ','u-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
   ['u-spec-medico-val','u-spec-adv-val','u-spec-cont-val','u-spec-eng-val','u-spec-corr-val','u-spec-consul-val','u-spec-dent-val','u-spec-psico-val'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   updateSpecFields();
-  document.getElementById('u-perfil').value='Parceiro';
+  document.getElementById('u-perfil').value=_conAba==='contatos'?'Contato':'Parceiro';
   document.getElementById('u-tipo').value='PJ';
   document.getElementById('u-status').value='Ativo';
   fillVinculoSelect(null);_usrPerfisRender();
@@ -4078,11 +4083,21 @@ function excluirMembro(id){
 
 
 
+// Conexões em duas sub-abas: Rede (quem recebe comissão) e Contatos (fora da rede)
+let _conAba='rede';
+function _conSub(aba){
+  _conAba=aba;
+  document.getElementById('con-pnl-rede').hidden=aba!=='rede';
+  document.getElementById('con-pnl-contatos').hidden=aba!=='contatos';
+  document.getElementById('con-sub-rede').classList.toggle('on',aba==='rede');
+  document.getElementById('con-sub-contatos').classList.toggle('on',aba==='contatos');
+}
 // Contatos: pessoas guardadas no sistema, fora da rede e sem comissão
 function renderContatosMembros(){
   const el=document.getElementById('con-contatos');if(!el)return;
   const lista=users.filter(u=>u.perfil==='Contato').sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
-  if(!lista.length){el.innerHTML=`<div style="color:#aaa;font-size:13px">Nenhum contato ainda. Em "+ Adicionar", escolha o perfil Contato.</div>`;return;}
+  const qtd=document.getElementById('con-qtd-contatos');if(qtd)qtd.textContent=lista.length?'('+lista.length+')':'';
+  if(!lista.length){el.innerHTML=`<div style="color:#aaa;font-size:13px">Nenhum contato ainda.</div>`;return;}
   el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">${lista.map(u=>`
     <div style="border:1.5px solid #cbd5e1;border-radius:10px;padding:12px 14px;cursor:pointer" onclick="openEditUsr(${u.id})">
       <div style="font-size:13px;font-weight:600;color:#0a1628;margin-bottom:4px">${esc(u.nome)}</div>
@@ -4230,7 +4245,7 @@ function saveData(){
 function loadData(){
   try{
     // apaga sobras de módulos que não existem mais
-    ['iahub_projetos','iahub_sinergias','iahub_conexoes','iahub_notificacoes','iahub_oportunidades','iahub_externos','iahub_interesses','iahub_receitas','iahub_comissoes','iahub_contatos'].forEach(k=>localStorage.removeItem(k));
+    ['iahub_projetos','iahub_sinergias','iahub_conexoes','iahub_notificacoes','iahub_oportunidades','iahub_externos','iahub_interesses','iahub_receitas','iahub_comissoes'].forEach(k=>localStorage.removeItem(k));
     const d={};
     Object.entries(_LOCAL_CHAVES).forEach(([k,chave])=>{const v=localStorage.getItem(chave);if(v)d[k]=JSON.parse(v);});
     applyStateSnapshot(d);
@@ -4311,6 +4326,26 @@ function _migrarProdutoIAHub(){
   config.produtoIAHub=new Date().toISOString();
   saveData();
   if(q)setTimeout(()=>showToast(`🏷 Produto "IA Hub" criado na matriz e ${q} card(s) ligados a ele`),3000);
+}
+
+// Contatos do sistema antigo ficavam só no navegador (iahub_contatos). Se ainda existirem
+// neste navegador, viram pessoas com perfil Contato no banco (sem duplicar por nome).
+function _resgatarContatosLocais(){
+  let antigos=[];
+  try{antigos=JSON.parse(localStorage.getItem('iahub_contatos')||'[]');}catch(e){return;}
+  if(!Array.isArray(antigos)||!antigos.length)return;
+  const existe=new Set(users.map(u=>_impNorm(u.nome)));
+  let q=0,seq=Date.now();
+  antigos.forEach(c=>{
+    const nome=String(c.nome||'').trim();if(!nome||existe.has(_impNorm(nome)))return;
+    users.push({id:++seq,nome,perfil:'Contato',status:'Ativo',emp:c.empresa||c.emp||'',seg:c.segmento||c.seg||'',tel:c.telefone||c.tel||'',
+      email:c.email||'',obs:c.obs||'',desde:c.criado||new Date().toLocaleDateString('pt-BR')});
+    existe.add(_impNorm(nome));q++;
+  });
+  try{localStorage.setItem('iahub_contatos_backup',localStorage.getItem('iahub_contatos'));localStorage.removeItem('iahub_contatos');}catch(e){}
+  if(!q)return;
+  saveData();
+  setTimeout(()=>showToast(`📇 ${q} contato(s) antigo(s) deste navegador recuperado(s) para Conexões › Contatos`),3500);
 }
 
 // ===================== REGRAS DE DISTRIBUIÇÃO (cascata) =====================
