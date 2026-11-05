@@ -328,6 +328,10 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 .ap-sub{font-size:11px;color:#9ca3af;}
 .ap-val{font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums;}
 .ap-pago{opacity:.55;}
+.u-perfis{display:flex;gap:6px;}
+.u-perfil-btn{flex:1;border:1.5px solid #e5e7eb;background:#fff;border-radius:8px;padding:8px;font-size:13px;font-weight:600;color:#475569;cursor:pointer;}
+.u-perfil-btn.on{background:#0a1628;border-color:#0a1628;color:#fff;}
+[data-theme="dark"] .u-perfil-btn{background:#1a2035;border-color:#2d3748;color:#cbd5e1;}
 .dash-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:16px;}
 .dash-kpi{background:#fff;border:1px solid #eee;border-radius:10px;padding:12px 14px;cursor:pointer;transition:box-shadow .15s;}
 .dash-kpi:hover{box-shadow:0 2px 10px rgba(0,0,0,.06);}
@@ -831,6 +835,15 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <div class="fg">
       <div class="fg-sec" style="border:none;padding:0;margin-top:0">Dados pessoais</div>
       <div><label>Nome *</label><input id="u-nome" placeholder="Nome completo"></div>
+      <div class="full" id="u-perfil-wrap">
+        <label>Perfil na rede *</label>
+        <div class="u-perfis" id="u-perfis"></div>
+        <select id="u-perfil" style="display:none"><option>Sócio</option><option selected>Parceiro</option><option>Rede</option></select>
+      </div>
+      <div class="full" id="u-vinculo-wrap"><label>Vinculado a (quem trouxe) *</label>
+        <select id="u-vinculo"><option value="">— Nenhum —</option></select>
+        <div style="font-size:11px;color:#aaa;margin-top:3px" id="u-vinculo-hint">Define quem comissiona e acompanha este membro</div>
+      </div>
       <div><label>Tipo</label>
         <select id="u-tipo">
           <option value="PJ">Pessoa Jurídica</option>
@@ -861,11 +874,6 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
           <input id="u-spec-psico-val" placeholder="Ex: Clínica, Organizacional, Coaching, Neuropsicologia..."></div>
       </div>
       <div class="full"><label>Descrição das atividades</label><textarea id="u-ativ" placeholder="Serviços, público-alvo, proposta de valor..."></textarea></div>
-      <div class="fg-sec" id="u-sec-acesso">Perfil e acesso</div>
-      <div id="u-perfil-wrap"><label>Perfil</label>
-        <select id="u-perfil" onchange="onUsrPerfilChange()"><option>Sócio</option><option selected>Parceiro</option><option>Rede</option></select>
-        <div id="u-perfil-hint" style="display:none;font-size:11px;color:#d97706;margin-top:4px;padding:4px 8px;background:#fef3c7;border-radius:6px">Ao salvar, este membro será movido para a aba Contatos.</div>
-      </div>
       <div><label>Status do membro</label>
         <select id="u-status">
           <option value="Ativo">Ativo</option>
@@ -876,12 +884,6 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
           <option value="Inativo">Inativo</option>
           <option value="Pendente">Pendente</option>
         </select></div>
-      <div id="u-vinculo-wrap"><label>Vinculado a (responsável) *</label>
-        <select id="u-vinculo">
-          <option value="">— Nenhum —</option>
-        </select>
-        <div style="font-size:11px;color:#aaa;margin-top:3px" id="u-vinculo-hint">Define quem comissiona e acompanha este membro</div>
-      </div>
       <div class="full"><label>Observações internas</label><textarea id="u-obs" placeholder="Visível apenas para sócios..."></textarea></div>
     </div>
     <div class="modal-btns">
@@ -2130,46 +2132,30 @@ function showToast(msg){
   clearTimeout(t._to);t._to=setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.style.display='none',400);},4000);
 }
 function destroyChart(id){if(chartInstances[id]){chartInstances[id].destroy();delete chartInstances[id];}}
+// Perfil na rede (botões) + "Vinculado a": Parceiro → um sócio; Rede → sócio, parceiro ou outra pessoa da rede
+function _usrPerfisRender(){
+  const el=document.getElementById('u-perfis'),sel=document.getElementById('u-perfil');if(!el||!sel)return;
+  el.innerHTML=['Sócio','Parceiro','Rede'].map(p=>`<button type="button" class="u-perfil-btn ${sel.value===p?'on':''}" onclick="_usrPerfil('${p}')">${p}</button>`).join('');
+}
+function _usrPerfil(p){
+  const sel=document.getElementById('u-perfil');sel.value=p;
+  const atual=parseInt(document.getElementById('u-vinculo').value)||null;
+  fillVinculoSelect(atual);_usrPerfisRender();
+}
 function fillVinculoSelect(selectedId){
   const sel=document.getElementById('u-vinculo');if(!sel)return;
-  const perfilSel=document.getElementById('u-perfil');
-  const perfil=perfilSel?perfilSel.value:'Parceiro';
-  sel.innerHTML='';
-  let allowed=[];
-  let label='';
-  if(perfil==='Parceiro'){
-    allowed=users.filter(u=>u.perfil==='Sócio');
-    label='Parceiros devem estar vinculados a um sócio.';
-    sel.innerHTML='<option value="">— Selecione um sócio —</option>';
-  } else if(perfil==='Rede'){
-    allowed=users.filter(u=>u.perfil==='Sócio'||u.perfil==='Parceiro');
-    label='Rede deve estar vinculada a um sócio ou parceiro.';
-    sel.innerHTML='<option value="">— Selecione quem trouxe —</option>';
-  } else {
-    allowed=[];
-    label=perfil==='Sócio'?'Sócios não precisam de vínculo.':'Contatos não precisam de vínculo.';
-    sel.innerHTML='<option value="">— Nenhum —</option>';
-  }
-  // Coloca o usuário logado primeiro
-  const sorted=[...allowed].sort((a,b)=>{
-    if(a.id===currentUser?.id)return -1;
-    if(b.id===currentUser?.id)return 1;
-    return 0;
-  });
-  sorted.forEach(u=>{
-    const o=document.createElement('option');
-    o.value=u.id;
-    const label_=u.id===currentUser?.id?`${u.nome} — você (${u.perfil})`:`${u.nome} (${u.perfil})`;
-    o.text=label_;
-    if(u.id===selectedId||(selectedId===null&&u.id===currentUser?.id))o.selected=true;
-    sel.appendChild(o);
-  });
-  const hint=document.getElementById('u-vinculo-hint');
-  if(hint)hint.textContent=label;
-  const wrap=document.getElementById('u-vinculo-wrap');
-  if(wrap)wrap.style.display=(perfil==='Sócio'||perfil==='Contato')?'none':'';
+  const perfil=(document.getElementById('u-perfil')||{}).value||'Parceiro';
+  const wrap=document.getElementById('u-vinculo-wrap'),hint=document.getElementById('u-vinculo-hint');
+  if(perfil==='Sócio'){sel.innerHTML='<option value="">— Nenhum —</option>';if(wrap)wrap.style.display='none';return;}
+  if(wrap)wrap.style.display='';
+  const aceita=perfil==='Parceiro'?(u=>isSocioUser(u)):(u=>isSocioUser(u)||u.perfil==='Parceiro'||u.perfil==='Rede');
+  const lista=users.filter(u=>u.id!==editUsrId&&u.perfil!=='Operador'&&aceita(u)).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  const escolhido=lista.some(u=>u.id===selectedId)?selectedId:(lista.some(u=>u.id===currentUser?.id)?currentUser.id:null);
+  sel.innerHTML=`<option value="">— ${perfil==='Parceiro'?'Selecione um sócio':'Selecione quem trouxe'} —</option>`+
+    lista.map(u=>`<option value="${u.id}" ${u.id===escolhido?'selected':''}>${esc(u.nome)} (${u.perfil})${u.id===currentUser?.id?' — você':''}</option>`).join('');
+  if(hint)hint.textContent=perfil==='Parceiro'?'Parceiro fica vinculado ao sócio que o trouxe.':'Rede fica vinculada a quem a trouxe: sócio, parceiro ou outra pessoa da rede.';
 }
-document.addEventListener('change',e=>{if(e.target.id==='u-perfil')fillVinculoSelect(null);});
+document.addEventListener('change',e=>{if(e.target.id==='u-perfil'){fillVinculoSelect(null);_usrPerfisRender();}});
 
 // Grupos e subcategorias personalizados criados pelo sócio
 let customGroups={}; // {groupKey: {label:'...', cats:['...']}}
@@ -2278,7 +2264,7 @@ function openAddUsr(){
   document.getElementById('u-perfil').value='Parceiro';
   document.getElementById('u-tipo').value='PJ';
   document.getElementById('u-status').value='Ativo';
-  fillVinculoSelect(null);
+  fillVinculoSelect(null);_usrPerfisRender();
   const showAccess=isSocio();
   ['u-sec-acesso','u-perfil-wrap','u-vinculo-wrap'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=showAccess?'':'none';});
   document.getElementById('ov-usr').classList.add('open');
@@ -2294,10 +2280,11 @@ function openEditUsr(id){
   document.getElementById('u-seg').value=u.seg||'';
   document.getElementById('u-ativ').value=u.ativ||'';
   document.getElementById('u-perfil').value=u.perfil;
+  if(document.getElementById('u-perfil').value!==u.perfil)document.getElementById('u-perfil').value=isSocioUser(u)?'Sócio':'Parceiro';
   document.getElementById('u-tipo').value=u.tipo||'PJ';
   document.getElementById('u-status').value=u.status||'Ativo';
   document.getElementById('u-obs').value=u.obs||'';
-  fillVinculoSelect(u.vinculoId||null);
+  fillVinculoSelect(u.vinculoId||null);_usrPerfisRender();
   const showAccess=isSocio();
   ['u-sec-acesso','u-perfil-wrap','u-vinculo-wrap'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=showAccess?'':'none';});
   const sm=document.getElementById('u-spec-medico-val');if(sm)sm.value=u.especMedico||'';
