@@ -1566,8 +1566,8 @@ footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);font-si
   <h2>Rotina do dia (5 minutos)</h2>
   <ol class="passos">
     <li>Abra o <b>Dashboard</b> e olhe a <b>Minha semana</b>: Atrasado, Hoje, Esta semana, Sem próximo passo.</li>
-    <li>Clique em cada negócio da lista e registre o que aconteceu, com o <b>próximo passo</b> e a <b>data</b>.</li>
-    <li>Negócio que avançou? No Pipeline, <b>arraste o card</b> para a próxima etapa. O sistema já pede o próximo passo.</li>
+    <li>Clique em cada negócio da lista e registre o que aconteceu. Se houver <b>próximo passo</b>, anote com a <b>data</b>.</li>
+    <li>Negócio que avançou? No Pipeline, <b>arraste o card</b> para a próxima etapa.</li>
     <li>Negócio que não vai seguir? Marque como <b>Inativo</b> e informe o motivo.</li>
   </ol>
   <p class="nota">Ao entrar, aparece um resumo: "Sua semana: 3 atrasados · 2 para hoje…". A tabela por sócio no Dashboard mostra os números de todos, para vocês se cobrarem.</p>
@@ -1595,7 +1595,7 @@ footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);font-si
 
   <h3>Filtros e ferramentas</h3>
   <ul>
-    <li><b>Produto · Sócio · Rede · Situação</b>. A situação "Precisam de ação" junta os atrasados e os sem próximo passo.</li>
+    <li><b>Produto · Sócio · Rede · Situação</b>. A situação "Precisam de ação" junta os atrasados e os sem próximo passo parados há mais de 7 dias.</li>
     <li><span class="k">Etapas | Por cliente</span>: na visão por cliente, uma linha por cliente com todos os produtos dele.</li>
     <li><span class="k">⬇ Exportar</span> gera um Excel e <span class="k">🖨 Relatório</span> uma versão para imprimir ou salvar em PDF. Os dois saem <b>do que está filtrado na tela</b>. Exemplo: filtre "Sócio: Vick" e gere o relatório dele.</li>
     <li><span class="k">⬆ Importar</span> traz uma planilha (uma linha por cliente, "x" em cada produto). Antes de gravar, o sistema mostra a prévia e pergunta quem é cada nome da rede.</li>
@@ -1608,7 +1608,7 @@ footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);font-si
     <li><b>Produto</b> e <b>cliente</b>. O produto define a regra de comissão e se o negócio é recorrente.</li>
     <li><b>Originador</b>: quem está de frente com o cliente.</li>
     <li><b>Comissão de venda</b>: o sistema já sugere o sócio dono da rede e coloca o originador com o <b>piso da matriz</b>. O sócio pode subir o percentual até o <b>teto</b> (ex.: 50% em Novo Negócio, 25% no Sicoob), e o que sobra fica com ele. Dois sócios originaram juntos? Use <i>"Dividir a parte do sócio com outro sócio"</i>.</li>
-    <li><b>Próximo passo + data</b> (obrigatórios) e <b>prioridade</b>.</li>
+    <li><b>Próximo passo + data</b> (opcionais) e <b>prioridade</b>.</li>
     <li>Recorrência: Sicoob, GruPag, Energia, EcoÁgua, Contabilidade e BPO são sempre recorrentes. Em Revisão de Créditos, Transação e VGV, marque a caixa se o negócio for recorrente. Consultoria é pagamento único.</li>
   </ol>
 </section>
@@ -1640,7 +1640,7 @@ footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);font-si
 <section id="regras">
   <h2>Regras de ouro</h2>
   <div class="ouro"><ol>
-    <li>Todo negócio ativo tem <b>próximo passo com data</b>. Sem passo, ele não anda.</li>
+    <li>Quando houver algo a fazer, anote o <b>próximo passo com data</b>: é ele que alimenta a Minha semana.</li>
     <li>Olhe a <b>Minha semana</b> todo dia.</li>
     <li>Negócio que esfriou vai para <b>Inativo com motivo</b>. Pipeline honesto converte mais.</li>
     <li>Recorrente: faça o <b>fechamento do mês</b> todo mês, sem deixar pendentes.</li>
@@ -3073,8 +3073,6 @@ function negDrop(e,col){
   n.status=col;n.atualizadoEm=new Date().toISOString();
   if(col==='Fechado'&&!n.fechadoEm)n.fechadoEm=_dataLocal();
   saveData();renderPipeline();_negDragId=null;
-  // Mudou de etapa: já pede o próximo passo (se ainda está ativo)
-  if(mudou&&_negAtivo(n))_negAtualizar(n.id,'agora em '+col);
 }
 
 function renderPipeline(){
@@ -3522,8 +3520,8 @@ function _negDesdeEtapa(n){
 const DIAS_COLUNA_PAGO=30;
 
 // ===================== ACOMPANHAMENTO: PRÓXIMO PASSO, PRIORIDADE, FUNIL =====================
-// Todo negócio ativo deve ter um próximo passo com data. É isso que faz o pipeline andar:
-// a "situação" de cada card sai daí (atrasado, hoje, esta semana, sem próximo passo).
+// O próximo passo é opcional: ajuda a organizar, nunca trava um salvamento.
+// A "situação" de cada card sai dele (atrasado, hoje, esta semana, sem próximo passo).
 const DIAS_PARADO=7;
 const PRIOS={quente:{rot:'Quente',ico:'🔥',ord:0},morno:{rot:'Morno',ico:'',ord:1},frio:{rot:'Frio',ico:'❄️',ord:2}};
 const MOTIVOS_PERDA=['Sem retorno do cliente','Preço / condição','Adiado / sem timing','Ficou com concorrente','Sem perfil para o produto','Outro'];
@@ -3541,7 +3539,8 @@ function _negSit(n){
   const h=_dataLocal();
   return d<h?'atrasado':d===h?'hoje':d<=_maisDias(7)?'semana':'futuro';
 }
-function _negAtencao(n){const s=_negSit(n);return s==='atrasado'||s==='sempasso';}
+// Atenção = passo atrasado, ou sem passo e sem nenhuma atualização há mais de DIAS_PARADO dias (lembrete, não cobrança)
+function _negAtencao(n){const s=_negSit(n);return s==='atrasado'||(s==='sempasso'&&_diasParado(n)>DIAS_PARADO);}
 const _negParado=_negAtencao;// nome antigo, mesma ideia: precisa de ação
 function _negPrio(n){return PRIOS[n.prioridade]?n.prioridade:'morno';}
 function _dataBR(iso){if(!iso)return'';const[a,m,d]=iso.split('-');return`${d}/${m}`;}
@@ -3574,9 +3573,9 @@ function _negAtualizar(id,aviso){
     <div class="imp-ajuda" style="margin-bottom:12px">${esc(_prodLabel(_negProdKey(n)))} · ${esc(n.status||'Prospecção')}${aviso?' · '+esc(aviso):''}</div>
     <label>O que aconteceu? <span class="imp-ajuda">(vai para as notas)</span></label>
     <input id="na-nota" placeholder="Ex.: reunião feita, pediu proposta">
-    <label style="margin-top:10px">Próximo passo *</label>
+    <label style="margin-top:10px">Próximo passo <span class="imp-ajuda">(opcional)</span></label>
     <input id="na-passo" value="${esc(n.proximoPasso||'')}" placeholder="Ex.: enviar proposta de Energia">
-    <label style="margin-top:10px">Até quando *</label>
+    <label style="margin-top:10px">Até quando</label>
     <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
       <input id="na-data" type="date" value="${n.proximoPassoData||_maisDias(3)}" style="width:auto">
       ${[['Amanhã',1],['+3 dias',3],['+1 semana',7],['+15 dias',15]].map(([t,d])=>`<button type="button" class="na-rap" onclick="document.getElementById('na-data').value='${_maisDias(d)}'">${t}</button>`).join('')}
@@ -3593,10 +3592,9 @@ function _negAtualizar(id,aviso){
 function _negAtualizarSalvar(){
   const n=negocios.find(x=>x.id===_naId);if(!n)return;
   const passo=document.getElementById('na-passo').value.trim(),data=document.getElementById('na-data').value;
-  if(!passo||!data){alert('Informe o próximo passo e a data.');return;}
   const nota=document.getElementById('na-nota').value.trim();
   if(nota)n.notas=(n.notas?n.notas+'\n':'')+`${new Date().toLocaleDateString('pt-BR')} · ${currentUser.nome.split(' ')[0]}: ${nota}`;
-  n.proximoPasso=passo;n.proximoPassoData=data;
+  n.proximoPasso=passo;n.proximoPassoData=passo?(data||_maisDias(3)):'';
   n.prioridade=(document.querySelector('.na-prio.on')||{}).dataset?.p||_negPrio(n);
   n.atualizadoEm=new Date().toISOString();
   closeOv('ov-na');saveData();_rerenderAtual();
@@ -3605,8 +3603,8 @@ function _negAtualizarSalvar(){
 // ---------- Avisos de entrada e Minha semana ----------
 function _lembreteLogin(){
   const meus=negocios.filter(n=>_negSocios(n).includes(currentUser.id));
-  const atr=meus.filter(n=>_negSit(n)==='atrasado').length,hj=meus.filter(n=>_negSit(n)==='hoje').length,sem=meus.filter(n=>_negSit(n)==='sempasso').length;
-  const p=[atr&&`${atr} atrasado(s)`,hj&&`${hj} para hoje`,sem&&`${sem} sem próximo passo`].filter(Boolean);
+  const atr=meus.filter(n=>_negSit(n)==='atrasado').length,hj=meus.filter(n=>_negSit(n)==='hoje').length;
+  const p=[atr&&`${atr} atrasado(s)`,hj&&`${hj} para hoje`].filter(Boolean);
   if(p.length)setTimeout(()=>showToast('📋 Sua semana: '+p.join(' · ')),800);
 }
 function _dashParadosHtml(){
@@ -4008,11 +4006,10 @@ function saveNeg(){
   const stNovo=document.getElementById('neg-status').value;
   const ativoNovo=!['Pagamento Realizado','Perdido'].includes(stNovo);
   const passo=document.getElementById('neg-passo').value.trim(),passoData=document.getElementById('neg-passo-data').value;
-  if(ativoNovo&&(!passo||!passoData)){alert('Defina o próximo passo e a data. É isso que faz o negócio andar.');document.getElementById('neg-passo').focus();return;}
   const motivo=document.getElementById('neg-perda').value;
   if(stNovo==='Perdido'&&!motivo){alert('Escolha o motivo da inativação.');return;}
   const obj={
-    proximoPasso:ativoNovo?passo:'',proximoPassoData:ativoNovo?passoData:'',
+    proximoPasso:ativoNovo?passo:'',proximoPassoData:ativoNovo&&passo?(passoData||_maisDias(3)):'',
     recorrente:_negRecorrMarcado,
     prioridade:(document.querySelector('#neg-prios .na-prio.on')||{}).dataset?.p||'morno',
     motivoPerda:stNovo==='Perdido'?motivo:'',motivoPerdaObs:stNovo==='Perdido'?document.getElementById('neg-perda-obs').value.trim():'',
