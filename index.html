@@ -206,6 +206,8 @@ body{font-family:system-ui,sans-serif;background:#f5f0e8;color:#1a1a1a;font-size
 .pc-quem{font-size:11px;color:#9ca3af;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .pc-passo{display:flex;justify-content:space-between;gap:6px;font-size:11px;margin-top:4px;padding:2px 6px;border-radius:5px;background:#f8fafc;color:#475569;cursor:pointer;}
 .pc-passo span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pc-bdx{display:flex;align-items:center;gap:6px;font-size:10.5px;margin-top:4px;padding:2px 6px;border-radius:5px;background:#eef4fb;color:#0a3d75;border-left:3px solid #1B4F8A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:default;}
+.pc-bdx span{font-weight:700;font-size:9px;letter-spacing:.5px;color:#1B4F8A;}
 .pc-passo b{white-space:nowrap;}
 .pc-atrasado{background:#fef2f2;color:#b91c1c;}
 .pc-hoje{background:#fffbeb;color:#b45309;}
@@ -3077,6 +3079,7 @@ function negDrop(e,col){
 
 function renderPipeline(){
   if(!isSocio()){document.getElementById('tab-pipeline').innerHTML='<div class="blocked"><h2>Acesso restrito</h2></div>';return;}
+  _bdxCarregar();// processo do BIDATX (somente leitura); re-desenha sozinho se algo mudou
   const el=document.getElementById('tab-pipeline');
   el.innerHTML=`<div style="height:100%;display:flex;flex-direction:column;overflow:hidden">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;padding:12px 16px 10px">
@@ -3189,6 +3192,66 @@ function _pipPassoHtml(n){
   if(s==='sempasso')return`<div class="pc-passo pc-sem" onclick="event.stopPropagation();_negAtualizar(${n.id})">＋ definir próximo passo</div>`;
   return`<div class="pc-passo pc-${s}" onclick="event.stopPropagation();_negAtualizar(${n.id})" title="${esc(n.proximoPasso||'')}"><span>${esc(n.proximoPasso||'')}</span><b>${s==='hoje'?'hoje':_dataBR(n.proximoPassoData)}</b></div>`;
 }
+// ===================== PROCESSO BIDATX (SOMENTE LEITURA) =====================
+// O BIDATX Sistema é o dono do processo tributário. O IA Hub só LÊ a linha 'bidatx' de bidatx_data
+// e mostra em que passo (1 a 6) cada cliente está. NUNCA gravar em bidatx_data: o BIDATX regrava a linha inteira.
+// Etapas do BIDATX (ids): 1 Reunião · 2 Levantamento · 3 Apres. Levantamento · 4 Contrato · 5-9 compensações/validação.
+const BDX_PASSOS=['Procuração Eletrônica','Levantamento de Dados','Apresentação ao Cliente','Proposta Enviada','Proposta Assinada','Compensação Tributária'];
+const BDX_TIPOS={'Fiscal':'Fiscal','Previdenciário':'Prev.'};// Consultoria e Transação: etapas ainda não validadas, ficam de fora
+let _bdx={cnpj:{},nome:{},ok:false,tent:0,sig:''};
+function _bdxPasso(opp,tipo){
+  const e=Number((opp.etapasPorTipo||{})[tipo]);
+  if(e>=1&&e<=3)return e;
+  if(e===4){const d=((opp.docsPorTipo||{})[tipo]||{})['4_Contrato Assinado'];return d&&d.recebido?5:4;}
+  if(e>=5&&e<=9)return 6;
+  return 0;
+}
+function _bdxIndexar(opors){
+  const cnpj={},nome={};
+  (opors||[]).forEach(o=>{
+    if(!o||o.status==='inativo')return;
+    const itens=[];
+    (o.tipos||[]).forEach(t=>{if(BDX_TIPOS[t]){const p=_bdxPasso(o,t);if(p)itens.push({tipo:BDX_TIPOS[t],passo:p});}});
+    if(!itens.length)return;
+    const reg={cliente:o.cliente,itens};
+    const c=String(o.cnpj||'').replace(/\D/g,'');
+    if(c.length===14)(cnpj[c]=cnpj[c]||[]).push(reg);
+    const k=_impNorm(o.cliente);
+    if(k)(nome[k]=nome[k]||[]).push(reg);
+  });
+  return{cnpj,nome};
+}
+// Só negócios de crédito tributário (o que o BIDATX opera); Consultoria, Passivos/Transação e demais produtos não.
+function _bdxElegivel(n){const p=_prodLabel(_negProdKey(n));return /tribut/i.test(p)&&!/consultoria|passivo|transa[cç]/i.test(p);}
+function _bdxDe(n){
+  if(!_bdx.ok||!_bdxElegivel(n))return null;
+  const c=String(n.cnpj||'').replace(/\D/g,'');
+  let l=c.length===14?_bdx.cnpj[c]:null;
+  if(!l){const x=_bdx.nome[_impNorm(n.titulo)];if(x)l=x;}// sem CNPJ: só liga por nome idêntico
+  return l&&l.length===1?l[0]:null;// mais de um cadastro igual no BIDATX = ambíguo, não mostra
+}
+function _bdxChipHtml(n){
+  const r=_bdxDe(n);if(!r)return'';
+  const txt=r.itens.length===1?`${r.itens[0].passo}/6 · ${BDX_PASSOS[r.itens[0].passo-1]}`:r.itens.map(i=>`${i.tipo} ${i.passo}/6`).join(' · ');
+  const tip='Processo no BIDATX Sistema (só leitura)\n'+r.itens.map(i=>`${i.tipo}: ${i.passo}/6 ${BDX_PASSOS[i.passo-1]}`).join('\n');
+  return`<div class="pc-bdx" title="${esc(tip)}"><span>BIDATX</span>${esc(txt)}</div>`;
+}
+async function _bdxCarregar(forcar){
+  if(!supaClient||!currentUser)return;
+  if(!forcar&&Date.now()-_bdx.tent<60000)return;
+  _bdx.tent=Date.now();
+  try{
+    const {data,error}=await supaClient.from('bidatx_data').select('opors').eq('id','bidatx').maybeSingle();
+    if(error||!data||!Array.isArray(data.opors)){console.info('BIDATX: sem leitura',error&&error.message);return;}
+    const idx=_bdxIndexar(data.opors);
+    const sig=JSON.stringify([idx.cnpj,idx.nome]);
+    const mudou=sig!==_bdx.sig;
+    _bdx={...idx,ok:true,tent:_bdx.tent,sig};
+    const painel=document.getElementById('tab-negocios');
+    if(mudou&&painel&&painel.classList.contains('active')&&!document.querySelector('.overlay.open'))renderPipeline();
+  }catch(e){console.info('BIDATX: falha ao ler',e&&e.message);}
+}
+
 function _pipKanbanHtml(negFilt){
   return`<div style="flex:1;display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;min-height:0;padding:0 16px 12px">
     ${NEG_COLS.map(col=>{
@@ -3213,6 +3276,7 @@ function _pipKanbanHtml(negFilt){
               <div class="pc-top"><span class="pc-cli">${pr.ico?pr.ico+' ':''}${esc(n.titulo)}</span>
                 <span class="pc-acoes"><button title="Registrar andamento" onclick="event.stopPropagation();_negAtualizar(${n.id})">✓</button><button title="Ver cliente" onclick="event.stopPropagation();abrirFichaCliente(${n.id})">👤</button></span></div>
               <div class="pc-meta"><span class="pc-prod" style="color:${cor};border-color:${cor}55;background:${cor}12">${esc(prod)}</span><span class="pc-quem">${esc(_pipQuem(n))}</span></div>
+              ${_bdxChipHtml(n)}
               ${_pipPassoHtml(n)}
             </div>`;
           }).join(''):`<div style="color:#9ca3af;font-size:12px;text-align:center;padding:24px 8px">Arraste aqui</div>`}
