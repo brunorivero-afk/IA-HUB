@@ -1080,6 +1080,9 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 <div class="overlay" id="ov-neg">
   <div class="modal" style="width:540px;max-height:92vh;overflow-y:auto">
     <h2 id="neg-ttl" style="font-size:16px;font-weight:700;margin-bottom:14px">Novo Negócio</h2>
+    <div id="neg-bdx-aviso" style="display:none;margin-bottom:14px;padding:9px 12px;background:#eef4fb;border-left:3px solid #1B4F8A;border-radius:6px;font-size:12px;color:#0a3d75;line-height:1.5">
+      🔗 <b>Cliente espelhado do BIDATX.</b> Nome, produto, tipo e etapa são controlados lá. Aqui você edita acompanhamento, originador, valor, notas e comissão.
+    </div>
 
     <!-- 0. Tipo — Próprio vs Não-Próprio -->
     <div style="margin-bottom:18px">
@@ -4108,8 +4111,6 @@ function openNegModal(id){
   }
   document.getElementById('neg-titulo').value=n?n.titulo:'';
   document.getElementById('neg-status').value=n?n.status||'Prospecção':'Prospecção';
-  selStatus.disabled=!!(n&&n.bdx);// card espelhado do BIDATX: só o BIDATX muda a etapa
-  selStatus.title=n&&n.bdx?'Este card espelha o BIDATX: a etapa muda lá.':'';
   document.getElementById('neg-orig').value=n?n.originadorId||currentUser.id:currentUser.id;
   document.getElementById('neg-notas').value=n?n.notas||'':'';
   document.getElementById('neg-valor').value=n&&n.valor?n.valor:'';
@@ -4125,7 +4126,20 @@ function openNegModal(id){
   document.getElementById('neg-perda-obs').value=n?n.motivoPerdaObs||'':'';
   _negRecorrMarcado=!!(n&&n.recorrente);_negRecorrUI();
   _negStatusChange();
+  _negTravarEspelho(!!(n&&n.bdx));
   document.getElementById('ov-neg').classList.add('open');
+}
+// Card espelhado do BIDATX: nome, produto, tipo e etapa pertencem ao BIDATX; o resto continua editável aqui.
+function _negTravarEspelho(lock){
+  const t=document.getElementById('neg-titulo');
+  if(t){t.readOnly=lock;t.style.background=lock?'#f3f4f6':'';t.style.cursor=lock?'not-allowed':'';}
+  const o=document.getElementById('neg-outro-desc');if(o)o.readOnly=lock;
+  const chips=document.getElementById('neg-prod-chips');
+  if(chips){chips.style.pointerEvents=lock?'none':'';chips.style.opacity=lock?'.6':'';chips.querySelectorAll('button').forEach(b=>b.disabled=lock);}
+  ['neg-tipo-proprio','neg-tipo-nao-proprio'].forEach(id=>{const b=document.getElementById(id);if(b){b.disabled=lock;b.style.pointerEvents=lock?'none':'';b.style.opacity=lock?'.6':'';}});
+  const s=document.getElementById('neg-status');
+  if(s){s.disabled=lock;s.title=lock?'Este card espelha o BIDATX: a etapa muda lá.':'';}
+  const a=document.getElementById('neg-bdx-aviso');if(a)a.style.display=lock?'':'none';
 }
 // Linha de recorrência no cadastro: o produto decide, ou o negócio marca quando "depende"
 let _negRecorrMarcado=false;
@@ -4174,6 +4188,10 @@ function saveNeg(){
     taxaBase:document.getElementById('neg-taxa-base').innerText||null,
     notas:document.getElementById('neg-notas').value.trim(),
   };
+  const espelho=_negEditId?negocios.find(x=>x.id===_negEditId):null;
+  if(espelho&&espelho.bdx){// o que vem do BIDATX não muda por aqui, mesmo que o formulário seja manipulado
+    obj.titulo=espelho.titulo;obj.tipo=espelho.tipo;obj.configProdutoId=espelho.configProdutoId;obj.produtoOutro=espelho.produtoOutro;obj.status=espelho.status;
+  }
   obj.atualizadoEm=new Date().toISOString();
   if(obj.status==='Fechado'&&!(_negEditId&&negocios.find(x=>x.id===_negEditId)?.fechadoEm)){
     obj.fechadoEm=new Date().toISOString().slice(0,10);
