@@ -3071,6 +3071,7 @@ function negDrop(e,col){
   const i=negocios.findIndex(n=>n.id===_negDragId);
   if(i===-1){_negDragId=null;return;}
   const n=negocios[i],mudou=(n.status||'Prospecção')!==col;
+  if(n.bdx&&mudou){_negDragId=null;showToast('Este card espelha o BIDATX: a etapa muda lá, não aqui.');return;}
   if(mudou)_negRegistrarEtapa(n,col);
   n.status=col;n.atualizadoEm=new Date().toISOString();
   if(col==='Fechado'&&!n.fechadoEm)n.fechadoEm=_dataLocal();
@@ -3198,7 +3199,7 @@ function _pipPassoHtml(n){
 // Etapas do BIDATX (ids): 1 Reunião · 2 Levantamento · 3 Apres. Levantamento · 4 Contrato · 5-9 compensações/validação.
 const BDX_PASSOS=['Procuração Eletrônica','Levantamento de Dados','Apresentação ao Cliente','Proposta Enviada','Proposta Assinada','Compensação Tributária'];
 const BDX_TIPOS={'Fiscal':'Fiscal','Previdenciário':'Prev.'};// Consultoria e Transação: etapas ainda não validadas, ficam de fora
-let _bdx={cnpj:{},nome:{},ok:false,tent:0,sig:''};
+let _bdx={cnpj:{},nome:{},clientes:{},ok:false,tent:0,sig:''};
 function _bdxPasso(opp,tipo){
   const e=Number((opp.etapasPorTipo||{})[tipo]);
   if(e>=1&&e<=3)return e;
@@ -3236,6 +3237,86 @@ function _bdxChipHtml(n){
   const tip='Processo no BIDATX Sistema (só leitura)\n'+r.itens.map(i=>`${i.tipo}: ${i.passo}/6 ${BDX_PASSOS[i.passo-1]}`).join('\n');
   return`<div class="pc-bdx" title="${esc(tip)}"><span>BIDATX</span>${esc(txt)}</div>`;
 }
+// ---- ESPELHO: cada cliente do BIDATX vira um card no pipeline (uma via: BIDATX → IA Hub) ----
+// Coluna: passos 01-03 Prospecção · 04 Proposta · 05 e 06 Fechado · com compensação paga = Pagamento Realizado.
+// Só o BIDATX move o card espelhado (card.bdx = {key,...}). Dinheiro NÃO entra: recebimentos seguem lançados no IA Hub.
+const BDX_COLUNA=passo=>passo>=5?'Fechado':passo===4?'Proposta':'Prospecção';
+function _bdxChave(o){const c=String(o.cnpj||'').replace(/\D/g,'');return c.length===14?c:'n:'+_impNorm(o.cliente);}
+function _bdxClientes(opors){
+  const g={};
+  (opors||[]).forEach(o=>{
+    if(!o||!o.cliente)return;
+    const tipos=(o.tipos||[]).filter(t=>BDX_TIPOS[t]);
+    if(!tipos.length)return;
+    const passo=Math.max(0,...tipos.map(t=>_bdxPasso(o,t)));
+    if(!passo)return;
+    const pagos=(o.compensacoes||[]).filter(c=>c&&c.pago&&!c.semResultado);
+    const datasPag=pagos.map(c=>c.dataPagamento).filter(Boolean).sort();
+    const datas=[];
+    Object.values(o.historicoPorTipo||{}).forEach(l=>(l||[]).forEach(h=>h&&h.data&&datas.push(h.data)));
+    Object.values(o.etapaEntradaPorTipo||{}).forEach(m=>Object.values(m||{}).forEach(d=>d&&datas.push(d)));
+    const r={key:_bdxChave(o),titulo:String(o.cliente).trim(),cnpj:o.cnpj||'',passo,pago:pagos.length>0,pagoEm:datasPag[0]||'',
+      inativo:o.status==='inativo',ult:datas.sort().slice(-1)[0]||'',resp:o.responsavel||'',origem:o.origem||'',indicado:o.indicado||''};
+    const a=g[r.key];
+    if(!a)g[r.key]=r;
+    else{// mesmo cliente repetido no BIDATX: junta
+      a.passo=Math.max(a.passo,r.passo);a.pago=a.pago||r.pago;a.inativo=a.inativo&&r.inativo;
+      if(r.ult>a.ult)a.ult=r.ult;
+      if(r.pagoEm&&(!a.pagoEm||r.pagoEm<a.pagoEm))a.pagoEm=r.pagoEm;
+    }
+  });
+  return g;
+}
+// Cria o que falta e move o que mudou. Devolve true se alterou algo (e já gravou).
+function _bdxEspelhar(){
+  if(!_bdx.ok||!currentUser||!isSocio())return false;
+  const prod=config.comissoes.find(c=>/cr[eé]ditos?\s+tribut/i.test(c.produto));
+  if(!prod){console.info('BIDATX espelho: produto "Revisão de Créditos Tributários" não encontrado na matriz');return false;}
+  const ign=new Set(config.bdxIgnorar||[]);
+  const agora=new Date().toISOString();
+  let seq=Math.max(Date.now(),...negocios.map(n=>+n.id||0));
+  const porChave={};negocios.forEach(n=>{if(n.bdx&&n.bdx.key)porChave[n.bdx.key]=n;});
+  let criados=0,mudados=0;
+  Object.values(_bdx.clientes).forEach(c=>{
+    const col=c.pago?'Pagamento Realizado':BDX_COLUNA(c.passo);
+    const n=porChave[c.key];
+    if(!n){
+      if(c.inativo||ign.has(c.key))return;
+      const regra=_regraParaProduto(prod);
+      const soc=_impAcharPessoa(c.resp,true)||_impAcharPessoa(c.indicado,true);
+      const notas='Espelho do BIDATX Sistema. Responsável: '+(c.resp||'—')+(c.origem?' · Origem: '+c.origem:'')+(c.indicado?' · Indicado por: '+c.indicado:'');
+      const novo={id:++seq,titulo:c.titulo,tipo:'proprio',status:col,valor:0,cnpj:c.cnpj,
+        originadorId:soc?soc.id:null,configProdutoId:prod.id,produtoOutro:null,
+        comissaoVenda:{regraId:regra.id,socioDonoId:soc?soc.id:null,cosocios:[],participantes:[]},taxaRede:null,
+        notas,criado:new Date().toLocaleDateString('pt-BR'),atualizadoEm:c.ult||agora,
+        historicoEtapas:[{etapa:col,em:agora,por:currentUser.id}],bdx:{key:c.key,passo:c.passo}};
+      if(col==='Fechado')novo.fechadoEm=_dataLocal();
+      if(col==='Pagamento Realizado')novo.pagoEm=c.pagoEm||_dataLocal();
+      negocios.push(novo);criados++;return;
+    }
+    n.bdx.passo=c.passo;
+    if(c.inativo){
+      if(n.status!=='Perdido'){_negRegistrarEtapa(n,'Perdido');n.status='Perdido';n.motivoPerda='Outro';n.bdx.inativoPorBdx=true;n.atualizadoEm=agora;mudados++;}
+      return;
+    }
+    if(n.status==='Perdido'){
+      if(!n.bdx.inativoPorBdx)return;// inativado à mão pelos sócios: respeita
+      delete n.motivoPerda;n.bdx.inativoPorBdx=false;n.status='Prospecção';mudados++;
+    }
+    if(n.status==='Pagamento Realizado'&&col!=='Pagamento Realizado')return;// pagamento não se desfaz
+    if(n.status!==col){
+      _negRegistrarEtapa(n,col);n.status=col;n.atualizadoEm=agora;
+      if(col==='Fechado'&&!n.fechadoEm)n.fechadoEm=_dataLocal();
+      if(col==='Pagamento Realizado'&&!n.pagoEm)n.pagoEm=c.pagoEm||_dataLocal();
+      mudados++;
+    }
+    if(c.ult&&(!n.atualizadoEm||c.ult>n.atualizadoEm)){n.atualizadoEm=c.ult;mudados++;}// "parado" reflete a atividade real do BIDATX
+  });
+  if(!criados&&!mudados)return false;
+  saveData();
+  if(criados)setTimeout(()=>showToast(`🔗 ${criados} cliente(s) do BIDATX entraram no pipeline`),500);
+  return true;
+}
 async function _bdxCarregar(forcar){
   if(!supaClient||!currentUser)return;
   if(!forcar&&Date.now()-_bdx.tent<60000)return;
@@ -3244,11 +3325,13 @@ async function _bdxCarregar(forcar){
     const {data,error}=await supaClient.from('bidatx_data').select('opors').eq('id','bidatx').maybeSingle();
     if(error||!data||!Array.isArray(data.opors)){console.info('BIDATX: sem leitura',error&&error.message);return;}
     const idx=_bdxIndexar(data.opors);
-    const sig=JSON.stringify([idx.cnpj,idx.nome]);
+    const clientes=_bdxClientes(data.opors);
+    const sig=JSON.stringify([idx.cnpj,idx.nome,clientes]);
     const mudou=sig!==_bdx.sig;
-    _bdx={...idx,ok:true,tent:_bdx.tent,sig};
+    _bdx={...idx,clientes,ok:true,tent:_bdx.tent,sig};
+    const espelhou=_bdxEspelhar();
     const painel=document.getElementById('tab-negocios');
-    if(mudou&&painel&&painel.classList.contains('active')&&!document.querySelector('.overlay.open'))renderPipeline();
+    if((mudou||espelhou)&&painel&&painel.classList.contains('active')&&!document.querySelector('.overlay.open'))renderPipeline();
   }catch(e){console.info('BIDATX: falha ao ler',e&&e.message);}
 }
 
@@ -3271,7 +3354,7 @@ function _pipKanbanHtml(negFilt){
             const cfg=n.configProdutoId?config.comissoes.find(c=>c.id===n.configProdutoId):null;
             const cor=cfg?_cfgEmpresa(cfg.empresaId).cor:'#64748b';
             const pr=PRIOS[_negPrio(n)];
-            return`<div draggable="true" ondragstart="negDragStart(event,${n.id})" ondragend="negDragEnd(event)"
+            return`<div draggable="${n.bdx?'false':'true'}" ondragstart="negDragStart(event,${n.id})" ondragend="negDragEnd(event)"
                      class="pip-card pc ${_negPrio(n)==='quente'?'pc-quente':''}" style="border-left:3px solid ${NEG_COL_COLOR[col]}" onclick="openNegModal(${n.id})">
               <div class="pc-top"><span class="pc-cli">${pr.ico?pr.ico+' ':''}${esc(n.titulo)}</span>
                 <span class="pc-acoes"><button title="Registrar andamento" onclick="event.stopPropagation();_negAtualizar(${n.id})">✓</button><button title="Ver cliente" onclick="event.stopPropagation();abrirFichaCliente(${n.id})">👤</button></span></div>
@@ -4025,6 +4108,8 @@ function openNegModal(id){
   }
   document.getElementById('neg-titulo').value=n?n.titulo:'';
   document.getElementById('neg-status').value=n?n.status||'Prospecção':'Prospecção';
+  selStatus.disabled=!!(n&&n.bdx);// card espelhado do BIDATX: só o BIDATX muda a etapa
+  selStatus.title=n&&n.bdx?'Este card espelha o BIDATX: a etapa muda lá.':'';
   document.getElementById('neg-orig').value=n?n.originadorId||currentUser.id:currentUser.id;
   document.getElementById('neg-notas').value=n?n.notas||'':'';
   document.getElementById('neg-valor').value=n&&n.valor?n.valor:'';
@@ -4104,6 +4189,8 @@ function saveNeg(){
 }
 function removeNeg(id){
   if(!confirm('Remover este negócio?'))return;
+  const alvo=negocios.find(n=>n.id===id);
+  if(alvo&&alvo.bdx&&alvo.bdx.key)config.bdxIgnorar=[...new Set([...(config.bdxIgnorar||[]),alvo.bdx.key])];// não recriar o espelho
   negocios=negocios.filter(n=>n.id!==id);
   closeOv('ov-neg');saveData();renderPipeline();
 }
