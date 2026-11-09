@@ -1131,7 +1131,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
       <div style="grid-column:1/-1">
         <label style="font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:4px">Valor Estimado (R$)</label>
-        <input id="neg-valor" type="number" min="0" step="0.01" placeholder="Ex: 15000" oninput="if(_cvAberto)_cvRender()"
+        <input id="neg-valor" type="text" inputmode="numeric" placeholder="R$ 0,00" oninput="_moedaMask(this);if(_cvAberto)_cvRender()"
           style="width:100%;padding:8px;border:1px solid #0F6E5644;border-radius:8px;font-size:13px;background:#f0faf4">
       </div>
       <div>
@@ -4067,7 +4067,7 @@ function _cvValidar(){
 function _cvRender(){
   const pessoas=users.filter(u=>!isSocioUser(u)&&u.perfil!=='Operador'&&u.perfil!=='Contato').sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   const {teto,piso,soma,erros}=_cvValidar();
-  const valor=parseFloat(document.getElementById('neg-valor').value)||0;
+  const valor=_moedaVal(document.getElementById('neg-valor'));
   const emR=p=>valor?` <span class="cv-rs">${_brl(valor*p/100)}</span>`:'';
   const soc=users.find(u=>u.id===parseInt(document.getElementById('neg-socio').value));
   document.getElementById('neg-cv-info').innerHTML=`Comissão de venda: <b>${teto}% do total</b>${emR(teto)}${piso?` · piso da matriz para a ponta: <b>${piso}%</b>`:''}. Percentuais sobre o total recebido.`;
@@ -4081,6 +4081,11 @@ function _cvRender(){
   document.getElementById('neg-cv-resumo').innerHTML=`<div class="cv-resumo"><span>${soc?esc(soc.nome):'Sócio dono da rede'}${co?' e '+esc(co.nome)+' dividem':' fica com'}</span><b>${_r2(resto)}%${emR(resto)}</b></div>`
     +(erros.length?`<div class="cv-erros">${erros.map(e=>'⚠ '+esc(e)).join('<br>')}</div>`:'');
 }
+
+// Campo de dinheiro: digita só números e ele vira "R$ 1.234,56" (os 2 últimos dígitos são os centavos)
+function _moedaFmt(v){return'R$ '+(+v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function _moedaVal(el){const d=String(el&&el.value||'').replace(/\D/g,'');return d?+d/100:0;}
+function _moedaMask(el){const v=_moedaVal(el);el.value=v?_moedaFmt(v):'';}
 
 // --- Modal Negócio ---
 function openNegModal(id){
@@ -4113,7 +4118,7 @@ function openNegModal(id){
   document.getElementById('neg-status').value=n?n.status||'Prospecção':'Prospecção';
   document.getElementById('neg-orig').value=n?n.originadorId||currentUser.id:currentUser.id;
   document.getElementById('neg-notas').value=n?n.notas||'':'';
-  document.getElementById('neg-valor').value=n&&n.valor?n.valor:'';
+  document.getElementById('neg-valor').value=n&&n.valor?_moedaFmt(n.valor):'';
   _negTipo=n&&n.tipo?n.tipo:'proprio';
   selectNegTipo(_negTipo);
   _cvInit(n);
@@ -4179,7 +4184,7 @@ function saveNeg(){
     comissaoVenda:{regraId:+document.getElementById('neg-regra').value,socioDonoId:parseInt(document.getElementById('neg-socio').value)||null,cosocios:document.getElementById('neg-cosocio').value?[+document.getElementById('neg-cosocio').value]:[],participantes:_cvPart.map(p=>({userId:p.userId,pct:+p.pct||0}))},
     titulo,
     tipo:_negTipo||'proprio',
-    valor:parseFloat(document.getElementById('neg-valor').value)||null,
+    valor:_moedaVal(document.getElementById('neg-valor'))||null,
     status:document.getElementById('neg-status').value,
     originadorId:parseInt(document.getElementById('neg-orig').value)||currentUser.id,
     configProdutoId:isProdOutro?null:(_negProdSelecionado||null),
