@@ -1807,7 +1807,7 @@ async function _entrarComSessao(){
   const u=users.find(x=>x.id===+soc.user_id);
   if(!u){_loginErro('Seu cadastro de sócio não foi encontrado nos dados.');return false;}
   currentUser=u;
-  _limpezaDadosV1();_migrarEtapasV2();_migrarProdutoIAHub();_resgatarContatosLocais();
+  _limpezaDadosV1();_migrarEtapasV2();_migrarProdutoIAHub();_migrarGruPagSemBanco();_resgatarContatosLocais();
   setupMain();showScreen('main');showTab('rede');_lembreteLogin();
   _vigiarVersao();
   return true;
@@ -4513,6 +4513,23 @@ function _migrarProdutoIAHub(){
   config.produtoIAHub=new Date().toISOString();
   saveData();
   if(q)setTimeout(()=>showToast(`🏷 Produto "IA Hub" criado na matriz e ${q} card(s) ligados a ele`),3000);
+}
+
+// GruPag: o valor lançado já é o que entra na BIdaTX (não há metade do banco, como no Sicoob).
+// Daí para frente a divisão é igual ao Sicoob. Tira a linha "sai" sobre o total da regra GruPag, uma vez.
+function _migrarGruPagSemBanco(){
+  if(config.grupagSemBanco)return;
+  const r=getRegras().find(x=>/grupag/i.test(x.nome));
+  if(r){
+    const fora=(r.linhas||[]).filter(l=>l.destino==='sai'&&l.base==='total').map(l=>l.id);
+    if(fora.length){
+      r.linhas=r.linhas.filter(l=>!fora.includes(l.id));
+      r.linhas.forEach(l=>{if(fora.includes(l.base))l.base='total';});
+      setTimeout(()=>showToast('💳 Regra GruPag corrigida: o valor recebido já é o que entra na BIdaTX'),4500);
+    }
+  }
+  config.grupagSemBanco=new Date().toISOString();
+  saveData();
 }
 
 // Contatos do sistema antigo ficavam só no navegador (iahub_contatos). Se ainda existirem
