@@ -1129,10 +1129,17 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
 
     <!-- 3. Valor estimado + Etapa + Originador -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-      <div style="grid-column:1/-1">
-        <label style="font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:4px">Valor Estimado (R$)</label>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:4px">Faturamento da empresa (R$/mês)</label>
+        <input id="neg-fat" type="text" inputmode="numeric" placeholder="R$ 0,00" oninput="_moedaMask(this)"
+          style="width:100%;padding:8px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px">
+        <div style="font-size:11px;color:#94a3b8;margin-top:3px">Só informativo, não entra em conta nenhuma</div>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:4px">Valor estimado · entra na BIdaTX (R$)</label>
         <input id="neg-valor" type="text" inputmode="numeric" placeholder="R$ 0,00" oninput="_moedaMask(this);if(_cvAberto)_cvRender()"
           style="width:100%;padding:8px;border:1px solid #0F6E5644;border-radius:8px;font-size:13px;background:#f0faf4">
+        <div style="font-size:11px;color:#94a3b8;margin-top:3px">Base da prévia da comissão e dos totais</div>
       </div>
       <div>
         <label style="font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:4px">Etapa</label>
@@ -3833,7 +3840,7 @@ function _negLinhaRel(n){
   const rede=(cv.participantes||[]).map(p=>`${nome(p.userId)} ${p.pct}%`).join(', ')||(()=>{const o=users.find(u=>u.id===n.originadorId);return o&&!isSocioUser(o)?o.nome:'';})();
   const notas=String(n.notas||'').split('\n').map(s=>s.trim()).filter(Boolean);
   return{cliente:n.titulo,cnpj:n.cnpj||'',produto:prod,etapa:_etapaRot(n.status||'Prospecção'),
-    socios:_negSocios(n).map(nome).join(' + '),rede,valor:n.valor||null,
+    socios:_negSocios(n).map(nome).join(' + '),rede,valor:n.valor||null,faturamento:n.faturamento||null,
     dias:_negAtivo(n)?_diasParado(n):'',parado:_negAtencao(n),sit:(SIT[_negSit(n)]||{}).rot||'',
     passo:n.proximoPasso||'',passoData:n.proximoPassoData?n.proximoPassoData.split('-').reverse().join('/'):'',prio:PRIOS[_negPrio(n)].rot,motivo:n.motivoPerda||'',
     atualizado:n.atualizadoEm?new Date(n.atualizadoEm).toLocaleDateString('pt-BR'):(n.criado||''),
@@ -3847,10 +3854,10 @@ async function exportarPipelineExcel(){
   const lista=_pipOrdenados();
   if(!lista.length){alert('Nada para exportar com esse filtro.');return;}
   try{await _impLoadXLSX();}catch(e){alert(e.message);return;}
-  const cab=['Cliente','CNPJ','Produto','Etapa','Prioridade','Próximo passo','Até','Situação','Sócio(s)','Rede (% comissão)','Valor estimado','Última atualização','Última nota','Motivo da inativação'];
-  const linhas=lista.map(n=>{const r=_negLinhaRel(n);return[r.cliente,r.cnpj,r.produto,r.etapa,r.prio,r.passo,r.passoData,r.sit,r.socios,r.rede,r.valor,r.atualizado,r.ultimaNota,r.motivo];});
+  const cab=['Cliente','CNPJ','Produto','Etapa','Prioridade','Próximo passo','Até','Situação','Sócio(s)','Rede (% comissão)','Valor estimado (entra na BIdaTX)','Faturamento da empresa (mês)','Última atualização','Última nota','Motivo da inativação'];
+  const linhas=lista.map(n=>{const r=_negLinhaRel(n);return[r.cliente,r.cnpj,r.produto,r.etapa,r.prio,r.passo,r.passoData,r.sit,r.socios,r.rede,r.valor,r.faturamento,r.atualizado,r.ultimaNota,r.motivo];});
   const ws=XLSX.utils.aoa_to_sheet([cab,...linhas]);
-  ws['!cols']=[{wch:32},{wch:20},{wch:28},{wch:14},{wch:10},{wch:34},{wch:10},{wch:16},{wch:22},{wch:30},{wch:14},{wch:14},{wch:50},{wch:24}];
+  ws['!cols']=[{wch:32},{wch:20},{wch:28},{wch:14},{wch:10},{wch:34},{wch:10},{wch:16},{wch:22},{wch:30},{wch:16},{wch:18},{wch:14},{wch:50},{wch:24}];
   ws['!autofilter']={ref:XLSX.utils.encode_range({s:{r:0,c:0},e:{r:linhas.length,c:cab.length-1}})};
   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Pipeline');
   const sufixo=_pipTituloFiltro().replace(/[^\wÀ-ú ]+/g,' ').replace(/\s+/g,'_').slice(0,50);
@@ -4119,6 +4126,7 @@ function openNegModal(id){
   document.getElementById('neg-orig').value=n?n.originadorId||currentUser.id:currentUser.id;
   document.getElementById('neg-notas').value=n?n.notas||'':'';
   document.getElementById('neg-valor').value=n&&n.valor?_moedaFmt(n.valor):'';
+  document.getElementById('neg-fat').value=n&&n.faturamento?_moedaFmt(n.faturamento):'';
   _negTipo=n&&n.tipo?n.tipo:'proprio';
   selectNegTipo(_negTipo);
   _cvInit(n);
@@ -4185,6 +4193,7 @@ function saveNeg(){
     titulo,
     tipo:_negTipo||'proprio',
     valor:_moedaVal(document.getElementById('neg-valor'))||null,
+    faturamento:_moedaVal(document.getElementById('neg-fat'))||null,
     status:document.getElementById('neg-status').value,
     originadorId:parseInt(document.getElementById('neg-orig').value)||currentUser.id,
     configProdutoId:isProdOutro?null:(_negProdSelecionado||null),
