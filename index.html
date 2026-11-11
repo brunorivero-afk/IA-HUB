@@ -3206,12 +3206,15 @@ function _pipPassoHtml(n){
 // ===================== PROCESSO BIDATX (SOMENTE LEITURA) =====================
 // O BIDATX Sistema é o dono do processo tributário. O IA Hub só LÊ a linha 'bidatx' de bidatx_data
 // e mostra em que passo (1 a 6) cada cliente está. NUNCA gravar em bidatx_data: o BIDATX regrava a linha inteira.
-// Etapas do BIDATX (ids): 1 Reunião · 2 Levantamento · 3 Apres. Levantamento · 4 Contrato · 5-9 compensações/validação.
+// Etapas do BIDATX: desde 11/11/2026 (config.pipelineV2) já são as mesmas 6 daqui, id 1 a 6 = passo 1 a 6.
+// Antes eram 9 (1 Reunião · 2 Levantamento · 3 Apres. Levantamento · 4 Contrato · 5-9 compensações/validação).
+let _bdxV2=false;
 const BDX_PASSOS=['Procuração Eletrônica','Levantamento de Dados','Apresentação ao Cliente','Proposta Enviada','Proposta Assinada','Compensação Tributária'];
 const BDX_TIPOS={'Fiscal':'Fiscal','Previdenciário':'Prev.'};// Consultoria e Transação: etapas ainda não validadas, ficam de fora
 let _bdx={cnpj:{},nome:{},clientes:{},ok:false,tent:0,sig:''};
 function _bdxPasso(opp,tipo){
   const e=Number((opp.etapasPorTipo||{})[tipo]);
+  if(_bdxV2)return e>=1&&e<=6?e:0;
   if(e>=1&&e<=3)return e;
   if(e===4){const d=((opp.docsPorTipo||{})[tipo]||{})['4_Contrato Assinado'];return d&&d.recebido?5:4;}
   if(e>=5&&e<=9)return 6;
@@ -3332,8 +3335,9 @@ async function _bdxCarregar(forcar){
   if(!forcar&&Date.now()-_bdx.tent<60000)return;
   _bdx.tent=Date.now();
   try{
-    const {data,error}=await supaClient.from('bidatx_data').select('opors').eq('id','bidatx').maybeSingle();
+    const {data,error}=await supaClient.from('bidatx_data').select('opors,config').eq('id','bidatx').maybeSingle();
     if(error||!data||!Array.isArray(data.opors)){console.info('BIDATX: sem leitura',error&&error.message);return;}
+    _bdxV2=!!(data.config&&data.config.pipelineV2);
     const idx=_bdxIndexar(data.opors);
     const clientes=_bdxClientes(data.opors);
     const sig=JSON.stringify([idx.cnpj,idx.nome,clientes]);
