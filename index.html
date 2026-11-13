@@ -1587,11 +1587,12 @@ footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);font-si
 
 <section id="pipeline">
   <h2>Pipeline</h2>
-  <h3>As 4 etapas (iguais para todos os produtos)</h3>
+  <h3>As 5 etapas (iguais para todos os produtos)</h3>
   <div class="tab"><table>
     <tr><th>Etapa</th><th>O card está aqui quando…</th></tr>
-    <tr><td>Prospecção</td><td>há primeiras conversas, ainda sem proposta.</td></tr>
-    <tr><td>Proposta</td><td>a proposta foi enviada e está em negociação.</td></tr>
+    <tr><td>Prospecção</td><td>primeiro contato: lead, indicação, conversa inicial.</td></tr>
+    <tr><td>Negociação</td><td>o cliente topou conversar de verdade: reunião feita, troca de documentos, levantamento em andamento. Ainda sem proposta.</td></tr>
+    <tr><td>Proposta</td><td>a proposta formal foi enviada e aguarda resposta.</td></tr>
     <tr><td>Fechado</td><td>o cliente disse sim e está sendo formalizado: contrato, documentação, abertura de conta.</td></tr>
     <tr><td>Pagamento Realizado</td><td>entrou o primeiro pagamento. Acontece <b>sozinho</b> quando o recebimento é lançado. Ficam visíveis só os últimos 30 dias.</td></tr>
   </table></div>
@@ -3049,7 +3050,8 @@ function removeLanc(id){if(!confirm('Remover?'))return;lancamentos=lancamentos.f
 // ===================== PIPELINE DE NEGÓCIOS =====================
 // Pipeline universal (04/11/2026): Proposta já inclui a negociação; Fechado = disse sim, formalizando.
 // 'Perdido' continua sendo o valor gravado, mas aparece para o usuário como "Inativo".
-const NEG_COLS=['Prospecção','Proposta','Fechado','Pagamento Realizado'];
+// Negociação voltou em 13/11/2026: separa o lead frio (Prospecção) do cliente que já está andando, antes da proposta.
+const NEG_COLS=['Prospecção','Negociação','Proposta','Fechado','Pagamento Realizado'];
 const _etapaRot=e=>e==='Perdido'?'Inativo':e;
 const NEG_COL_COLOR={
   'Prospecção':'#64748b','Proposta':'#854F0B',
@@ -3251,9 +3253,9 @@ function _bdxChipHtml(n){
   return`<div class="pc-bdx" title="${esc(tip)}"><span>BIDATX</span>${esc(txt)}</div>`;
 }
 // ---- ESPELHO: cada cliente do BIDATX vira um card no pipeline (uma via: BIDATX → IA Hub) ----
-// Coluna: passos 01-03 Prospecção · 04 Proposta · 05 e 06 Fechado · com compensação paga = Pagamento Realizado.
+// Coluna: passo 01 Prospecção · 02-03 Negociação · 04 Proposta · 05 e 06 Fechado · com compensação paga = Pagamento Realizado.
 // Só o BIDATX move o card espelhado (card.bdx = {key,...}). Dinheiro NÃO entra: recebimentos seguem lançados no IA Hub.
-const BDX_COLUNA=passo=>passo>=5?'Fechado':passo===4?'Proposta':'Prospecção';
+const BDX_COLUNA=passo=>passo>=5?'Fechado':passo===4?'Proposta':passo>=2?'Negociação':'Prospecção';
 function _bdxChave(o){const c=String(o.cnpj||'').replace(/\D/g,'');return c.length===14?c:'n:'+_impNorm(o.cliente);}
 function _bdxClientes(opors){
   const g={};
@@ -3554,7 +3556,7 @@ function _impPrevia(){
     const obs=iObs.map(i=>String(l[i]||'').trim()).filter(Boolean).join(' · ');
     const valor=iValor!=null?parseFloat(String(l[iValor]||'').replace(/[^\d,.-]/g,'').replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.'))||null:null;
     const etTxt=iEtapa!=null?_impNorm(l[iEtapa]):'';
-    const etapa=NEG_COLS.find(c=>_impNorm(c)===etTxt)||(/negocia/.test(etTxt)?'Proposta':/inativ|perdid/.test(etTxt)?'Perdido':'Prospecção');
+    const etapa=NEG_COLS.find(c=>_impNorm(c)===etTxt)||(/negocia/.test(etTxt)?'Negociação':/inativ|perdid/.test(etTxt)?'Perdido':'Prospecção');
     return{cliente,cnpj:iCnpj!=null?String(l[iCnpj]||'').trim():'',valor,etapa,socios,rede,produtos,obs,celRede:iRede.map(i=>String(l[i]||'').trim()).filter(x=>x&&x!=='-').join(' / ')};
   }).filter(r=>r.cliente);
   const lista=Object.values(pessoas).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
