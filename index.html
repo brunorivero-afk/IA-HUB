@@ -4076,26 +4076,39 @@ function _cvValidar(){
   const teto=_cvTetoPct(_cvRegra()),piso=_cvPisoPct(),o=_cvOrig();
   const soma=_cvPart.reduce((s,p)=>s+(+p.pct||0),0);
   const ponta=o&&!isSocioUser(o)?_cvPart.find(p=>p.userId===o.id):null;
-  const erros=[],avisos=[];
+  const erros=[],avisos=[],infos=[];
+  let acimaTeto=null;// registro de quem liberou (vai junto na comissaoVenda ao salvar)
   if(soma>teto+1e-9){
-    // Revisão de Créditos e Transação Tributária: pode passar do teto (decisão do sócio), só avisa.
-    // Sicoob, GruPag e demais: continua travado.
-    if(_cvLivreAcimaTeto())avisos.push(`A soma (${_r2(soma)}%) passa ${_r2(soma-teto)}% do teto de ${teto}%. A diferença sai do que fica no grupo.`);
-    else erros.push(`A soma (${soma}%) passa do teto de ${teto}% da comissão de venda.`);
+    // Revisão de Créditos e Transação Tributária: só o administrador (Bruno) libera acima do teto; avisa e confirma.
+    // Outro sócio pode salvar o card se os percentuais já liberados não mudaram. Sicoob, GruPag e demais: travado.
+    // (Trava de tela: os sócios gravam o JSON inteiro, então não é à prova de quem mexer no console.)
+    const salvo=_negEditId?(negocios.find(n=>n.id===_negEditId)||{}).comissaoVenda:null;
+    const norm=l=>JSON.stringify((l||[]).map(p=>[+p.userId,+p.pct||0]).sort((a,b)=>a[0]-b[0]));
+    const igual=!!(salvo&&salvo.acimaTeto&&norm(salvo.participantes)===norm(_cvPart)&&+salvo.regraId===+document.getElementById('neg-regra').value);
+    const quem=salvo&&salvo.acimaTeto?`${salvo.acimaTeto.por} em ${new Date(salvo.acimaTeto.em).toLocaleDateString('pt-BR')}`:'';
+    if(!_cvLivreAcimaTeto())erros.push(`A soma (${soma}%) passa do teto de ${teto}% da comissão de venda.`);
+    else if(igual){acimaTeto=salvo.acimaTeto;infos.push(`Acima do teto (${_r2(soma)}% para ${teto}%) liberado por ${quem}.`);}
+    else if(_ehAdmin()){acimaTeto={por:currentUser.nome.split(' ')[0],porId:currentUser.id,em:new Date().toISOString(),soma:_r2(soma),teto};
+      avisos.push(`A soma (${_r2(soma)}%) passa ${_r2(soma-teto)}% do teto de ${teto}%. A diferença sai do que fica no grupo.`);}
+    else erros.push(`A soma (${_r2(soma)}%) passa do teto de ${teto}%. Só ${_nomeAdmin()} pode liberar comissão acima do teto.`);
   }
   if(o&&!isSocioUser(o)&&piso&&(!ponta||ponta.pct<piso))erros.push(`${o.nome.split(' ')[0]} (originador) está abaixo do piso da matriz: ${piso}%.`);
   if(_cvPart.some(p=>!p.userId))erros.push('Escolha a pessoa em todas as linhas.');
   if(!document.getElementById('neg-socio').value)erros.push('Escolha o sócio dono da rede.');
   if(document.getElementById('neg-cosocio').value&&document.getElementById('neg-cosocio').value===document.getElementById('neg-socio').value)erros.push('O co-originador precisa ser outro sócio.');
-  return{teto,piso,soma,erros,avisos};
+  return{teto,piso,soma,erros,avisos,infos,acimaTeto};
 }
+// Administrador: quem pode liberar comissão acima do teto. Padrão = Bruno; config.adminIds permite incluir outros.
+function _adminIds(){return config.adminIds&&config.adminIds.length?config.adminIds:[_socioIdPorNome('bruno')].filter(Boolean);}
+function _ehAdmin(){return !!currentUser&&_adminIds().includes(currentUser.id);}
+function _nomeAdmin(){return _adminIds().map(id=>((users.find(u=>u.id===id)||{}).nome||'').split(' ')[0]).filter(Boolean).join(' ou ')||'o administrador';}
 function _cvLivreAcimaTeto(){
   const prod=_negProdSelecionado&&_negProdSelecionado!=='outro'?config.comissoes.find(c=>c.id===_negProdSelecionado):null;
   return !!prod&&/revis[aã]o de cr[eé]dit|transa[cç][aã]o|passivo/i.test(prod.produto+' '+(prod.obs||''));
 }
 function _cvRender(){
   const pessoas=users.filter(u=>!isSocioUser(u)&&u.perfil!=='Operador'&&u.perfil!=='Contato').sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
-  const {teto,piso,soma,erros,avisos}=_cvValidar();
+  const {teto,piso,soma,erros,avisos,infos}=_cvValidar();
   const valor=_moedaVal(document.getElementById('neg-valor'));
   const emR=p=>valor?` <span class="cv-rs">${_brl(valor*p/100)}</span>`:'';
   const soc=users.find(u=>u.id===parseInt(document.getElementById('neg-socio').value));
@@ -4108,7 +4121,8 @@ function _cvRender(){
   const resto=Math.max(0,teto-soma);
   const co=users.find(u=>u.id===parseInt(document.getElementById('neg-cosocio').value));
   document.getElementById('neg-cv-resumo').innerHTML=`<div class="cv-resumo"><span>${soc?esc(soc.nome):'Sócio dono da rede'}${co?' e '+esc(co.nome)+' dividem':' fica com'}</span><b>${_r2(resto)}%${emR(resto)}</b></div>`
-    +(erros.length||avisos.length?`<div class="cv-erros">${[...erros,...avisos].map(e=>'⚠ '+esc(e)).join('<br>')}</div>`:'');
+    +(erros.length||avisos.length?`<div class="cv-erros">${[...erros,...avisos].map(e=>'⚠ '+esc(e)).join('<br>')}</div>`:'')
+    +(infos.length?`<div class="cv-erros" style="color:#0F6E56">${infos.map(e=>'✔ '+esc(e)).join('<br>')}</div>`:'');
 }
 
 // Campo de dinheiro: digita só números e ele vira "R$ 1.234,56" (os 2 últimos dígitos são os centavos)
@@ -4212,7 +4226,7 @@ function saveNeg(){
     recorrente:_negRecorrMarcado,
     prioridade:(document.querySelector('#neg-prios .na-prio.on')||{}).dataset?.p||'morno',
     motivoPerda:stNovo==='Perdido'?motivo:'',motivoPerdaObs:stNovo==='Perdido'?document.getElementById('neg-perda-obs').value.trim():'',
-    comissaoVenda:{regraId:+document.getElementById('neg-regra').value,socioDonoId:parseInt(document.getElementById('neg-socio').value)||null,cosocios:document.getElementById('neg-cosocio').value?[+document.getElementById('neg-cosocio').value]:[],participantes:_cvPart.map(p=>({userId:p.userId,pct:+p.pct||0}))},
+    comissaoVenda:{regraId:+document.getElementById('neg-regra').value,socioDonoId:parseInt(document.getElementById('neg-socio').value)||null,cosocios:document.getElementById('neg-cosocio').value?[+document.getElementById('neg-cosocio').value]:[],participantes:_cvPart.map(p=>({userId:p.userId,pct:+p.pct||0})),...(cv.acimaTeto?{acimaTeto:cv.acimaTeto}:{})},
     titulo,
     tipo:_negTipo||'proprio',
     valor:_moedaVal(document.getElementById('neg-valor'))||null,
