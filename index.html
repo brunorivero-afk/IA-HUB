@@ -1620,7 +1620,7 @@ footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);font-si
   <ol class="passos">
     <li><b>Produto</b> e <b>cliente</b>. O produto define a regra de comissão e se o negócio é recorrente.</li>
     <li><b>Originador</b>: quem está de frente com o cliente.</li>
-    <li><b>Comissão de venda</b>: o sistema já sugere o sócio dono da rede e coloca o originador com o <b>piso da matriz</b>. O sócio pode subir o percentual até o <b>teto</b> (ex.: 50% em Novo Negócio, 25% no Sicoob), e o que sobra fica com ele. Dois sócios originaram juntos? Use <i>"Dividir a parte do sócio com outro sócio"</i>.</li>
+    <li><b>Comissão de venda</b>: o sistema já sugere o sócio dono da rede e coloca o originador com o <b>piso da matriz</b>. O sócio pode subir o percentual até o <b>teto</b> (ex.: 50% em Novo Negócio, 25% no Sicoob). Em <b>Revisão de Créditos e Transação Tributária</b> dá para passar do teto: o sistema avisa, pede confirmação e a diferença sai do que fica no grupo.e o que sobra fica com ele. Dois sócios originaram juntos? Use <i>"Dividir a parte do sócio com outro sócio"</i>.</li>
     <li><b>Próximo passo + data</b> (opcionais) e <b>prioridade</b>.</li>
     <li>Recorrência: Sicoob, GruPag, Energia, EcoÁgua, Contabilidade e BPO são sempre recorrentes. Em Revisão de Créditos, Transação e VGV, marque a caixa se o negócio for recorrente. Consultoria é pagamento único.</li>
   </ol>
@@ -4076,17 +4076,26 @@ function _cvValidar(){
   const teto=_cvTetoPct(_cvRegra()),piso=_cvPisoPct(),o=_cvOrig();
   const soma=_cvPart.reduce((s,p)=>s+(+p.pct||0),0);
   const ponta=o&&!isSocioUser(o)?_cvPart.find(p=>p.userId===o.id):null;
-  const erros=[];
-  if(soma>teto+1e-9)erros.push(`A soma (${soma}%) passa do teto de ${teto}% da comissão de venda.`);
+  const erros=[],avisos=[];
+  if(soma>teto+1e-9){
+    // Revisão de Créditos e Transação Tributária: pode passar do teto (decisão do sócio), só avisa.
+    // Sicoob, GruPag e demais: continua travado.
+    if(_cvLivreAcimaTeto())avisos.push(`A soma (${_r2(soma)}%) passa ${_r2(soma-teto)}% do teto de ${teto}%. A diferença sai do que fica no grupo.`);
+    else erros.push(`A soma (${soma}%) passa do teto de ${teto}% da comissão de venda.`);
+  }
   if(o&&!isSocioUser(o)&&piso&&(!ponta||ponta.pct<piso))erros.push(`${o.nome.split(' ')[0]} (originador) está abaixo do piso da matriz: ${piso}%.`);
   if(_cvPart.some(p=>!p.userId))erros.push('Escolha a pessoa em todas as linhas.');
   if(!document.getElementById('neg-socio').value)erros.push('Escolha o sócio dono da rede.');
   if(document.getElementById('neg-cosocio').value&&document.getElementById('neg-cosocio').value===document.getElementById('neg-socio').value)erros.push('O co-originador precisa ser outro sócio.');
-  return{teto,piso,soma,erros};
+  return{teto,piso,soma,erros,avisos};
+}
+function _cvLivreAcimaTeto(){
+  const prod=_negProdSelecionado&&_negProdSelecionado!=='outro'?config.comissoes.find(c=>c.id===_negProdSelecionado):null;
+  return !!prod&&/revis[aã]o de cr[eé]dit|transa[cç][aã]o|passivo/i.test(prod.produto+' '+(prod.obs||''));
 }
 function _cvRender(){
   const pessoas=users.filter(u=>!isSocioUser(u)&&u.perfil!=='Operador'&&u.perfil!=='Contato').sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
-  const {teto,piso,soma,erros}=_cvValidar();
+  const {teto,piso,soma,erros,avisos}=_cvValidar();
   const valor=_moedaVal(document.getElementById('neg-valor'));
   const emR=p=>valor?` <span class="cv-rs">${_brl(valor*p/100)}</span>`:'';
   const soc=users.find(u=>u.id===parseInt(document.getElementById('neg-socio').value));
@@ -4099,7 +4108,7 @@ function _cvRender(){
   const resto=Math.max(0,teto-soma);
   const co=users.find(u=>u.id===parseInt(document.getElementById('neg-cosocio').value));
   document.getElementById('neg-cv-resumo').innerHTML=`<div class="cv-resumo"><span>${soc?esc(soc.nome):'Sócio dono da rede'}${co?' e '+esc(co.nome)+' dividem':' fica com'}</span><b>${_r2(resto)}%${emR(resto)}</b></div>`
-    +(erros.length?`<div class="cv-erros">${erros.map(e=>'⚠ '+esc(e)).join('<br>')}</div>`:'');
+    +(erros.length||avisos.length?`<div class="cv-erros">${[...erros,...avisos].map(e=>'⚠ '+esc(e)).join('<br>')}</div>`:'');
 }
 
 // Campo de dinheiro: digita só números e ele vira "R$ 1.234,56" (os 2 últimos dígitos são os centavos)
@@ -4192,6 +4201,7 @@ function saveNeg(){
   if(isProdOutro&&!produtoOutro){alert('Descreva o tipo de negócio.');return;}
   const cv=_cvValidar();
   if(cv.erros.length){alert('Comissão de venda:\n'+cv.erros.join('\n'));return;}
+  if(cv.avisos.length&&!confirm('Comissão de venda:\n'+cv.avisos.join('\n')+'\n\nSalvar assim mesmo?'))return;
   const stNovo=document.getElementById('neg-status').value;
   const ativoNovo=!['Pagamento Realizado','Perdido'].includes(stNovo);
   const passo=document.getElementById('neg-passo').value.trim(),passoData=document.getElementById('neg-passo-data').value;
@@ -4634,6 +4644,15 @@ function calcDistribuicao(regra,ctx){
     return memo[l.id]=_r2(v);
   }
   const nivel=l=>{let n=0,cur=l;const vistos=new Set();while(cur&&cur.base!=='total'&&!vistos.has(cur.id)){vistos.add(cur.id);cur=byId(cur.base);n++;}return n;};
+  // Rede acima do teto (só dá para salvar assim em Revisão de Créditos / Transação): a rede recebe o % inteiro
+  // e a diferença sai das linhas "o que sobrar" ao lado da comissão de venda (o que fica no grupo).
+  if(ctx.participantes&&ctx.socioDonoId){
+    L.filter(l=>l.destino==='vendedor').forEach(l=>{
+      const v=amt(l);
+      const soma=_r2(ctx.participantes.filter(p=>users.some(u=>u.id===p.userId)).reduce((s,p)=>s+(+ctx.valor||0)*(+p.pct||0)/100,0));
+      if(soma>v+0.005){Object.keys(memo).forEach(k=>delete memo[k]);memo[l.id]=soma;}
+    });
+  }
   const rows=[];
   // Parte do sócio: dividida em partes iguais quando há outro sócio co-originador
   const pushSocios=(r,socId,valor,rotulo)=>{
