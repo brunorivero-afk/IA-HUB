@@ -1587,13 +1587,14 @@ footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);font-si
 
 <section id="pipeline">
   <h2>Pipeline</h2>
-  <h3>As 5 etapas (iguais para todos os produtos)</h3>
+  <h3>As 6 etapas (iguais para todos os produtos)</h3>
   <div class="tab"><table>
     <tr><th>Etapa</th><th>O card está aqui quando…</th></tr>
     <tr><td>Prospecção</td><td>primeiro contato: lead, indicação, conversa inicial.</td></tr>
     <tr><td>Negociação</td><td>o cliente topou conversar de verdade: reunião feita, troca de documentos, levantamento em andamento. Ainda sem proposta.</td></tr>
     <tr><td>Proposta</td><td>a proposta formal foi enviada e aguarda resposta.</td></tr>
     <tr><td>Fechado</td><td>o cliente disse sim e está sendo formalizado: contrato, documentação, abertura de conta.</td></tr>
+    <tr><td>Compensação Tributária</td><td>contrato assinado e os créditos estão sendo usados junto ao Fisco (compensação). Para os produtos tributários. Os demais passam direto de Fechado para Pagamento Realizado.</td></tr>
     <tr><td>Pagamento Realizado</td><td>entrou o primeiro pagamento. Acontece <b>sozinho</b> quando o recebimento é lançado. Ficam visíveis só os últimos 30 dias.</td></tr>
   </table></div>
   <p><b>Inativo</b> não é coluna: o card sai do quadro e vai para <span class="k">📋 Inativos</span>, com o motivo. Pode ser reativado a qualquer momento.</p>
@@ -1984,7 +1985,7 @@ function renderDashboard(){
   const hoje=new Date(),mes=hoje.toISOString().slice(0,7);
   const ativos=negocios.filter(_negAtivo);
   const clientesAtivos=new Set(ativos.map(n=>_impNorm(n.titulo))).size;
-  const fechadosMes=negocios.filter(n=>['Fechado','Pagamento Realizado'].includes(n.status)&&String(n.fechadoEm||'').startsWith(mes));
+  const fechadosMes=negocios.filter(n=>[...NEG_FECHADAS,'Pagamento Realizado'].includes(n.status)&&String(n.fechadoEm||'').startsWith(mes));
   const aPagar=_linhasAPagar().filter(x=>!x.r.pago);
   const recMes=pagamentos.filter(p=>(p.data||'').startsWith(mes)).reduce((s,p)=>s+(+p.valorRecebido||0),0);
   const kpi=(rot,val,sub,acao)=>`<div class="dash-kpi" ${acao?`onclick="${acao}"`:''}><div class="dash-kpi-rot">${rot}</div><div class="dash-kpi-val">${val}</div>${sub?`<div class="dash-kpi-sub">${sub}</div>`:''}</div>`;
@@ -3051,11 +3052,19 @@ function removeLanc(id){if(!confirm('Remover?'))return;lancamentos=lancamentos.f
 // Pipeline universal (04/11/2026): Proposta já inclui a negociação; Fechado = disse sim, formalizando.
 // 'Perdido' continua sendo o valor gravado, mas aparece para o usuário como "Inativo".
 // Negociação voltou em 13/11/2026: separa o lead frio (Prospecção) do cliente que já está andando, antes da proposta.
-const NEG_COLS=['Prospecção','Negociação','Proposta','Fechado','Pagamento Realizado'];
+// Compensação Tributária entrou em 18/11/2026, antes de Pagamento: contrato assinado, créditos sendo usados junto ao Fisco.
+const NEG_COLS=['Prospecção','Negociação','Proposta','Fechado','Compensação Tributária','Pagamento Realizado'];
+// Etapas de "já fechou": contrato assinado (Fechado) ou em compensação
+const NEG_FECHADAS=['Fechado','Compensação Tributária'];
+// 18/11/2026: o BIDATX Sistema deixou de ser usado; tudo se concentra no IA Hub. O espelho (leitura do bidatx_data) fica DESLIGADO.
+// Os cards que vieram de lá continuam onde estão (n.bdx guardado só como histórico) e viram cards normais: arrastam e editam.
+const BDX_ESPELHO_ATIVO=false;
+const _negEspelho=n=>BDX_ESPELHO_ATIVO&&!!(n&&n.bdx);
 const _etapaRot=e=>e==='Perdido'?'Inativo':e;
 const NEG_COL_COLOR={
   'Prospecção':'#64748b','Proposta':'#854F0B',
   'Negociação':'#0059a9','Fechado':'#0F6E56',
+  'Compensação Tributária':'#0e7490',
   'Pagamento Realizado':'#065f46'
 };
 const NEG_PAPEIS=['Originador','Comercial','Técnico','Curador','Sócio'];
@@ -3083,10 +3092,10 @@ function negDrop(e,col){
   const i=negocios.findIndex(n=>n.id===_negDragId);
   if(i===-1){_negDragId=null;return;}
   const n=negocios[i],mudou=(n.status||'Prospecção')!==col;
-  if(n.bdx&&mudou){_negDragId=null;showToast('Este card espelha o BIDATX: a etapa muda lá, não aqui.');return;}
+  if(_negEspelho(n)&&mudou){_negDragId=null;showToast('Este card espelha o BIDATX: a etapa muda lá, não aqui.');return;}
   if(mudou)_negRegistrarEtapa(n,col);
   n.status=col;n.atualizadoEm=new Date().toISOString();
-  if(col==='Fechado'&&!n.fechadoEm)n.fechadoEm=_dataLocal();
+  if(NEG_FECHADAS.includes(col)&&!n.fechadoEm)n.fechadoEm=_dataLocal();
   saveData();renderPipeline();_negDragId=null;
 }
 
@@ -3134,7 +3143,7 @@ function _renderPortfolioView(){
         ${portfolio.slice().sort((a,b)=>(_PORT_ORDEM[a.tipo]??9)-(_PORT_ORDEM[b.tipo]??9)||String(a.nome).localeCompare(String(b.nome),'pt-BR')).map(p=>{
           const resp=p.responsavelId?users.find(u=>u.id===p.responsavelId):null;
           const clientes=negocios.filter(n=>n.portafolioId===p.id);
-          const ativos=clientes.filter(n=>n.status!=='Fechado'&&n.status!=='Perdido').length;
+          const ativos=clientes.filter(n=>!NEG_FECHADAS.includes(n.status)&&n.status!=='Perdido').length;
           return`<div class="port-card" onclick="openPortModal(${p.id})">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
               <div style="font-size:14px;font-weight:700;color:#0a1628;line-height:1.3">${esc(p.nome)}</div>
@@ -3165,7 +3174,7 @@ function _renderClientesView(){
   const redePip=_pipPessoasRede();
   const ativos=base.filter(_negAtivo);
   const fechadosMes=base.filter(n=>{
-    if(n.status!=='Fechado'||!n.fechadoEm)return false;
+    if(!NEG_FECHADAS.includes(n.status)||!n.fechadoEm)return false;
     try{const d=new Date(n.fechadoEm);return d.getMonth()===mesAtual&&d.getFullYear()===anoAtual;}catch(e){return false;}
   });
   const qtdSit=s=>base.filter(n=>s==='quente'?_negAtivo(n)&&_negPrio(n)==='quente':s==='atencao'?_negAtencao(n):_negSit(n)===s).length;
@@ -3260,9 +3269,9 @@ function _bdxChipHtml(n){
   return`<div class="pc-bdx" title="${esc(tip)}"><span>BIDATX</span>${esc(txt)}</div>`;
 }
 // ---- ESPELHO: cada cliente do BIDATX vira um card no pipeline (uma via: BIDATX → IA Hub) ----
-// Coluna: passo 01 Prospecção · 02-03 Negociação · 04 Proposta · 05 e 06 Fechado · com compensação paga = Pagamento Realizado.
+// Coluna: passo 01 Prospecção · 02-03 Negociação · 04 Proposta · 05 Fechado · 06 Compensação Tributária · com compensação paga = Pagamento Realizado.
 // Só o BIDATX move o card espelhado (card.bdx = {key,...}). Dinheiro NÃO entra: recebimentos seguem lançados no IA Hub.
-const BDX_COLUNA=passo=>passo>=5?'Fechado':passo===4?'Proposta':passo>=2?'Negociação':'Prospecção';
+const BDX_COLUNA=passo=>passo>=6?'Compensação Tributária':passo===5?'Fechado':passo===4?'Proposta':passo>=2?'Negociação':'Prospecção';
 function _bdxChave(o){const c=String(o.cnpj||'').replace(/\D/g,'');return c.length===14?c:'n:'+_impNorm(o.cliente);}
 function _bdxClientes(opors){
   const g={};
@@ -3312,7 +3321,7 @@ function _bdxEspelhar(){
         comissaoVenda:{regraId:regra.id,socioDonoId:soc?soc.id:null,cosocios:[],participantes:[]},taxaRede:null,
         notas,criado:new Date().toLocaleDateString('pt-BR'),atualizadoEm:c.ult||agora,
         historicoEtapas:[{etapa:col,em:agora,por:currentUser.id}],bdx:{key:c.key,passo:c.passo}};
-      if(col==='Fechado')novo.fechadoEm=_dataLocal();
+      if(NEG_FECHADAS.includes(col))novo.fechadoEm=_dataLocal();
       if(col==='Pagamento Realizado')novo.pagoEm=c.pagoEm||_dataLocal();
       negocios.push(novo);criados++;return;
     }
@@ -3328,7 +3337,7 @@ function _bdxEspelhar(){
     if(n.status==='Pagamento Realizado'&&col!=='Pagamento Realizado')return;// pagamento não se desfaz
     if(n.status!==col){
       _negRegistrarEtapa(n,col);n.status=col;n.atualizadoEm=agora;
-      if(col==='Fechado'&&!n.fechadoEm)n.fechadoEm=_dataLocal();
+      if(NEG_FECHADAS.includes(col)&&!n.fechadoEm)n.fechadoEm=_dataLocal();
       if(col==='Pagamento Realizado'&&!n.pagoEm)n.pagoEm=c.pagoEm||_dataLocal();
       mudados++;
     }
@@ -3340,6 +3349,7 @@ function _bdxEspelhar(){
   return true;
 }
 async function _bdxCarregar(forcar){
+  if(!BDX_ESPELHO_ATIVO)return;
   if(!supaClient||!currentUser)return;
   if(!forcar&&Date.now()-_bdx.tent<60000)return;
   _bdx.tent=Date.now();
@@ -3377,7 +3387,7 @@ function _pipKanbanHtml(negFilt){
             const cfg=n.configProdutoId?config.comissoes.find(c=>c.id===n.configProdutoId):null;
             const cor=cfg?_cfgEmpresa(cfg.empresaId).cor:'#64748b';
             const pr=PRIOS[_negPrio(n)];
-            return`<div draggable="${n.bdx?'false':'true'}" ondragstart="negDragStart(event,${n.id})" ondragend="negDragEnd(event)"
+            return`<div draggable="${_negEspelho(n)?'false':'true'}" ondragstart="negDragStart(event,${n.id})" ondragend="negDragEnd(event)"
                      class="pip-card pc ${_negPrio(n)==='quente'?'pc-quente':''}" style="border-left:3px solid ${NEG_COL_COLOR[col]}" onclick="openNegModal(${n.id})">
               <div class="pc-top"><span class="pc-cli">${pr.ico?pr.ico+' ':''}${esc(n.titulo)}</span>
                 <span class="pc-acoes"><button title="Registrar andamento" onclick="event.stopPropagation();_negAtualizar(${n.id})">✓</button><button title="Ver cliente" onclick="event.stopPropagation();abrirFichaCliente(${n.id})">👤</button></span></div>
@@ -3563,7 +3573,7 @@ function _impPrevia(){
     const obs=iObs.map(i=>String(l[i]||'').trim()).filter(Boolean).join(' · ');
     const valor=iValor!=null?parseFloat(String(l[iValor]||'').replace(/[^\d,.-]/g,'').replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.'))||null:null;
     const etTxt=iEtapa!=null?_impNorm(l[iEtapa]):'';
-    const etapa=NEG_COLS.find(c=>_impNorm(c)===etTxt)||(/negocia/.test(etTxt)?'Negociação':/inativ|perdid/.test(etTxt)?'Perdido':'Prospecção');
+    const etapa=NEG_COLS.find(c=>_impNorm(c)===etTxt)||(/negocia/.test(etTxt)?'Negociação':/compens/.test(etTxt)?'Compensação Tributária':/inativ|perdid/.test(etTxt)?'Perdido':'Prospecção');
     return{cliente,cnpj:iCnpj!=null?String(l[iCnpj]||'').trim():'',valor,etapa,socios,rede,produtos,obs,celRede:iRede.map(i=>String(l[i]||'').trim()).filter(x=>x&&x!=='-').join(' / ')};
   }).filter(r=>r.cliente);
   const lista=Object.values(pessoas).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
@@ -3648,7 +3658,7 @@ function _impExecutar(){
     const notas=[r.obs,r.celRede?'Rede (planilha): '+r.celRede:'',x.outrosProdutos.length?'Também interessa: '+x.outrosProdutos.map(p=>p.prodId==='outro'?p.rotulo:(config.comissoes.find(c=>c.id===p.prodId)||{}).produto).join(', '):'',`Importado de ${_imp.arquivo} em ${hojeBR}`].filter(Boolean).join('\n');
     negocios.push({
       id:++seq,titulo:x.titulo,tipo:'proprio',status:r.etapa,valor:r.valor,
-      cnpj:r.cnpj||'',fechadoEm:r.etapa==='Fechado'?agora.toISOString().slice(0,10):undefined,
+      cnpj:r.cnpj||'',fechadoEm:NEG_FECHADAS.includes(r.etapa)?agora.toISOString().slice(0,10):undefined,
       originadorId:orig?orig.id:currentUser.id,
       configProdutoId:prod?prod.id:null,produtoOutro:prod?null:(x.outro||'A definir'),
       comissaoVenda:{regraId:regra.id,socioDonoId:soc?soc.id:null,cosocios:r.socios.slice(1).map(s=>s.id),
@@ -4175,7 +4185,7 @@ function openNegModal(id){
   document.getElementById('neg-perda-obs').value=n?n.motivoPerdaObs||'':'';
   _negRecorrMarcado=!!(n&&n.recorrente);_negRecorrUI();
   _negStatusChange();
-  _negTravarEspelho(!!(n&&n.bdx));
+  _negTravarEspelho(_negEspelho(n));
   document.getElementById('ov-neg').classList.add('open');
 }
 // Card espelhado do BIDATX: nome, produto, tipo e etapa pertencem ao BIDATX; o resto continua editável aqui.
@@ -4240,11 +4250,11 @@ function saveNeg(){
     notas:document.getElementById('neg-notas').value.trim(),
   };
   const espelho=_negEditId?negocios.find(x=>x.id===_negEditId):null;
-  if(espelho&&espelho.bdx){// o que vem do BIDATX não muda por aqui, mesmo que o formulário seja manipulado
+  if(_negEspelho(espelho)){// o que vem do BIDATX não muda por aqui, mesmo que o formulário seja manipulado
     obj.titulo=espelho.titulo;obj.tipo=espelho.tipo;obj.configProdutoId=espelho.configProdutoId;obj.produtoOutro=espelho.produtoOutro;obj.status=espelho.status;
   }
   obj.atualizadoEm=new Date().toISOString();
-  if(obj.status==='Fechado'&&!(_negEditId&&negocios.find(x=>x.id===_negEditId)?.fechadoEm)){
+  if(NEG_FECHADAS.includes(obj.status)&&!(_negEditId&&negocios.find(x=>x.id===_negEditId)?.fechadoEm)){
     obj.fechadoEm=new Date().toISOString().slice(0,10);
   }
   if(_negEditId){
