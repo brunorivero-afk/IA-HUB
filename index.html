@@ -1199,7 +1199,7 @@ button.btn-sm{padding:4px 10px;font-size:11px;}
     </div>
 
     <div class="modal-footer" style="display:flex;gap:10px;justify-content:space-between;margin-top:18px">
-      <button onclick="if(_negEditId)removeNeg(_negEditId)" style="border:none;background:none;color:#ef4444;cursor:pointer;font-size:13px;padding:6px 0" id="neg-del-btn">Excluir</button>
+      <button onclick="if(_negEditId)removeNeg(_negEditId)" title="Tira o card do pipeline e guarda em 📋 Inativos (pode reativar depois)" style="border:none;background:none;color:#ef4444;cursor:pointer;font-size:13px;padding:6px 0" id="neg-del-btn">Excluir</button>
       <div style="display:flex;gap:10px">
         <button class="btn-sec" onclick="closeOv('ov-neg')">Cancelar</button>
         <button class="btn-p" onclick="saveNeg()">Salvar</button>
@@ -1604,7 +1604,7 @@ footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);font-si
     <tr><td>Compensação Tributária</td><td>contrato assinado e os créditos estão sendo usados junto ao Fisco (compensação). Para os produtos tributários. Os demais passam direto de Fechado para Pagamento Realizado.</td></tr>
     <tr><td>Pagamento Realizado</td><td>entrou o primeiro pagamento. Acontece <b>sozinho</b> quando o recebimento é lançado. Ficam visíveis só os últimos 30 dias.</td></tr>
   </table></div>
-  <p><b>Inativo</b> não é coluna: o card sai do quadro e vai para <span class="k">📋 Inativos</span>, com o motivo. Pode ser reativado a qualquer momento.</p>
+  <p><b>Inativo</b> não é coluna: o card sai do quadro e vai para <span class="k">📋 Inativos</span>, com o motivo. Pode ser reativado a qualquer momento: volta para a etapa em que estava. O botão <b>Excluir</b> do card também manda para Inativos, sem apagar. Apagar de vez só dentro de Inativos, em "Apagar de vez".</p>
 
   <h3>Lendo o card</h3>
   <ul>
@@ -2757,12 +2757,13 @@ function abrirInativos(){
             <div style="font-size:13px;font-weight:600;color:#0a1628">${esc(n.titulo)}</div>
             ${(()=>{const cp=n.configProdutoId?config.comissoes.find(c=>c.id===n.configProdutoId):null;const lbl=cp?cp.produto:(n.produtoOutro||null);return lbl?`<div style="font-size:11px;color:#6b7280">${esc(lbl)}</div>`:''})()}
             <div style="font-size:12px;color:#991b1b;margin-top:4px">${esc(n.motivoPerda||"Motivo não informado")}${n.motivoPerdaObs?" · "+esc(n.motivoPerdaObs):""}</div>
+            ${(()=>{const hs=n.historicoEtapas||[];let i=-1;hs.forEach((x,k)=>{if(x.etapa==='Perdido')i=k;});const em=i>=0?hs[i].em:n.excluidoEm;const de=(i>0?hs[i-1].etapa:'')||n.inativadoDe||'';return(de||em)?`<div style="font-size:11px;color:#9ca3af;margin-top:2px">${de?'Estava em: '+esc(de):''}${de&&em?' · ':''}${em?'inativado em '+new Date(em).toLocaleDateString('pt-BR'):''}</div>`:'';})()}
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
             ${orig?`<span style="font-size:11px;color:#9ca3af">✦ ${orig.nome.split(' ')[0]}</span>`:''}
             <div style="display:flex;gap:6px">
-              <button class="btn-s btn-sm" onclick="openNegModal(${n.id});closeOv('ov-inativos')">Reativar</button>
-              <button class="btn-d btn-sm" onclick="removeNeg(${n.id});abrirInativos()">Excluir</button>
+              <button class="btn-s btn-sm" title="Volta para a etapa em que estava" onclick="reativarNeg(${n.id})">Reativar</button>
+              <button class="btn-d btn-sm" title="Apaga de vez (sem volta)" onclick="excluirDeVez(${n.id});abrirInativos()">Apagar de vez</button>
             </div>
           </div>
         </div>`;}).join('')}
@@ -3208,7 +3209,7 @@ function _renderClientesView(){
       </div>
       <span class="pip-cont">${ativos.length} ativos · ${fechadosMes.length} fechados no mês</span>
       <span style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn-p pip-btn-sec" onclick="abrirInativos()">📋 Inativos</button>
+        <button class="btn-p pip-btn-sec" onclick="abrirInativos()">📋 Inativos (${negocios.filter(n=>n.status==='Perdido').length})</button>
         <button class="btn-p pip-btn-sec" onclick="abrirImportarPlanilha()">⬆ Importar</button>
         <button class="btn-p pip-btn-sec" onclick="exportarPipelineExcel()" title="Exporta para Excel o que está filtrado na tela">⬇ Exportar</button>
         <button class="btn-p pip-btn-sec" onclick="relatorioPipeline()" title="Relatório do que está filtrado (imprimir ou salvar em PDF)">🖨 Relatório</button>
@@ -4155,7 +4156,9 @@ function openNegModal(id){
   _negEditId=id;
   const n=id?negocios.find(x=>x.id===id):null;
   document.getElementById('neg-ttl').textContent=n?'Editar Negócio':'Novo Negócio';
-  document.getElementById('neg-del-btn').style.display=id?'':'none';
+  const delBtn=document.getElementById('neg-del-btn');
+  delBtn.style.display=id?'':'none';
+  delBtn.textContent=n&&n.status==='Perdido'?'Apagar de vez':'Excluir';
   const selStatus=document.getElementById('neg-status');
   selStatus.innerHTML=NEG_COLS.map(c=>`<option>${c}</option>`).join('')+'<option value="Perdido">Inativo</option>';
   const selOrig=document.getElementById('neg-orig');
@@ -4275,10 +4278,37 @@ function saveNeg(){
   }
   closeOv('ov-neg');saveData();_rerenderAtual();
 }
+// 23/11/2026: "Excluir" no pipeline NÃO apaga mais. O card vai para 📋 Inativos (status 'Perdido'),
+// guardando a etapa em que estava, quem e quando. Apagar de vez só dentro de Inativos (excluirDeVez).
 function removeNeg(id){
-  if(!confirm('Remover este negócio?'))return;
-  const alvo=negocios.find(n=>n.id===id);
-  if(alvo&&alvo.bdx&&alvo.bdx.key)config.bdxIgnorar=[...new Set([...(config.bdxIgnorar||[]),alvo.bdx.key])];// não recriar o espelho
+  const alvo=negocios.find(n=>n.id===id);if(!alvo)return;
+  if(alvo.status==='Perdido'){excluirDeVez(id);return;}
+  if(!confirm(`Excluir "${alvo.titulo}" do pipeline?\n\nO card vai para 📋 Inativos e pode ser reativado depois.`))return;
+  _negRegistrarEtapa(alvo,'Perdido');
+  alvo.inativadoDe=alvo.status||'Prospecção';
+  alvo.status='Perdido';
+  if(!alvo.motivoPerda)alvo.motivoPerda='Excluído do pipeline';
+  alvo.excluidoEm=new Date().toISOString();alvo.excluidoPor=currentUser&&currentUser.id;
+  alvo.atualizadoEm=alvo.excluidoEm;
+  closeOv('ov-neg');saveData();renderPipeline();
+  showToast('Card movido para 📋 Inativos');
+}
+// Reativar: volta para a etapa em que o card estava antes de ir para Inativos e abre o card para conferir o próximo passo
+function reativarNeg(id){
+  const n=negocios.find(x=>x.id===id);if(!n)return;
+  const hs=n.historicoEtapas||[];let i=-1;hs.forEach((x,k)=>{if(x.etapa==='Perdido')i=k;});
+  const volta=(i>0&&hs[i-1].etapa!=='Perdido'&&NEG_COLS.includes(hs[i-1].etapa)?hs[i-1].etapa:null)||(NEG_COLS.includes(n.inativadoDe)?n.inativadoDe:'Prospecção');
+  _negRegistrarEtapa(n,volta);
+  n.status=volta;delete n.motivoPerda;delete n.motivoPerdaObs;delete n.inativadoDe;delete n.excluidoEm;delete n.excluidoPor;
+  n.atualizadoEm=new Date().toISOString();
+  saveData();closeOv('ov-inativos');renderPipeline();
+  showToast(`Reativado em ${volta}`);
+  openNegModal(id);
+}
+function excluirDeVez(id){
+  const alvo=negocios.find(n=>n.id===id);if(!alvo)return;
+  if(!confirm(`Apagar "${alvo.titulo}" DE VEZ?\n\nIsto não tem volta: o card some também de Inativos.`))return;
+  if(alvo.bdx&&alvo.bdx.key)config.bdxIgnorar=[...new Set([...(config.bdxIgnorar||[]),alvo.bdx.key])];// não recriar o espelho
   negocios=negocios.filter(n=>n.id!==id);
   closeOv('ov-neg');saveData();renderPipeline();
 }
